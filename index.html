@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fantasy Football Auction Assistant</title>
+    <title>Fantasy Football Auction Assistant Pro</title>
 
     <!-- PWA / App Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -11,10 +11,9 @@
     <meta name="theme-color" content="#0f172a">
     <link rel="manifest" href="manifest.json">
 
-    <!-- Tailwind CSS for modern responsive dark-mode styling -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Modern backdrop scrollbar styling */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -26,12 +25,9 @@
             background: #475569;
             border-radius: 4px;
         }
-        /* Touch friendly sizing for inputs */
         input, select, button {
             min-height: 2.2rem;
         }
-
-        /* Seamless Infinite Ticker Keyframes */
         @keyframes ticker {
             0% { transform: translateX(0); }
             100% { transform: translateX(-50%); }
@@ -50,12 +46,15 @@
 
     <!-- Top Navigation Bar -->
     <nav class="bg-slate-950 border-b border-slate-800 py-3 px-4 sticky top-0 z-50 shadow-lg">
-        <div class="max-w-4xl mx-auto flex justify-between items-center">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-2">
                 <span class="text-xl">🏈</span>
                 <h1 class="text-lg font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
                     Draft Assistant Pro
                 </h1>
+                <span id="save-status" class="hidden sm:inline-block text-[10px] bg-slate-800 text-emerald-400 border border-slate-700 font-bold px-2 py-0.5 rounded-full ml-2">
+                    ✓ Auto-Saved
+                </span>
             </div>
             <div class="flex items-center space-x-2">
                 <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Budget Pool:</span>
@@ -69,7 +68,7 @@
     </nav>
 
     <!-- Main App Container -->
-    <main class="max-w-4xl mx-auto p-4 space-y-4 pb-28">
+    <main class="max-w-6xl mx-auto p-4 space-y-4 pb-28">
 
         <!-- Real-Time Metrics Banner -->
         <section class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
@@ -91,10 +90,22 @@
             </div>
         </section>
 
-        <!-- Main Workspace -->
+        <!-- Market Inflation Indicator Banner -->
+        <section id="market-inflation-banner" class="bg-slate-800 border border-slate-700 rounded-xl p-3 flex flex-wrap justify-between items-center text-xs space-y-1 sm:space-y-0">
+            <div class="flex items-center space-x-2">
+                <span class="text-amber-400 text-sm">📈</span>
+                <span class="font-bold text-slate-200">Room Inflation Index:</span>
+                <span id="market-inflation-status" class="font-extrabold text-emerald-400">0% (Balanced Market)</span>
+            </div>
+            <div class="text-slate-400 text-[11px]" id="market-inflation-note">
+                Log room sales to track if managers are overspending or giving discounts.
+            </div>
+        </section>
+
+        <!-- Main Workspace Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
             
-            <!-- Left Panel: Logging & Controls -->
+            <!-- Left Panel: Logging, Target Wishlist, Controls -->
             <div class="lg:col-span-5 space-y-4">
                 
                 <!-- Log Drafted Player Box -->
@@ -111,7 +122,7 @@
                         <div class="grid grid-cols-2 gap-2">
                             <div>
                                 <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Player Name</label>
-                                <input id="input-player" type="text" placeholder="e.g. Lamar" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-200 focus:ring-1 focus:ring-emerald-500 focus:outline-none">
+                                <input id="input-player" type="text" placeholder="e.g. Lamar Jackson" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-200 focus:ring-1 focus:ring-emerald-500 focus:outline-none">
                             </div>
                             <div>
                                 <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Actual Cost ($)</label>
@@ -124,7 +135,29 @@
                     </div>
                 </section>
 
-                <!-- Add New Custom Slot Box -->
+                <!-- Quick Target / Wishlist Clipboard -->
+                <section class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-teal-400">🎯</span>
+                            <h2 class="text-sm font-bold text-slate-200">Quick-Select Target Board</h2>
+                        </div>
+                        <span class="text-[10px] text-slate-400">Click name to fill logging form</span>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex space-x-2">
+                            <input id="input-wish-name" type="text" placeholder="Add target (e.g. Bijan, Sun God)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1 text-xs text-slate-200 focus:ring-1 focus:ring-teal-500 focus:outline-none">
+                            <button id="btn-add-wish" class="bg-teal-600 hover:bg-teal-500 px-3 py-1 rounded-lg text-xs font-bold text-white transition">
+                                Add
+                            </button>
+                        </div>
+                        <div id="wishlist-container" class="flex flex-wrap gap-1.5 pt-1">
+                            <!-- Target badges dynamically generated here -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Add Custom Slot Box -->
                 <section class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
                     <div class="flex items-center space-x-2 mb-3">
                         <span class="text-blue-400">➕</span>
@@ -132,7 +165,7 @@
                     </div>
                     <div class="grid grid-cols-2 gap-2 mb-3">
                         <div>
-                            <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Position Name</label>
+                            <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Position / Name</label>
                             <input id="add-slot-name" type="text" placeholder="e.g. SUPERFLEX" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:outline-none">
                         </div>
                         <div>
@@ -156,7 +189,7 @@
                     </div>
                     <div class="space-y-3">
                         <div class="grid grid-cols-2 gap-2">
-                            <input id="market-player" type="text" placeholder="e.g. Bijan Robinson" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-purple-500 focus:outline-none">
+                            <input id="market-player" type="text" placeholder="e.g. Ja'Marr Chase" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-purple-500 focus:outline-none">
                             <input id="market-cost" type="number" placeholder="Cost ($)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-purple-500 focus:outline-none">
                         </div>
                         <button id="btn-market-save" class="w-full bg-purple-600 hover:bg-purple-500 font-bold py-1.5 rounded-lg transition text-xs shadow-md text-white">
@@ -174,23 +207,41 @@
             </div>
 
             <!-- Right Panel: Roster & Targets Grid -->
-            <div class="lg:col-span-7">
+            <div class="lg:col-span-7 space-y-4">
                 <section class="bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden">
-                    <div class="p-4 bg-slate-800 border-b border-slate-700 flex justify-between items-center">
+                    <div class="p-4 bg-slate-800 border-b border-slate-700 flex flex-wrap justify-between items-center gap-2">
                         <div class="flex items-center space-x-2">
                             <span class="text-emerald-400">📋</span>
                             <h2 class="text-sm font-bold text-slate-200">Roster, Plan, and Live Projections</h2>
                         </div>
-                        <button id="btn-reset" class="text-xs bg-rose-950/40 hover:bg-rose-900 text-rose-300 font-bold px-3 py-1.5 rounded-lg border border-rose-800/40 transition">
-                            Reset Board
-                        </button>
+                        <div class="flex space-x-2">
+                            <button id="btn-clear-data" class="text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold px-2.5 py-1.5 rounded-lg transition" title="Clear LocalStorage memory">
+                                Clear Storage
+                            </button>
+                            <button id="btn-reset" class="text-xs bg-rose-950/40 hover:bg-rose-900 text-rose-300 font-bold px-3 py-1.5 rounded-lg border border-rose-800/40 transition">
+                                Reset Board
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Position Filter Bar -->
+                    <div class="p-2 bg-slate-900/90 border-b border-slate-700/80 flex flex-wrap gap-1 items-center text-[11px]">
+                        <span class="text-slate-400 font-bold px-2 uppercase tracking-wider">Filter:</span>
+                        <button class="pos-filter-btn px-2.5 py-0.5 rounded font-bold bg-emerald-600 text-white" data-pos="ALL">ALL</button>
+                        <button class="pos-filter-btn px-2 py-0.5 rounded font-bold bg-slate-800 text-slate-300 hover:bg-slate-700" data-pos="QB">QB</button>
+                        <button class="pos-filter-btn px-2 py-0.5 rounded font-bold bg-slate-800 text-slate-300 hover:bg-slate-700" data-pos="RB">RB</button>
+                        <button class="pos-filter-btn px-2 py-0.5 rounded font-bold bg-slate-800 text-slate-300 hover:bg-slate-700" data-pos="WR">WR</button>
+                        <button class="pos-filter-btn px-2 py-0.5 rounded font-bold bg-slate-800 text-slate-300 hover:bg-slate-700" data-pos="TE">TE</button>
+                        <button class="pos-filter-btn px-2 py-0.5 rounded font-bold bg-slate-800 text-slate-300 hover:bg-slate-700" data-pos="FLEX">FLEX</button>
+                        <button class="pos-filter-btn px-2 py-0.5 rounded font-bold bg-slate-800 text-slate-300 hover:bg-slate-700" data-pos="BENCH">BENCH</button>
                     </div>
                     
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs">
                             <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[10px] font-bold border-b border-slate-700">
                                 <tr>
-                                    <th class="p-3">Slot (Edit Name)</th>
+                                    <th class="p-3">Pos</th>
+                                    <th class="p-3">Slot Name</th>
                                     <th class="p-3">Plan $</th>
                                     <th class="p-3">Adj Target</th>
                                     <th class="p-3">Player Drafted</th>
@@ -199,15 +250,14 @@
                                 </tr>
                             </thead>
                             <tbody id="roster-tbody" class="divide-y divide-slate-700/60">
-                                <!-- Dynamically generated rows go here -->
+                                <!-- Dynamic rows -->
                             </tbody>
-                            <!-- Live Totals Footer -->
                             <tfoot class="bg-slate-900/90 text-slate-300 font-bold border-t-2 border-slate-700 text-xs">
                                 <tr>
-                                    <td class="p-3 uppercase text-[10px] text-slate-400">Total:</td>
+                                    <td colspan="2" class="p-3 uppercase text-[10px] text-slate-400">Total Summary:</td>
                                     <td id="foot-plan-sum" class="p-3 text-sky-400">$0</td>
                                     <td id="foot-adj-sum" class="p-3 text-emerald-400">$0</td>
-                                    <td class="p-3 text-slate-500 italic">Roster Summary</td>
+                                    <td class="p-3 text-slate-500 italic">Active Roster</td>
                                     <td id="foot-spent-sum" class="p-3 text-amber-400">$0</td>
                                     <td></td>
                                 </tr>
@@ -222,96 +272,200 @@
 
     <!-- Infinite Scrolling Pro Tips Banner Footer -->
     <footer class="bg-slate-950 border-t border-slate-800 py-2.5 fixed bottom-0 left-0 w-full z-40 overflow-hidden shadow-2xl flex items-center">
-        <!-- Label Badge -->
         <div class="bg-emerald-500 text-slate-950 font-black text-[10px] uppercase tracking-widest px-3 py-1.5 z-10 flex-shrink-0 flex items-center space-x-1 shadow-lg ml-2 rounded">
             <span>💡</span> <span>PRO TIPS TICKER</span>
         </div>
         
-        <!-- Scrolling Container -->
         <div class="overflow-hidden w-full relative flex items-center ml-2">
             <div id="ticker-content" class="animate-ticker text-xs font-medium text-slate-300 space-x-8 whitespace-nowrap cursor-pointer">
-                <!-- JavaScript will populate 30+ pro tips here dynamically -->
+                <!-- Dynamic Ticker Tips -->
             </div>
         </div>
     </footer>
 
-    <!-- Core App Logic -->
+    <!-- App Logic -->
     <script>
         const proTipsList = [
-            // APP GUIDES & FEATURES
-            "📱 <strong class='text-emerald-400'>ADJ TARGET COLUMN:</strong> Shows your real-time budget for open slots based on surplus cash from prior savings.",
-            "📊 <strong class='text-purple-400'>ROOM SALES LOG:</strong> Track what other teams buy to quickly spot positional inflation or deep-discount trends.",
-            "🛡️ <strong class='text-amber-400'>MAX BID ALLOWED:</strong> Calculates the absolute maximum you can bid while keeping $1 for every remaining open slot.",
-            "⚠️ <strong class='text-rose-400'>UNALLOCATED PLAN:</strong> Flashes red when your planned targets exceed your budget. Keep it at $0 for a balanced plan!",
-            "✏️ <strong class='text-sky-400'>EDIT ON THE FLY:</strong> Click directly into any Slot Name or Plan $ box in the table to re-adjust targets mid-draft.",
-            "➕ <strong class='text-blue-400'>CUSTOM SLOTS:</strong> Use 'Add Custom Position' to add Superflex, TE Premium, or extra bench spots instantly.",
-            "🗑️ <strong class='text-rose-400'>SLOT REMOVAL:</strong> Click the '✕' icon beside any row to remove unnecessary slots and free up budget dollars.",
-            "💵 <strong class='text-emerald-400'>SPENT VARIANCE:</strong> Green '-$X' shows you scored a bargain! Red '+$X' alerts you that you overspent your plan.",
-            "⚙️ <strong class='text-teal-400'>BUDGET POOL TOP-BAR:</strong> Change the default $200 budget at the top if your league uses custom draft budgets ($100, $500, etc.).",
-            "🔒 <strong class='text-purple-400'>LOCK & SAVE PICK:</strong> Logging a player removes them from your active target targets and locks their cost into spent cash.",
-            "🔄 <strong class='text-rose-400'>RESET BOARD:</strong> Need to restart? The top-right 'Reset Board' button wipes logged picks and resets default slots.",
-            "⏸️ <strong class='text-amber-400'>PAUSE TICKER:</strong> Hover your mouse or tap and hold on this ticker anytime to pause the scrolling text and read!",
-
-            // AUCTION STRATEGY & TACTICS
-            "🔥 <strong class='text-emerald-400'>HERO STARTER STRATEGY:</strong> Pay up for 1-2 premier studs to anchor your team, then dominate the $1-$5 value picks.",
+            "📱 <strong class='text-emerald-400'>ADJ TARGET COLUMN:</strong> Shows real-time budget for open slots based on surplus cash from prior bargains.",
+            "📊 <strong class='text-purple-400'>ROOM SALES LOG:</strong> Log room sales to automatically calculate room inflation and spot overall market trends.",
+            "🎯 <strong class='text-teal-400'>TARGET BOARD:</strong> Add top sleepers or targets to your Wishlist board and click any name to auto-fill logging forms!",
+            "🛡️ <strong class='text-amber-400'>MAX BID ALLOWED:</strong> Calculates the absolute maximum you can bid while keeping $1 for remaining open slots.",
+            "⚠️ <strong class='text-rose-400'>UNALLOCATED PLAN:</strong> Flashes red when planned targets exceed total budget. Keep it balanced at $0!",
+            "✏️ <strong class='text-sky-400'>EDIT ON THE FLY:</strong> Click directly into any Slot Name or Plan $ box to adjust targets mid-draft.",
+            "➕ <strong class='text-blue-400'>CUSTOM SLOTS:</strong> Add Superflex, TE Premium, or extra bench spots instantly.",
+            "🗑️ <strong class='text-rose-400'>SLOT REMOVAL:</strong> Click '✕' beside any row to remove unnecessary slots and re-allocate funds.",
+            "💵 <strong class='text-emerald-400'>SPENT VARIANCE:</strong> Green '-$X' shows a bargain! Red '+$X' alerts you that you overspent your plan.",
+            "⚙️ <strong class='text-teal-400'>BUDGET POOL TOP-BAR:</strong> Adjust the default budget if your league uses custom amounts ($100, $500, etc.).",
+            "💾 <strong class='text-emerald-400'>AUTO-SAVE:</strong> All picks, targets, and custom slots automatically save to your browser in real time!",
+            "⏸️ <strong class='text-amber-400'>PAUSE TICKER:</strong> Hover or tap and hold on this ticker anytime to pause scrolling text and read!",
+            "🔥 <strong class='text-emerald-400'>HERO STARTER STRATEGY:</strong> Pay up for 1-2 premier studs to anchor your team, then dominate $1-$5 value picks.",
             "💰 <strong class='text-amber-400'>BENCH DISCIPLINE:</strong> Keep bench spending strictly to $1-$2 to maximize starting lineup firepower.",
             "🎯 <strong class='text-purple-400'>NOMINATION DECEPTION:</strong> Nominate high-cost stars you DON'T want early to drain rival budgets.",
-            "⚡ <strong class='text-teal-400'>ENDGAME FLEXIBILITY:</strong> Keep $3-$5 extra in late rounds to easily outbid $1 managers on key high-upside sleepers.",
-            "⚖️ <strong class='text-sky-400'>PRICE ENFORCING DANGER:</strong> Bidding up players to 'keep managers honest' is dangerous. Never bid unless you want the player!",
+            "⚡ <strong class='text-teal-400'>ENDGAME FLEXIBILITY:</strong> Keep $3-$5 extra in late rounds to easily outbid $1 managers on key sleepers.",
+            "⚖️ <strong class='text-sky-400'>PRICE ENFORCING DANGER:</strong> Never bid up players to 'keep managers honest' unless you want them on your team!",
             "🏷️ <strong class='text-emerald-400'>TIER JUMPING:</strong> Never wait for the final player in a position tier—desperate managers always overpay for the last option!",
-            "🏈 <strong class='text-amber-400'>KICKER & DEFENSE:</strong> Never spend more than $1 on Kickers or Defenses in auction drafts. Ever.",
+            "🏈 <strong class='text-amber-400'>KICKER & DEFENSE:</strong> Never spend more than $1 on Kickers or Defenses in auction drafts.",
             "💡 <strong class='text-sky-400'>80/20 RULE:</strong> Allocate 80-90% of your initial budget strictly to your starting lineup.",
             "⏱️ <strong class='text-purple-400'>MONITOR MONEY IN ROOM:</strong> Watch which managers have deep pockets so you don't get trapped in bidding wars.",
-            "📉 <strong class='text-rose-400'>EXPLOIT EARLY HESITATION:</strong> If your room starts overly cautious, jump in and snag top-tier studs at huge initial discounts.",
-            "🚀 <strong class='text-teal-400'>NOMINATE YOUR TARGETS LATE:</strong> In later rounds, nominate $1 sleepers you actually want when rivals are broke.",
+            "📉 <strong class='text-rose-400'>EXPLOIT EARLY HESITATION:</strong> If your room starts overly cautious, jump in and snag top-tier studs at massive discounts.",
+            "🚀 <strong class='text-teal-400'>NOMINATE TARGETS LATE:</strong> In later rounds, nominate $1 sleepers you actually want when rivals are broke.",
             "🏈 <strong class='text-emerald-400'>STUDS AND SCRUBS:</strong> Blowing 70% on two top-5 overall picks works if you excel at identifying waiver wire breakouts.",
-            "📊 <strong class='text-sky-400'>NO LEFT-OVER CASH:</strong> Unspent draft budget turns into Monopoly money. Spend every single dollar before the draft ends!",
+            "📊 <strong class='text-sky-400'>NO LEFT-OVER CASH:</strong> Unspent draft budget is wasted money. Spend every single dollar before the draft ends!",
             "🎯 <strong class='text-purple-400'>HANDCUFF TAXING:</strong> Nominate elite RB handcuffs to force the star's owner to spend key budget dollars protecting their pick.",
-            "⏳ <strong class='text-amber-400'>STAY COOL UNDER PRESSURE:</strong> Don't let draft room hype push you into overpaying by $10+ on a single player.",
-            "📈 <strong class='text-emerald-400'>INFLATION ADJUSTMENT:</strong> If top RBs sell for 20% over budget, adjust your expectations—WRs or TEs will be discounted!",
+            "⏳ <strong class='text-amber-400'>STAY COOL:</strong> Don't let draft room hype push you into overpaying by $10+ on a single player.",
+            "📈 <strong class='text-emerald-400'>INFLATION ADJUSTMENT:</strong> If top RBs sell for 20% over budget, adjust expectations—WRs or TEs will be discounted!",
             "🏆 <strong class='text-teal-400'>FLEX VALUE:</strong> Invest in high-ceiling WRs/RBs for your FLEX spots rather than spreading small dollars across a weak bench.",
-            "🛡️ <strong class='text-rose-400'>SUPERFLEX PREMIUM:</strong> In Superflex formats, reserve at least 35-45% of your total budget for two top-tier starting QBs.",
-            "🔮 <strong class='text-purple-400'>TARGET VALUE TIERS:</strong> Focus on getting the middle player in a tier where prices settle into consistent bargains.",
-            "📱 <strong class='text-sky-400'>PWA INSTALL:</strong> Add this app to your Home Screen from Safari or Chrome for a full-screen, native app experience!"
+            "🛡️ <strong class='text-rose-400'>SUPERFLEX PREMIUM:</strong> Reserve at least 35-45% of total budget for two top-tier starting QBs in Superflex.",
+            "📱 <strong class='text-sky-400'>PWA INSTALL:</strong> Add this app to your Home Screen from Safari or Chrome for a full-screen app experience!"
         ];
 
-        // Populate Ticker HTML
-        function setupTicker() {
-            const tickerElem = document.getElementById('ticker-content');
-            if (!tickerElem) return;
-
-            const fullSet = presentationTipsHTML(proTipsList);
-            // Duplicate set back-to-back for seamless infinite CSS scroll loop
-            tickerElem.innerHTML = fullSet + fullSet;
-        }
-
-        function presentationTipsHTML(tips) {
-            return tips.map(tip => `<span>${tip}</span>`).join('');
-        }
-
-       const defaultSlots = [
-    { id: "QB1", planUSD: 20, player: "", cost: null },
-    { id: "RB1", planUSD: 36, player: "", cost: null },
-    { id: "RB2", planUSD: 21, player: "", cost: null },
-    { id: "WR/RB", planUSD: 13, player: "", cost: null },
-    { id: "WR1", planUSD: 35, player: "", cost: null },
-    { id: "WR2", planUSD: 24, player: "", cost: null },
-    { id: "WR3", planUSD: 16, player: "", cost: null },
-    { id: "QB2", planUSD: 6, player: "", cost: null },
-    { id: "FLEX1", planUSD: 12, player: "", cost: null },
-    { id: "FLEX2", planUSD: 8, player: "", cost: null },
-    { id: "KICKER", planUSD: 1, player: "", cost: null },
-    { id: "DEFENSE", planUSD: 1, player: "", cost: null },
-    { id: "Bench1", planUSD: 3, player: "", cost: null },
-    { id: "Bench2", planUSD: 1, player: "", cost: null },
-    { id: "Bench3", planUSD: 1, player: "", cost: null },
-    { id: "Bench4", planUSD: 1, player: "", cost: null },
-    { id: "Bench5", planUSD: 1, player: "", cost: null },
-];
+        const defaultSlots = [
+            { id: "QB1", planUSD: 20, player: "", cost: null },
+            { id: "RB1", planUSD: 36, player: "", cost: null },
+            { id: "RB2", planUSD: 21, player: "", cost: null },
+            { id: "WR/RB", planUSD: 13, player: "", cost: null },
+            { id: "WR1", planUSD: 35, player: "", cost: null },
+            { id: "WR2", planUSD: 24, player: "", cost: null },
+            { id: "WR3", planUSD: 16, player: "", cost: null },
+            { id: "QB2", planUSD: 6, player: "", cost: null },
+            { id: "FLEX1", planUSD: 12, player: "", cost: null },
+            { id: "FLEX2", planUSD: 8, player: "", cost: null },
+            { id: "KICKER", planUSD: 1, player: "", cost: null },
+            { id: "DEFENSE", planUSD: 1, player: "", cost: null },
+            { id: "Bench1", planUSD: 3, player: "", cost: null },
+            { id: "Bench2", planUSD: 1, player: "", cost: null },
+            { id: "Bench3", planUSD: 1, player: "", cost: null },
+            { id: "Bench4", planUSD: 1, player: "", cost: null },
+            { id: "Bench5", planUSD: 1, player: "", cost: null },
+        ];
 
         let totalBudget = 200;
         let slots = JSON.parse(JSON.stringify(defaultSlots));
         let marketLogs = [];
+        let wishlist = ["Lamar Jackson", "Breece Hall", "Malik Nabers", "Trey McBride"];
+        let activePosFilter = "ALL";
+
+        function setupTicker() {
+            const tickerElem = document.getElementById('ticker-content');
+            if (!tickerElem) return;
+            const fullSet = proTipsList.map(tip => `<span>${tip}</span>`).join('');
+            tickerElem.innerHTML = fullSet + fullSet;
+        }
+
+        // LocalStorage Save & Load Logic
+        function saveState() {
+            try {
+                localStorage.setItem('draft_slots', JSON.stringify(slots));
+                localStorage.setItem('draft_market', JSON.stringify(marketLogs));
+                localStorage.setItem('draft_wishlist', JSON.stringify(wishlist));
+                localStorage.setItem('draft_budget', totalBudget);
+                
+                const saveBadge = document.getElementById('save-status');
+                if (saveBadge) {
+                    saveBadge.classList.remove('hidden');
+                    setTimeout(() => saveBadge.classList.add('hidden'), 1500);
+                }
+            } catch (e) {
+                console.error("Storage error:", e);
+            }
+        }
+
+        function loadState() {
+            try {
+                const savedSlots = localStorage.getItem('draft_slots');
+                const savedMarket = localStorage.getItem('draft_market');
+                const savedWish = localStorage.getItem('draft_wishlist');
+                const savedBudget = localStorage.getItem('draft_budget');
+
+                if (savedSlots) slots = JSON.parse(savedSlots);
+                if (savedMarket) marketLogs = JSON.parse(savedMarket);
+                if (savedWish) wishlist = JSON.parse(savedWish);
+                if (savedBudget) totalBudget = parseInt(savedBudget);
+            } catch (e) {
+                console.error("Error loading stored data:", e);
+            }
+        }
+
+        // Determine Position Category
+        function getPosTag(slotName) {
+            let s = slotName.toUpperCase();
+            if (s.includes("QB")) return { code: "QB", color: "bg-purple-900/60 text-purple-300 border-purple-700" };
+            if (s.includes("RB")) return { code: "RB", color: "bg-emerald-900/60 text-emerald-300 border-emerald-700" };
+            if (s.includes("WR")) return { code: "WR", color: "bg-sky-900/60 text-sky-300 border-sky-700" };
+            if (s.includes("TE")) return { code: "TE", color: "bg-amber-900/60 text-amber-300 border-amber-700" };
+            if (s.includes("FLEX") || s.includes("/")) return { code: "FLEX", color: "bg-teal-900/60 text-teal-300 border-teal-700" };
+            if (s.includes("BENCH")) return { code: "BENCH", color: "bg-slate-800 text-slate-400 border-slate-700" };
+            return { code: "DST/K", color: "bg-slate-800 text-slate-300 border-slate-700" };
+        }
+
+        // Calculate Inflation / Deflation Trend from Room Sales
+        function updateMarketInflation() {
+            const statusElem = document.getElementById('market-inflation-status');
+            const noteElem = document.getElementById('market-inflation-note');
+
+            if (marketLogs.length === 0) {
+                statusElem.innerText = "0% (Balanced Market)";
+                statusElem.className = "font-extrabold text-emerald-400";
+                noteElem.innerText = "Log room sales to track if managers are overspending or giving discounts.";
+                return;
+            }
+
+            let totalSpentRoom = marketLogs.reduce((acc, log) => acc + log.cost, 0);
+            // Baseline estimated average player price ($200 budget / 16 players = ~$12.5 per pick)
+            let estimatedAvgBase = marketLogs.length * 12.5; 
+            let diffPct = Math.round(((totalSpentRoom - estimatedAvgBase) / estimatedAvgBase) * 100);
+
+            if (diffPct > 5) {
+                statusElem.innerText = `+${diffPct}% (INFLATED ROOM - Bidding High)`;
+                statusElem.className = "font-extrabold text-rose-400";
+                noteElem.innerText = "Managers are overpaying early. Sit back and wait for mid-draft bargains!";
+            } else if (diffPct < -5) {
+                statusElem.innerText = `${diffPct}% (DISCOUNTED MARKET - Bargains Open)`;
+                statusElem.className = "font-extrabold text-teal-400";
+                noteElem.innerText = "The room is bidding cautiously. Jump in early to snag studs at discounts!";
+            } else {
+                statusElem.innerText = `${diffPct}% (Balanced Market)`;
+                statusElem.className = "font-extrabold text-emerald-400";
+                noteElem.innerText = "Spending is matching standard projections.";
+            }
+        }
+
+        // Render Quick Target Board
+        function renderWishlist() {
+            const container = document.getElementById('wishlist-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            if (wishlist.length === 0) {
+                container.innerHTML = `<span class="text-xs text-slate-500 italic">No targets added yet</span>`;
+                return;
+            }
+
+            wishlist.forEach((name, idx) => {
+                let badge = document.createElement('div');
+                badge.className = "flex items-center space-x-1 bg-slate-900 border border-teal-800/60 text-teal-300 text-xs px-2.5 py-1 rounded-lg cursor-pointer hover:bg-teal-950 transition active:scale-95";
+                badge.innerHTML = `
+                    <span class="wish-item font-semibold">${name}</span>
+                    <button data-w-idx="${idx}" class="btn-del-wish text-slate-500 hover:text-rose-400 font-bold ml-1 text-xs">✕</button>
+                `;
+                
+                badge.querySelector('.wish-item').addEventListener('click', () => {
+                    document.getElementById('input-player').value = name;
+                });
+
+                container.appendChild(badge);
+            });
+
+            document.querySelectorAll('.btn-del-wish').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    let idx = parseInt(e.target.getAttribute('data-w-idx'));
+                    wishlist.splice(idx, 1);
+                    renderWishlist();
+                    saveState();
+                });
+            });
+        }
 
         // Core Render Function
         function render() {
@@ -324,12 +478,10 @@
             let openSlotsCount = openSlots.length;
             let maxBid = openSlotsCount > 0 ? remainingBudget - (openSlotsCount - 1) : 0;
 
-            // Render top stats cards
             document.getElementById('stat-remaining').innerText = '$' + remainingBudget;
             document.getElementById('stat-maxbid').innerText = '$' + Math.max(0, maxBid);
             document.getElementById('stat-planned').innerText = '$' + totalPlanned;
             
-            // Render Unallocated Plan tracker
             let unallocElem = document.getElementById('stat-unallocated');
             let unallocLabel = document.getElementById('label-unallocated');
             if (unallocatedPlan < 0) {
@@ -349,7 +501,6 @@
                 unallocLabel.className = "text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1";
             }
 
-            // Render Max Bid labels
             let labelMaxBid = document.getElementById('label-max-bid');
             if (maxBid < 1) {
                 labelMaxBid.innerText = "OVER BUDGET WARNING";
@@ -359,10 +510,8 @@
                 labelMaxBid.className = "text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1";
             }
 
-            // Sum up baseline plan of open slots to distribute difference
             let sumBaseOpen = openSlots.reduce((acc, s) => acc + s.planUSD, 0);
 
-            // Pre-calculate rounded targets and absorb rounding drift on top slot
             let totalAdjTargetSum = 0;
             let highestPlanIdx = -1;
             let maxPlanVal = -1;
@@ -383,7 +532,6 @@
                 }
             });
 
-            // Adjust rounding difference onto the highest-value open target
             if (openSlotsCount > 0 && sumBaseOpen > 0) {
                 let drift = remainingBudget - totalAdjTargetSum;
                 if (drift !== 0 && highestPlanIdx !== -1) {
@@ -398,23 +546,27 @@
             select.innerHTML = '';
 
             slots.forEach((s, idx) => {
+                let pos = getPosTag(s.id);
+                
+                // Check active filter toggle
+                if (activePosFilter !== "ALL" && pos.code !== activePosFilter) {
+                    return;
+                }
+
                 let planUSD = s.planUSD;
                 let adjUSD = s._calculatedAdj !== null ? s._calculatedAdj : planUSD;
 
-                // Append select options for open slots
                 if (s.cost === null) {
                     let opt = document.createElement('option');
                     opt.value = idx;
-                    opt.innerText = `${s.id} (Adj Target: $${adjUSD})`;
+                    opt.innerText = `${s.id} (Target: $${adjUSD})`;
                     select.appendChild(opt);
                 }
 
-                // Generate table row
                 let tr = document.createElement('tr');
                 let rowBg = s.cost !== null ? 'bg-slate-900/40 text-slate-400' : 'hover:bg-slate-800/40 transition-colors duration-150';
                 tr.className = `${rowBg}`;
 
-                // Spent variance calculation
                 let priceColClass = "p-3 text-slate-400 font-medium";
                 let varianceText = "";
                 if (s.cost !== null) {
@@ -430,6 +582,9 @@
                 }
 
                 tr.innerHTML = `
+                    <td class="p-3">
+                        <span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded border ${pos.color}">${pos.code}</span>
+                    </td>
                     <td class="p-3">
                         <input type="text" value="${s.id}" data-idx="${idx}" class="slot-name-input w-full bg-transparent border-b border-dashed border-slate-700 focus:border-emerald-500 focus:ring-0 outline-none text-slate-200 font-semibold text-xs py-0.5">
                     </td>
@@ -457,15 +612,15 @@
                 tbody.appendChild(tr);
             });
 
-            // Update Footer Totals Row
             document.getElementById('foot-plan-sum').innerText = '$' + totalPlanned;
             document.getElementById('foot-adj-sum').innerText = '$' + totalAdjTargetSum;
             document.getElementById('foot-spent-sum').innerText = '$' + totalSpent;
 
             bindTableListeners();
+            updateMarketInflation();
+            saveState();
         }
 
-        // Live Table Bindings
         function bindTableListeners() {
             document.querySelectorAll('.slot-name-input').forEach(input => {
                 input.addEventListener('change', (e) => {
@@ -498,7 +653,6 @@
             });
         }
 
-        // Render Room market sales feed WITH DELETE BUTTONS
         function renderMarketFeed() {
             let feed = document.getElementById('market-feed');
             if (marketLogs.length === 0) {
@@ -509,7 +663,6 @@
             
             marketLogs.slice().reverse().forEach((log, reversedIdx) => {
                 let realIdx = marketLogs.length - 1 - reversedIdx;
-                
                 let li = document.createElement('li');
                 li.className = 'py-1.5 flex justify-between items-center text-slate-300';
                 li.innerHTML = `
@@ -527,16 +680,19 @@
                     let idx = parseInt(e.target.getAttribute('data-m-idx'));
                     marketLogs.splice(idx, 1);
                     renderMarketFeed();
+                    render();
                 });
             });
         }
 
-        // Main App Initializer
         function initApp() {
+            loadState();
             setupTicker();
+            renderWishlist();
 
             let budgetInput = document.getElementById('input-total-budget');
             if (budgetInput) {
+                budgetInput.value = totalBudget;
                 budgetInput.addEventListener('change', (e) => {
                     let val = parseInt(e.target.value);
                     if (!isNaN(val) && val > 0) {
@@ -545,6 +701,33 @@
                     }
                 });
             }
+
+            // Target Wishlist Adding
+            let addWishBtn = document.getElementById('btn-add-wish');
+            if (addWishBtn) {
+                addWishBtn.addEventListener('click', () => {
+                    let wishInput = document.getElementById('input-wish-name');
+                    let val = wishInput.value.trim();
+                    if (val) {
+                        wishlist.push(val);
+                        wishInput.value = '';
+                        renderWishlist();
+                        saveState();
+                    }
+                });
+            }
+
+            // Position Filters
+            document.querySelectorAll('.pos-filter-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.pos-filter-btn').forEach(b => {
+                        b.className = "pos-filter-btn px-2 py-0.5 rounded font-bold bg-slate-800 text-slate-300 hover:bg-slate-700";
+                    });
+                    e.target.className = "pos-filter-btn px-2.5 py-0.5 rounded font-bold bg-emerald-600 text-white";
+                    activePosFilter = e.target.getAttribute('data-pos');
+                    render();
+                });
+            });
 
             let addBtn = document.getElementById('btn-add-slot');
             if (addBtn) {
@@ -594,6 +777,7 @@
                         mPlayer.value = '';
                         mCost.value = '';
                         renderMarketFeed();
+                        render();
                     }
                 });
             }
@@ -601,7 +785,7 @@
             let resetBtn = document.getElementById('btn-reset');
             if (resetBtn) {
                 resetBtn.addEventListener('click', () => {
-                    if (confirm("Are you sure you want to reset all drafted players and restore default slots?")) {
+                    if (confirm("Reset all picks and restore default roster slots?")) {
                         slots = JSON.parse(JSON.stringify(defaultSlots));
                         marketLogs = [];
                         totalBudget = 200;
@@ -612,6 +796,24 @@
                 });
             }
 
+            let clearDataBtn = document.getElementById('btn-clear-data');
+            if (clearDataBtn) {
+                clearDataBtn.addEventListener('click', () => {
+                    if (confirm("Clear all saved LocalStorage memory?")) {
+                        localStorage.clear();
+                        slots = JSON.parse(JSON.stringify(defaultSlots));
+                        marketLogs = [];
+                        wishlist = [];
+                        totalBudget = 200;
+                        if (budgetInput) budgetInput.value = 200;
+                        render();
+                        renderMarketFeed();
+                        renderWishlist();
+                    }
+                });
+            }
+
+            renderMarketFeed();
             render();
         }
 
