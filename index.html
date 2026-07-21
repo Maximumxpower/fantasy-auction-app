@@ -46,7 +46,7 @@
 
     <!-- Top Navigation Bar -->
     <nav class="bg-slate-950 border-b border-slate-800 py-3 px-4 sticky top-0 z-50 shadow-lg">
-        <div class="max-w-6xl mx-auto flex justify-between items-center">
+        <div class="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-3">
             <div class="flex items-center space-x-2">
                 <span class="text-xl">🏈</span>
                 <h1 class="text-lg font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
@@ -56,12 +56,26 @@
                     ✓ Auto-Saved
                 </span>
             </div>
-            <div class="flex items-center space-x-2">
-                <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Budget Pool:</span>
-                <div class="relative flex items-center">
-                    <span class="absolute left-2.5 text-emerald-400 font-bold">$</span>
-                    <input id="input-total-budget" type="number" value="200" 
-                           class="w-20 pl-6 pr-2 py-1 bg-slate-900 border border-slate-700 rounded-lg text-sm text-emerald-400 font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none text-center">
+
+            <!-- Controls: Display Mode Toggle & Budget Pool -->
+            <div class="flex items-center space-x-3">
+                <!-- Dollar / Percentage Segmented Toggle -->
+                <div class="bg-slate-900 border border-slate-700 rounded-lg p-0.5 flex text-xs font-bold">
+                    <button id="btn-mode-usd" class="px-2.5 py-1 rounded-md transition text-emerald-400 bg-slate-800 shadow">
+                        $ USD
+                    </button>
+                    <button id="btn-mode-pct" class="px-2.5 py-1 rounded-md transition text-slate-400 hover:text-slate-200">
+                        % Budget
+                    </button>
+                </div>
+
+                <div class="flex items-center space-x-1.5">
+                    <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider hidden sm:inline">Budget:</span>
+                    <div class="relative flex items-center">
+                        <span class="absolute left-2 text-emerald-400 font-bold text-xs">$</span>
+                        <input id="input-total-budget" type="number" value="200" 
+                               class="w-16 pl-5 pr-1 py-1 bg-slate-900 border border-slate-700 rounded-lg text-xs text-emerald-400 font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none text-center">
+                    </div>
                 </div>
             </div>
         </div>
@@ -125,7 +139,7 @@
                                 <input id="input-player" type="text" placeholder="e.g. Lamar Jackson" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-200 focus:ring-1 focus:ring-emerald-500 focus:outline-none">
                             </div>
                             <div>
-                                <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Actual Cost ($)</label>
+                                <label id="label-actual-cost" class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Actual Cost ($)</label>
                                 <input id="input-price" type="number" placeholder="e.g. 30" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-200 focus:ring-1 focus:ring-emerald-500 focus:outline-none">
                             </div>
                         </div>
@@ -169,7 +183,7 @@
                             <input id="add-slot-name" type="text" placeholder="e.g. SUPERFLEX" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:outline-none">
                         </div>
                         <div>
-                            <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Plan Target ($)</label>
+                            <label id="label-add-plan" class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Plan Target ($)</label>
                             <input id="add-slot-plan" type="number" placeholder="e.g. 24" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:outline-none">
                         </div>
                     </div>
@@ -242,10 +256,10 @@
                                 <tr>
                                     <th class="p-3">Pos</th>
                                     <th class="p-3">Slot Name</th>
-                                    <th class="p-3">Plan $</th>
-                                    <th class="p-3">Adj Target</th>
+                                    <th id="th-plan" class="p-3">Plan ($)</th>
+                                    <th id="th-adj" class="p-3">Adj Target</th>
                                     <th class="p-3">Player Drafted</th>
-                                    <th class="p-3">Spent</th>
+                                    <th id="th-spent" class="p-3">Spent</th>
                                     <th class="p-3 text-center">Drop</th>
                                 </tr>
                             </thead>
@@ -287,36 +301,32 @@
     <script>
         const proTipsList = [
             "📱 <strong class='text-emerald-400'>ADJ TARGET COLUMN:</strong> Shows real-time budget for open slots based on surplus cash from prior bargains.",
+            "🔀 <strong class='text-teal-400'>TOGGLE MODE:</strong> Switch between $ USD and % Budget anytime in the top navigation bar!",
             "📊 <strong class='text-purple-400'>ROOM SALES LOG:</strong> Log room sales to automatically calculate room inflation and spot overall market trends.",
             "🎯 <strong class='text-teal-400'>TARGET BOARD:</strong> Add top sleepers or targets to your Wishlist board and click any name to auto-fill logging forms!",
             "🛡️ <strong class='text-amber-400'>MAX BID ALLOWED:</strong> Calculates the absolute maximum you can bid while keeping $1 for remaining open slots.",
-            "⚠️ <strong class='text-rose-400'>UNALLOCATED PLAN:</strong> Flashes red when planned targets exceed total budget. Keep it balanced at $0!",
-            "✏️ <strong class='text-sky-400'>EDIT ON THE FLY:</strong> Click directly into any Slot Name or Plan $ box to adjust targets mid-draft.",
+            "⚠️ <strong class='text-rose-400'>UNALLOCATED PLAN:</strong> Flashes red when planned targets exceed total budget. Keep it balanced at $0 / 0%!",
+            "✏️ <strong class='text-sky-400'>EDIT ON THE FLY:</strong> Click directly into any Slot Name or Plan box to adjust targets mid-draft.",
             "➕ <strong class='text-blue-400'>CUSTOM SLOTS:</strong> Add Superflex, TE Premium, or extra bench spots instantly.",
             "🗑️ <strong class='text-rose-400'>SLOT REMOVAL:</strong> Click '✕' beside any row to remove unnecessary slots and re-allocate funds.",
-            "💵 <strong class='text-emerald-400'>SPENT VARIANCE:</strong> Green '-$X' shows a bargain! Red '+$X' alerts you that you overspent your plan.",
+            "💵 <strong class='text-emerald-400'>SPENT VARIANCE:</strong> Green bargains show under budget! Red alerts warn you when you've overspent your plan.",
             "⚙️ <strong class='text-teal-400'>BUDGET POOL TOP-BAR:</strong> Adjust the default budget if your league uses custom amounts ($100, $500, etc.).",
             "💾 <strong class='text-emerald-400'>AUTO-SAVE:</strong> All picks, targets, and custom slots automatically save to your browser in real time!",
             "⏸️ <strong class='text-amber-400'>PAUSE TICKER:</strong> Hover or tap and hold on this ticker anytime to pause scrolling text and read!",
             "🔥 <strong class='text-emerald-400'>HERO STARTER STRATEGY:</strong> Pay up for 1-2 premier studs to anchor your team, then dominate $1-$5 value picks.",
-            "💰 <strong class='text-amber-400'>BENCH DISCIPLINE:</strong> Keep bench spending strictly to $1-$2 to maximize starting lineup firepower.",
+            "💰 <strong class='text-amber-400'>BENCH DISCIPLINE:</strong> Keep bench spending strictly to 1-2% to maximize starting lineup firepower.",
             "🎯 <strong class='text-purple-400'>NOMINATION DECEPTION:</strong> Nominate high-cost stars you DON'T want early to drain rival budgets.",
             "⚡ <strong class='text-teal-400'>ENDGAME FLEXIBILITY:</strong> Keep $3-$5 extra in late rounds to easily outbid $1 managers on key sleepers.",
             "⚖️ <strong class='text-sky-400'>PRICE ENFORCING DANGER:</strong> Never bid up players to 'keep managers honest' unless you want them on your team!",
             "🏷️ <strong class='text-emerald-400'>TIER JUMPING:</strong> Never wait for the final player in a position tier—desperate managers always overpay for the last option!",
-            "🏈 <strong class='text-amber-400'>KICKER & DEFENSE:</strong> Never spend more than $1 on Kickers or Defenses in auction drafts.",
+            "🏈 <strong class='text-amber-400'>KICKER & DEFENSE:</strong> Never spend more than $1 (0.5%) on Kickers or Defenses in auction drafts.",
             "💡 <strong class='text-sky-400'>80/20 RULE:</strong> Allocate 80-90% of your initial budget strictly to your starting lineup.",
             "⏱️ <strong class='text-purple-400'>MONITOR MONEY IN ROOM:</strong> Watch which managers have deep pockets so you don't get trapped in bidding wars.",
             "📉 <strong class='text-rose-400'>EXPLOIT EARLY HESITATION:</strong> If your room starts overly cautious, jump in and snag top-tier studs at massive discounts.",
             "🚀 <strong class='text-teal-400'>NOMINATE TARGETS LATE:</strong> In later rounds, nominate $1 sleepers you actually want when rivals are broke.",
             "🏈 <strong class='text-emerald-400'>STUDS AND SCRUBS:</strong> Blowing 70% on two top-5 overall picks works if you excel at identifying waiver wire breakouts.",
             "📊 <strong class='text-sky-400'>NO LEFT-OVER CASH:</strong> Unspent draft budget is wasted money. Spend every single dollar before the draft ends!",
-            "🎯 <strong class='text-purple-400'>HANDCUFF TAXING:</strong> Nominate elite RB handcuffs to force the star's owner to spend key budget dollars protecting their pick.",
-            "⏳ <strong class='text-amber-400'>STAY COOL:</strong> Don't let draft room hype push you into overpaying by $10+ on a single player.",
-            "📈 <strong class='text-emerald-400'>INFLATION ADJUSTMENT:</strong> If top RBs sell for 20% over budget, adjust expectations—WRs or TEs will be discounted!",
-            "🏆 <strong class='text-teal-400'>FLEX VALUE:</strong> Invest in high-ceiling WRs/RBs for your FLEX spots rather than spreading small dollars across a weak bench.",
-            "🛡️ <strong class='text-rose-400'>SUPERFLEX PREMIUM:</strong> Reserve at least 35-45% of total budget for two top-tier starting QBs in Superflex.",
-            "📱 <strong class='text-sky-400'>PWA INSTALL:</strong> Add this app to your Home Screen from Safari or Chrome for a full-screen app experience!"
+            "📈 <strong class='text-emerald-400'>INFLATION ADJUSTMENT:</strong> If top RBs sell for 20% over budget, adjust expectations—WRs or TEs will be discounted!"
         ];
 
         const defaultSlots = [
@@ -340,10 +350,21 @@
         ];
 
         let totalBudget = 200;
+        let displayMode = 'dollars'; // 'dollars' | 'percent'
         let slots = JSON.parse(JSON.stringify(defaultSlots));
         let marketLogs = [];
         let wishlist = ["Lamar Jackson", "Breece Hall", "Malik Nabers", "Trey McBride"];
         let activePosFilter = "ALL";
+
+        // Formatter Helper function
+        function valFormat(usdVal) {
+            if (usdVal === null || usdVal === undefined) return '-';
+            if (displayMode === 'percent') {
+                let pct = (usdVal / totalBudget) * 100;
+                return `${pct.toFixed(1)}%`;
+            }
+            return `$${Math.round(usdVal)}`;
+        }
 
         function setupTicker() {
             const tickerElem = document.getElementById('ticker-content');
@@ -359,6 +380,7 @@
                 localStorage.setItem('draft_market', JSON.stringify(marketLogs));
                 localStorage.setItem('draft_wishlist', JSON.stringify(wishlist));
                 localStorage.setItem('draft_budget', totalBudget);
+                localStorage.setItem('draft_display_mode', displayMode);
                 
                 const saveBadge = document.getElementById('save-status');
                 if (saveBadge) {
@@ -376,13 +398,34 @@
                 const savedMarket = localStorage.getItem('draft_market');
                 const savedWish = localStorage.getItem('draft_wishlist');
                 const savedBudget = localStorage.getItem('draft_budget');
+                const savedMode = localStorage.getItem('draft_display_mode');
 
                 if (savedSlots) slots = JSON.parse(savedSlots);
                 if (savedMarket) marketLogs = JSON.parse(savedMarket);
                 if (savedWish) wishlist = JSON.parse(savedWish);
                 if (savedBudget) totalBudget = parseInt(savedBudget);
+                if (savedMode) displayMode = savedMode;
             } catch (e) {
                 console.error("Error loading stored data:", e);
+            }
+        }
+
+        function updateToggleButtons() {
+            const btnUsd = document.getElementById('btn-mode-usd');
+            const btnPct = document.getElementById('btn-mode-pct');
+            
+            if (displayMode === 'dollars') {
+                btnUsd.className = "px-2.5 py-1 rounded-md transition text-emerald-400 bg-slate-800 shadow font-bold";
+                btnPct.className = "px-2.5 py-1 rounded-md transition text-slate-400 hover:text-slate-200 font-bold";
+                document.getElementById('th-plan').innerText = "Plan ($)";
+                document.getElementById('label-actual-cost').innerText = "Actual Cost ($)";
+                document.getElementById('label-add-plan').innerText = "Plan Target ($)";
+            } else {
+                btnPct.className = "px-2.5 py-1 rounded-md transition text-teal-400 bg-slate-800 shadow font-bold";
+                btnUsd.className = "px-2.5 py-1 rounded-md transition text-slate-400 hover:text-slate-200 font-bold";
+                document.getElementById('th-plan').innerText = "Plan (%)";
+                document.getElementById('label-actual-cost').innerText = "Actual Cost (%)";
+                document.getElementById('label-add-plan').innerText = "Plan Target (%)";
             }
         }
 
@@ -411,8 +454,7 @@
             }
 
             let totalSpentRoom = marketLogs.reduce((acc, log) => acc + log.cost, 0);
-            // Baseline estimated average player price ($200 budget / 16 players = ~$12.5 per pick)
-            let estimatedAvgBase = marketLogs.length * 12.5; 
+            let estimatedAvgBase = marketLogs.length * (totalBudget / 16); 
             let diffPct = Math.round(((totalSpentRoom - estimatedAvgBase) / estimatedAvgBase) * 100);
 
             if (diffPct > 5) {
@@ -469,6 +511,8 @@
 
         // Core Render Function
         function render() {
+            updateToggleButtons();
+
             let totalSpent = slots.reduce((acc, s) => acc + (s.cost !== null ? s.cost : 0), 0);
             let totalPlanned = slots.reduce((acc, s) => acc + s.planUSD, 0);
             let unallocatedPlan = totalBudget - totalPlanned;
@@ -478,24 +522,24 @@
             let openSlotsCount = openSlots.length;
             let maxBid = openSlotsCount > 0 ? remainingBudget - (openSlotsCount - 1) : 0;
 
-            document.getElementById('stat-remaining').innerText = '$' + remainingBudget;
-            document.getElementById('stat-maxbid').innerText = '$' + Math.max(0, maxBid);
-            document.getElementById('stat-planned').innerText = '$' + totalPlanned;
+            document.getElementById('stat-remaining').innerText = valFormat(remainingBudget);
+            document.getElementById('stat-maxbid').innerText = valFormat(Math.max(0, maxBid));
+            document.getElementById('stat-planned').innerText = valFormat(totalPlanned);
             
             let unallocElem = document.getElementById('stat-unallocated');
             let unallocLabel = document.getElementById('label-unallocated');
             if (unallocatedPlan < 0) {
-                unallocElem.innerText = '-$' + Math.abs(unallocatedPlan);
+                unallocElem.innerText = '-' + valFormat(Math.abs(unallocatedPlan));
                 unallocElem.className = "text-xl sm:text-2xl font-extrabold text-rose-400";
                 unallocLabel.innerText = "PLAN OVER BUDGET";
                 unallocLabel.className = "text-[10px] sm:text-xs text-rose-400 font-bold uppercase tracking-wider block mb-1 animate-pulse";
             } else if (unallocatedPlan > 0) {
-                unallocElem.innerText = '+$' + unallocatedPlan;
+                unallocElem.innerText = '+' + valFormat(unallocatedPlan);
                 unallocElem.className = "text-xl sm:text-2xl font-extrabold text-amber-400";
                 unallocLabel.innerText = "UNALLOCATED CASH";
                 unallocLabel.className = "text-[10px] sm:text-xs text-amber-400 font-bold uppercase tracking-wider block mb-1";
             } else {
-                unallocElem.innerText = '$0';
+                unallocElem.innerText = valFormat(0);
                 unallocElem.className = "text-xl sm:text-2xl font-extrabold text-emerald-400";
                 unallocLabel.innerText = "PLAN BALANCED";
                 unallocLabel.className = "text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1";
@@ -548,7 +592,6 @@
             slots.forEach((s, idx) => {
                 let pos = getPosTag(s.id);
                 
-                // Check active filter toggle
                 if (activePosFilter !== "ALL" && pos.code !== activePosFilter) {
                     return;
                 }
@@ -559,7 +602,7 @@
                 if (s.cost === null) {
                     let opt = document.createElement('option');
                     opt.value = idx;
-                    opt.innerText = `${s.id} (Target: $${adjUSD})`;
+                    opt.innerText = `${s.id} (Target: ${valFormat(adjUSD)})`;
                     select.appendChild(opt);
                 }
 
@@ -572,14 +615,16 @@
                 if (s.cost !== null) {
                     let diff = s.cost - s.planUSD;
                     if (diff > 0) {
-                        varianceText = `<span class="text-[10px] text-rose-400 block">+ $${diff}</span>`;
+                        varianceText = `<span class="text-[10px] text-rose-400 block">+ ${valFormat(diff)}</span>`;
                     } else if (diff < 0) {
-                        varianceText = `<span class="text-[10px] text-emerald-400 block">- $${Math.abs(diff)}</span>`;
+                        varianceText = `<span class="text-[10px] text-emerald-400 block">- ${valFormat(Math.abs(diff))}</span>`;
                     } else {
                         varianceText = `<span class="text-[10px] text-slate-500 block">even</span>`;
                     }
                     priceColClass = "p-3 font-extrabold text-amber-400 text-sm";
                 }
+
+                let displayPlanInputValue = displayMode === 'percent' ? parseFloat(((s.planUSD / totalBudget) * 100).toFixed(1)) : s.planUSD;
 
                 tr.innerHTML = `
                     <td class="p-3">
@@ -590,18 +635,18 @@
                     </td>
                     <td class="p-3">
                         <div class="flex items-center space-x-1">
-                            <span class="text-slate-500">$</span>
-                            <input type="number" value="${s.planUSD}" data-idx="${idx}" class="plan-input w-12 bg-slate-900/50 border border-slate-700/60 rounded px-1.5 py-0.5 text-slate-200 font-semibold text-xs focus:ring-1 focus:ring-emerald-500 focus:outline-none">
+                            <span class="text-slate-500 text-xs">${displayMode === 'dollars' ? '$' : '%'}</span>
+                            <input type="number" step="${displayMode === 'percent' ? '0.5' : '1'}" value="${displayPlanInputValue}" data-idx="${idx}" class="plan-input w-14 bg-slate-900/50 border border-slate-700/60 rounded px-1.5 py-0.5 text-slate-200 font-semibold text-xs focus:ring-1 focus:ring-emerald-500 focus:outline-none">
                         </div>
                     </td>
                     <td class="p-3 font-bold text-sm text-emerald-400">
-                        ${s.cost !== null ? '<span class="text-slate-600">-</span>' : '$' + adjUSD}
+                        ${s.cost !== null ? '<span class="text-slate-600">-</span>' : valFormat(adjUSD)}
                     </td>
                     <td class="p-3 font-medium text-slate-200 truncate max-w-[110px]">
                         ${s.player || '<span class="text-slate-600 italic">unfilled</span>'}
                     </td>
                     <td class="${priceColClass}">
-                        ${s.cost !== null ? '$' + s.cost + varianceText : '<span class="text-slate-600">-</span>'}
+                        ${s.cost !== null ? valFormat(s.cost) + varianceText : '<span class="text-slate-600">-</span>'}
                     </td>
                     <td class="p-3 text-center">
                         <button data-idx="${idx}" class="btn-delete-slot text-rose-400 hover:text-rose-300 font-bold text-base px-2 py-1 transition-transform active:scale-90" title="Delete slot">
@@ -612,9 +657,9 @@
                 tbody.appendChild(tr);
             });
 
-            document.getElementById('foot-plan-sum').innerText = '$' + totalPlanned;
-            document.getElementById('foot-adj-sum').innerText = '$' + totalAdjTargetSum;
-            document.getElementById('foot-spent-sum').innerText = '$' + totalSpent;
+            document.getElementById('foot-plan-sum').innerText = valFormat(totalPlanned);
+            document.getElementById('foot-adj-sum').innerText = valFormat(totalAdjTargetSum);
+            document.getElementById('foot-spent-sum').innerText = valFormat(totalSpent);
 
             bindTableListeners();
             updateMarketInflation();
@@ -636,9 +681,13 @@
             document.querySelectorAll('.plan-input').forEach(input => {
                 input.addEventListener('change', (e) => {
                     let idx = e.target.getAttribute('data-idx');
-                    let val = parseInt(e.target.value);
+                    let val = parseFloat(e.target.value);
                     if (!isNaN(val) && val >= 0) {
-                        slots[idx].planUSD = val;
+                        if (displayMode === 'percent') {
+                            slots[idx].planUSD = Math.round((val / 100) * totalBudget);
+                        } else {
+                            slots[idx].planUSD = Math.round(val);
+                        }
                         render();
                     }
                 });
@@ -670,7 +719,7 @@
                         <button data-m-idx="${realIdx}" class="btn-delete-market text-rose-400 hover:text-rose-300 font-bold text-xs px-1" title="Delete entry">✕</button>
                         <span class="font-medium text-slate-200 truncate max-w-[130px]">${log.player}</span>
                     </div>
-                    <span class="font-bold text-amber-400">$${log.cost}</span>
+                    <span class="font-bold text-amber-400">${valFormat(log.cost)}</span>
                 `;
                 feed.appendChild(li);
             });
@@ -689,6 +738,18 @@
             loadState();
             setupTicker();
             renderWishlist();
+
+            // Toggle mode buttons
+            document.getElementById('btn-mode-usd').addEventListener('click', () => {
+                displayMode = 'dollars';
+                render();
+                renderMarketFeed();
+            });
+            document.getElementById('btn-mode-pct').addEventListener('click', () => {
+                displayMode = 'percent';
+                render();
+                renderMarketFeed();
+            });
 
             let budgetInput = document.getElementById('input-total-budget');
             if (budgetInput) {
@@ -735,9 +796,11 @@
                     let nameInput = document.getElementById('add-slot-name');
                     let planInput = document.getElementById('add-slot-plan');
                     let name = nameInput.value.trim() || 'SLOT';
-                    let plan = parseInt(planInput.value) || 1;
+                    let planVal = parseFloat(planInput.value) || 1;
 
-                    slots.push({ id: name, planUSD: plan, player: "", cost: null });
+                    let planUSD = displayMode === 'percent' ? Math.round((planVal / 100) * totalBudget) : Math.round(planVal);
+
+                    slots.push({ id: name, planUSD: planUSD, player: "", cost: null });
                     nameInput.value = '';
                     planInput.value = '';
                     render();
@@ -752,11 +815,12 @@
                     let priceInput = document.getElementById('input-price');
                     
                     let player = playerInput.value.trim();
-                    let price = parseInt(priceInput.value);
+                    let rawPrice = parseFloat(priceInput.value);
 
-                    if (slotIdx !== "" && player && !isNaN(price)) {
+                    if (slotIdx !== "" && player && !isNaN(rawPrice)) {
+                        let finalCostUSD = displayMode === 'percent' ? Math.round((rawPrice / 100) * totalBudget) : Math.round(rawPrice);
                         slots[slotIdx].player = player;
-                        slots[slotIdx].cost = price;
+                        slots[slotIdx].cost = finalCostUSD;
                         playerInput.value = '';
                         priceInput.value = '';
                         render();
@@ -770,10 +834,11 @@
                     let mPlayer = document.getElementById('market-player');
                     let mCost = document.getElementById('market-cost');
                     let player = mPlayer.value.trim();
-                    let cost = parseInt(mCost.value);
+                    let rawCost = parseFloat(mCost.value);
 
-                    if (player && !isNaN(cost)) {
-                        marketLogs.push({ player, cost });
+                    if (player && !isNaN(rawCost)) {
+                        let finalCostUSD = displayMode === 'percent' ? Math.round((rawCost / 100) * totalBudget) : Math.round(rawCost);
+                        marketLogs.push({ player, cost: finalCostUSD });
                         mPlayer.value = '';
                         mCost.value = '';
                         renderMarketFeed();
@@ -805,6 +870,7 @@
                         marketLogs = [];
                         wishlist = [];
                         totalBudget = 200;
+                        displayMode = 'dollars';
                         if (budgetInput) budgetInput.value = 200;
                         render();
                         renderMarketFeed();
