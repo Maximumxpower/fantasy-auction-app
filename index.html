@@ -112,7 +112,7 @@
                 <span id="market-inflation-status" class="font-extrabold text-emerald-400">0% (Balanced Market)</span>
             </div>
             <div class="text-slate-400 text-[11px]" id="market-inflation-note">
-                Log room sales to track if managers are overspending or giving discounts.
+                Log room sales to track if managers are overspending or giving discounts vs projected values.
             </div>
         </section>
 
@@ -121,6 +121,20 @@
             
             <!-- Left Panel: Logging, Target Wishlist, Controls -->
             <div class="lg:col-span-5 space-y-4">
+
+                <!-- Bulk Importer -->
+                <section class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
+                    <div class="flex items-center space-x-2 mb-2">
+                        <span class="text-sky-400">📋</span>
+                        <h2 class="text-sm font-bold text-slate-200">External List Bulk Importer</h2>
+                    </div>
+                    <div class="space-y-2">
+                        <textarea id="bulk-import-text" rows="3" placeholder="Paste continuous or formatted text list here..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-slate-200 focus:ring-1 focus:ring-sky-500 focus:outline-none resize-none"></textarea>
+                        <button id="btn-bulk-import" class="w-full bg-sky-600 hover:bg-sky-500 font-bold py-1.5 rounded-lg transition text-xs shadow-md text-white">
+                            Parse & Import Values (Auto Tiers & D/ST)
+                        </button>
+                    </div>
+                </section>
                 
                 <!-- Log Drafted Player Box -->
                 <section class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
@@ -135,12 +149,12 @@
                         </div>
                         <div class="grid grid-cols-2 gap-2">
                             <div>
-                                <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Player Name</label>
-                                <input id="input-player" type="text" placeholder="e.g. Lamar Jackson" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-200 focus:ring-1 focus:ring-emerald-500 focus:outline-none">
+                                <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Player / Defense Name</label>
+                                <input id="input-player" type="text" list="global-player-datalist" placeholder="e.g. San Francisco 49ers" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-200 focus:ring-1 focus:ring-emerald-500 focus:outline-none">
                             </div>
                             <div>
                                 <label id="label-actual-cost" class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Actual Cost ($)</label>
-                                <input id="input-price" type="number" placeholder="e.g. 30" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-200 focus:ring-1 focus:ring-emerald-500 focus:outline-none">
+                                <input id="input-price" type="number" placeholder="e.g. 1" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-200 focus:ring-1 focus:ring-emerald-500 focus:outline-none">
                             </div>
                         </div>
                         <button id="btn-save" class="w-full bg-emerald-600 hover:bg-emerald-500 font-bold py-2 rounded-lg transition text-sm shadow-lg text-white">
@@ -160,7 +174,7 @@
                     </div>
                     <div class="space-y-2">
                         <div class="flex space-x-2">
-                            <input id="input-wish-name" type="text" placeholder="Add target (e.g. Bijan, Sun God)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1 text-xs text-slate-200 focus:ring-1 focus:ring-teal-500 focus:outline-none">
+                            <input id="input-wish-name" type="text" list="global-player-datalist" placeholder="Add target (e.g. San Francisco 49ers)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1 text-xs text-slate-200 focus:ring-1 focus:ring-teal-500 focus:outline-none">
                             <button id="btn-add-wish" class="bg-teal-600 hover:bg-teal-500 px-3 py-1 rounded-lg text-xs font-bold text-white transition">
                                 Add
                             </button>
@@ -168,6 +182,33 @@
                         <div id="wishlist-container" class="flex flex-wrap gap-1.5 pt-1">
                             <!-- Target badges dynamically generated here -->
                         </div>
+                    </div>
+                </section>
+
+                <!-- Imported Position Tiers Board -->
+                <section class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-indigo-400">📊</span>
+                            <h2 class="text-sm font-bold text-slate-200">Imported Players & Auto-Tiers</h2>
+                        </div>
+                        <span id="imported-count-badge" class="text-[10px] bg-slate-900 text-indigo-300 font-bold px-2 py-0.5 rounded-full border border-indigo-900/50">0 Players</span>
+                    </div>
+                    
+                    <!-- Position Sub-Filter Tabs for Imported Board -->
+                    <div class="flex flex-wrap gap-1 mb-3 text-[11px]">
+                        <button class="imp-filter-btn px-2 py-0.5 rounded font-bold bg-indigo-600 text-white" data-pos="ALL">ALL</button>
+                        <button class="imp-filter-btn px-2 py-0.5 rounded font-bold bg-slate-900 text-slate-300 hover:bg-slate-700" data-pos="QB">QB</button>
+                        <button class="imp-filter-btn px-2 py-0.5 rounded font-bold bg-slate-900 text-slate-300 hover:bg-slate-700" data-pos="RB">RB</button>
+                        <button class="imp-filter-btn px-2 py-0.5 rounded font-bold bg-slate-900 text-slate-300 hover:bg-slate-700" data-pos="WR">WR</button>
+                        <button class="imp-filter-btn px-2 py-0.5 rounded font-bold bg-slate-900 text-slate-300 hover:bg-slate-700" data-pos="TE">TE</button>
+                        <button class="imp-filter-btn px-2 py-0.5 rounded font-bold bg-slate-900 text-slate-300 hover:bg-slate-700" data-pos="DEF">DEF</button>
+                        <button class="imp-filter-btn px-2 py-0.5 rounded font-bold bg-slate-900 text-slate-300 hover:bg-slate-700" data-pos="K">K</button>
+                    </div>
+
+                    <!-- Scrollable Container for Auto-Tiered Position Lists -->
+                    <div id="imported-board-container" class="bg-slate-900/60 rounded-lg p-2.5 max-h-96 overflow-y-auto border border-slate-800 space-y-4 text-xs">
+                        <div class="text-center text-slate-500 italic py-6">Import player data to populate position tiers</div>
                     </div>
                 </section>
 
@@ -203,7 +244,7 @@
                     </div>
                     <div class="space-y-3">
                         <div class="grid grid-cols-2 gap-2">
-                            <input id="market-player" type="text" placeholder="e.g. Ja'Marr Chase" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-purple-500 focus:outline-none">
+                            <input id="market-player" type="text" list="global-player-datalist" placeholder="e.g. Pittsburgh Steelers" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-purple-500 focus:outline-none">
                             <input id="market-cost" type="number" placeholder="Cost ($)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-purple-500 focus:outline-none">
                         </div>
                         <button id="btn-market-save" class="w-full bg-purple-600 hover:bg-purple-500 font-bold py-1.5 rounded-lg transition text-xs shadow-md text-white">
@@ -258,7 +299,7 @@
                                     <th class="p-3">Slot Name</th>
                                     <th id="th-plan" class="p-3">Plan ($)</th>
                                     <th id="th-adj" class="p-3">Adj Target</th>
-                                    <th class="p-3">Player Drafted</th>
+                                    <th class="p-3">Player / Defense Drafted</th>
                                     <th id="th-spent" class="p-3">Spent</th>
                                     <th class="p-3 text-center">Drop</th>
                                 </tr>
@@ -284,6 +325,9 @@
         </div>
     </main>
 
+    <!-- Global Datalist for Autocomplete Suggestions -->
+    <datalist id="global-player-datalist"></datalist>
+
     <!-- Infinite Scrolling Pro Tips Banner Footer -->
     <footer class="bg-slate-950 border-t border-slate-800 py-2.5 fixed bottom-0 left-0 w-full z-40 overflow-hidden shadow-2xl flex items-center">
         <div class="bg-emerald-500 text-slate-950 font-black text-[10px] uppercase tracking-widest px-3 py-1.5 z-10 flex-shrink-0 flex items-center space-x-1 shadow-lg ml-2 rounded">
@@ -301,9 +345,10 @@
     <script>
         const proTipsList = [
             "📱 <strong class='text-emerald-400'>ADJ TARGET COLUMN:</strong> Shows real-time budget for open slots based on surplus cash from prior bargains.",
+            "📋 <strong class='text-sky-400'>BULK IMPORTER:</strong> Copy-paste raw text lists directly from external sites to load player auction values!",
             "🔀 <strong class='text-teal-400'>TOGGLE MODE:</strong> Switch between $ USD and % Budget anytime in the top navigation bar!",
-            "📊 <strong class='text-purple-400'>ROOM SALES LOG:</strong> Log room sales to automatically calculate room inflation and spot overall market trends.",
-            "🎯 <strong class='text-teal-400'>TARGET BOARD:</strong> Add top sleepers or targets to your Wishlist board and click any name to auto-fill logging forms!",
+            "📊 <strong class='text-purple-400'>ROOM SALES LOG:</strong> Log room sales to automatically calculate actual room inflation based on player projections.",
+            "🎯 <strong class='text-teal-400'>TARGET BOARD:</strong> Add top sleepers or defenses to your Wishlist board and click any name to auto-fill logging forms!",
             "🛡️ <strong class='text-amber-400'>MAX BID ALLOWED:</strong> Calculates the absolute maximum you can bid while keeping $1 for remaining open slots.",
             "⚠️ <strong class='text-rose-400'>UNALLOCATED PLAN:</strong> Flashes red when planned targets exceed total budget. Keep it balanced at $0 / 0%!",
             "✏️ <strong class='text-sky-400'>EDIT ON THE FLY:</strong> Click directly into any Slot Name or Plan box to adjust targets mid-draft.",
@@ -314,19 +359,7 @@
             "💾 <strong class='text-emerald-400'>AUTO-SAVE:</strong> All picks, targets, and custom slots automatically save to your browser in real time!",
             "⏸️ <strong class='text-amber-400'>PAUSE TICKER:</strong> Hover or tap and hold on this ticker anytime to pause scrolling text and read!",
             "🔥 <strong class='text-emerald-400'>HERO STARTER STRATEGY:</strong> Pay up for 1-2 premier studs to anchor your team, then dominate $1-$5 value picks.",
-            "💰 <strong class='text-amber-400'>BENCH DISCIPLINE:</strong> Keep bench spending strictly to 1-2% to maximize starting lineup firepower.",
-            "🎯 <strong class='text-purple-400'>NOMINATION DECEPTION:</strong> Nominate high-cost stars you DON'T want early to drain rival budgets.",
-            "⚡ <strong class='text-teal-400'>ENDGAME FLEXIBILITY:</strong> Keep $3-$5 extra in late rounds to easily outbid $1 managers on key sleepers.",
-            "⚖️ <strong class='text-sky-400'>PRICE ENFORCING DANGER:</strong> Never bid up players to 'keep managers honest' unless you want them on your team!",
-            "🏷️ <strong class='text-emerald-400'>TIER JUMPING:</strong> Never wait for the final player in a position tier—desperate managers always overpay for the last option!",
-            "🏈 <strong class='text-amber-400'>KICKER & DEFENSE:</strong> Never spend more than $1 (0.5%) on Kickers or Defenses in auction drafts.",
-            "💡 <strong class='text-sky-400'>80/20 RULE:</strong> Allocate 80-90% of your initial budget strictly to your starting lineup.",
-            "⏱️ <strong class='text-purple-400'>MONITOR MONEY IN ROOM:</strong> Watch which managers have deep pockets so you don't get trapped in bidding wars.",
-            "📉 <strong class='text-rose-400'>EXPLOIT EARLY HESITATION:</strong> If your room starts overly cautious, jump in and snag top-tier studs at massive discounts.",
-            "🚀 <strong class='text-teal-400'>NOMINATE TARGETS LATE:</strong> In later rounds, nominate $1 sleepers you actually want when rivals are broke.",
-            "🏈 <strong class='text-emerald-400'>STUDS AND SCRUBS:</strong> Blowing 70% on two top-5 overall picks works if you excel at identifying waiver wire breakouts.",
-            "📊 <strong class='text-sky-400'>NO LEFT-OVER CASH:</strong> Unspent draft budget is wasted money. Spend every single dollar before the draft ends!",
-            "📈 <strong class='text-emerald-400'>INFLATION ADJUSTMENT:</strong> If top RBs sell for 20% over budget, adjust expectations—WRs or TEs will be discounted!"
+            "💰 <strong class='text-amber-400'>BENCH DISCIPLINE:</strong> Keep bench spending strictly to 1-2% to maximize starting lineup firepower."
         ];
 
         const defaultSlots = [
@@ -353,10 +386,25 @@
         let displayMode = 'dollars'; // 'dollars' | 'percent'
         let slots = JSON.parse(JSON.stringify(defaultSlots));
         let marketLogs = [];
-        let wishlist = ["Lamar Jackson", "Breece Hall", "Malik Nabers", "Trey McBride"];
+        let wishlist = ["Jahmyr Gibbs", "Bijan Robinson", "San Francisco 49ers", "Pittsburgh Steelers"];
         let activePosFilter = "ALL";
+        let activeImportedFilter = "ALL";
+        
+        let importedPlayerMap = {}; 
+        let importedPlayerDetails = {}; 
 
-        // Formatter Helper function
+        function normalizePos(posTag) {
+            if (!posTag) return 'UTIL';
+            let upper = posTag.toUpperCase();
+            if (upper.includes('QB')) return 'QB';
+            if (upper.includes('RB')) return 'RB';
+            if (upper.includes('WR')) return 'WR';
+            if (upper.includes('TE')) return 'TE';
+            if (upper.includes('DST') || upper.includes('DEF')) return 'DEF';
+            if (upper.includes('K')) return 'K';
+            return 'UTIL';
+        }
+
         function valFormat(usdVal) {
             if (usdVal === null || usdVal === undefined) return '-';
             if (displayMode === 'percent') {
@@ -373,7 +421,23 @@
             tickerElem.innerHTML = fullSet + fullSet;
         }
 
-        // LocalStorage Save & Load Logic
+        function refreshSearchSuggestions() {
+            const datalist = document.getElementById('global-player-datalist');
+            if (!datalist) return;
+            datalist.innerHTML = '';
+
+            let names = new Set([
+                ...Object.keys(importedPlayerMap),
+                ...wishlist
+            ]);
+
+            names.forEach(name => {
+                let opt = document.createElement('option');
+                opt.value = name;
+                datalist.appendChild(opt);
+            });
+        }
+
         function saveState() {
             try {
                 localStorage.setItem('draft_slots', JSON.stringify(slots));
@@ -381,6 +445,8 @@
                 localStorage.setItem('draft_wishlist', JSON.stringify(wishlist));
                 localStorage.setItem('draft_budget', totalBudget);
                 localStorage.setItem('draft_display_mode', displayMode);
+                localStorage.setItem('draft_player_map', JSON.stringify(importedPlayerMap));
+                localStorage.setItem('draft_player_details', JSON.stringify(importedPlayerDetails));
                 
                 const saveBadge = document.getElementById('save-status');
                 if (saveBadge) {
@@ -399,12 +465,16 @@
                 const savedWish = localStorage.getItem('draft_wishlist');
                 const savedBudget = localStorage.getItem('draft_budget');
                 const savedMode = localStorage.getItem('draft_display_mode');
+                const savedMap = localStorage.getItem('draft_player_map');
+                const savedDetails = localStorage.getItem('draft_player_details');
 
                 if (savedSlots) slots = JSON.parse(savedSlots);
                 if (savedMarket) marketLogs = JSON.parse(savedMarket);
                 if (savedWish) wishlist = JSON.parse(savedWish);
                 if (savedBudget) totalBudget = parseInt(savedBudget);
                 if (savedMode) displayMode = savedMode;
+                if (savedMap) importedPlayerMap = JSON.parse(savedMap);
+                if (savedDetails) importedPlayerDetails = JSON.parse(savedDetails);
             } catch (e) {
                 console.error("Error loading stored data:", e);
             }
@@ -429,7 +499,6 @@
             }
         }
 
-        // Determine Position Category
         function getPosTag(slotName) {
             let s = slotName.toUpperCase();
             if (s.includes("QB")) return { code: "QB", color: "bg-purple-900/60 text-purple-300 border-purple-700" };
@@ -441,7 +510,101 @@
             return { code: "DST/K", color: "bg-slate-800 text-slate-300 border-slate-700" };
         }
 
-        // Calculate Inflation / Deflation Trend from Room Sales
+        function isPlayerDrafted(playerName) {
+            let normName = playerName.trim().toLowerCase();
+            return slots.some(s => s.player && s.player.trim().toLowerCase() === normName);
+        }
+
+        function renderImportedBoard() {
+            const container = document.getElementById('imported-board-container');
+            const badge = document.getElementById('imported-count-badge');
+            if (!container) return;
+
+            let totalImported = Object.keys(importedPlayerDetails).length;
+            if (badge) badge.innerText = `${totalImported} Players`;
+
+            if (totalImported === 0) {
+                container.innerHTML = `<div class="text-center text-slate-500 italic py-6">Import player data to populate position tiers</div>`;
+                return;
+            }
+
+            let groups = { QB: [], RB: [], WR: [], TE: [], DEF: [], K: [], UTIL: [] };
+            Object.keys(importedPlayerDetails).forEach(name => {
+                let info = importedPlayerDetails[name];
+                let p = groups[info.pos] ? info.pos : 'UTIL';
+                groups[p].push({ name: name, value: info.value });
+            });
+
+            container.innerHTML = '';
+            let filteredPositions = activeImportedFilter === 'ALL' ? ['QB', 'RB', 'WR', 'TE', 'DEF', 'K', 'UTIL'] : [activeImportedFilter];
+
+            filteredPositions.forEach(pos => {
+                let players = groups[pos];
+                if (!players || players.length === 0) return;
+
+                players.sort((a, b) => b.value - a.value);
+
+                let tiers = [];
+                let currentTier = 1;
+                let currentTierList = [];
+                let prevVal = players[0].value;
+
+                players.forEach((p, idx) => {
+                    if (idx > 0 && (prevVal - p.value >= 3) && currentTierList.length > 0) {
+                        tiers.push({ tier: currentTier, players: currentTierList });
+                        currentTier++;
+                        currentTierList = [];
+                    }
+                    currentTierList.push(p);
+                    prevVal = p.value;
+                });
+                if (currentTierList.length > 0) {
+                    tiers.push({ tier: currentTier, players: currentTierList });
+                }
+
+                let posDiv = document.createElement('div');
+                posDiv.className = "space-y-2 mb-3 pb-2 border-b border-slate-800 last:border-0";
+                
+                let headerHTML = `<div class="flex items-center justify-between bg-slate-950/60 px-2 py-1 rounded font-bold text-slate-300">
+                    <span>${pos} Tier Breakdown</span>
+                    <span class="text-[10px] text-slate-500">${players.length} players</span>
+                </div>`;
+                
+                let tiersHTML = '';
+                tiers.forEach(t => {
+                    let playerBadges = t.players.map(pl => {
+                        let drafted = isPlayerDrafted(pl.name);
+                        let badgeStyle = drafted 
+                            ? "bg-slate-900/40 text-slate-600 border-slate-800 line-through opacity-40" 
+                            : "bg-slate-900 text-slate-300 border-slate-700 hover:border-indigo-500 cursor-pointer";
+                        
+                        return `<span data-p-name="${pl.name}" class="imp-player-badge inline-flex items-center space-x-1 px-2 py-0.5 rounded border text-[11px] transition ${badgeStyle}" title="Click to select">
+                            <span>${pl.name}</span>
+                            <span class="text-indigo-400 font-semibold">(${valFormat(pl.value)})</span>
+                        </span>`;
+                    }).join(' ');
+
+                    tiersHTML += `<div class="space-y-1">
+                        <div class="text-[10px] font-extrabold text-indigo-400 uppercase tracking-wider">Tier ${t.tier}</div>
+                        <div class="flex flex-wrap gap-1">${playerBadges}</div>
+                    </div>`;
+                });
+
+                posDiv.innerHTML = headerHTML + `<div class="space-y-2 pl-1">${tiersHTML}</div>`;
+                container.appendChild(posDiv);
+            });
+
+            container.querySelectorAll('.imp-player-badge').forEach(badge => {
+                badge.addEventListener('click', (e) => {
+                    let name = e.currentTarget.getAttribute('data-p-name');
+                    document.getElementById('input-player').value = name;
+                    if (importedPlayerMap[name] !== undefined) {
+                        document.getElementById('input-price').value = importedPlayerMap[name];
+                    }
+                });
+            });
+        }
+
         function updateMarketInflation() {
             const statusElem = document.getElementById('market-inflation-status');
             const noteElem = document.getElementById('market-inflation-note');
@@ -453,26 +616,34 @@
                 return;
             }
 
-            let totalSpentRoom = marketLogs.reduce((acc, log) => acc + log.cost, 0);
-            let estimatedAvgBase = marketLogs.length * (totalBudget / 16); 
-            let diffPct = Math.round(((totalSpentRoom - estimatedAvgBase) / estimatedAvgBase) * 100);
+            let totalSpentRoom = 0;
+            let totalExpectedVal = 0;
 
-            if (diffPct > 5) {
+            marketLogs.forEach(log => {
+                totalSpentRoom += log.cost;
+                let exp = importedPlayerMap[log.player] !== undefined ? importedPlayerMap[log.player] : log.cost;
+                totalExpectedVal += exp;
+            });
+
+            if (totalExpectedVal === 0) totalExpectedVal = totalSpentRoom;
+
+            let diffPct = Math.round(((totalSpentRoom - totalExpectedVal) / totalExpectedVal) * 100);
+
+            if (diffPct > 3) {
                 statusElem.innerText = `+${diffPct}% (INFLATED ROOM - Bidding High)`;
                 statusElem.className = "font-extrabold text-rose-400";
-                noteElem.innerText = "Managers are overpaying early. Sit back and wait for mid-draft bargains!";
-            } else if (diffPct < -5) {
+                noteElem.innerText = "Managers are paying above baseline projections. Keep surplus cash for mid-draft bargains!";
+            } else if (diffPct < -3) {
                 statusElem.innerText = `${diffPct}% (DISCOUNTED MARKET - Bargains Open)`;
                 statusElem.className = "font-extrabold text-teal-400";
                 noteElem.innerText = "The room is bidding cautiously. Jump in early to snag studs at discounts!";
             } else {
                 statusElem.innerText = `${diffPct}% (Balanced Market)`;
                 statusElem.className = "font-extrabold text-emerald-400";
-                noteElem.innerText = "Spending is matching standard projections.";
+                noteElem.innerText = "Spending is closely tracking player projections.";
             }
         }
 
-        // Render Quick Target Board
         function renderWishlist() {
             const container = document.getElementById('wishlist-container');
             if (!container) return;
@@ -486,13 +657,19 @@
             wishlist.forEach((name, idx) => {
                 let badge = document.createElement('div');
                 badge.className = "flex items-center space-x-1 bg-slate-900 border border-teal-800/60 text-teal-300 text-xs px-2.5 py-1 rounded-lg cursor-pointer hover:bg-teal-950 transition active:scale-95";
+                
+                let projVal = importedPlayerMap[name] !== undefined ? ` ($${importedPlayerMap[name]})` : '';
+
                 badge.innerHTML = `
-                    <span class="wish-item font-semibold">${name}</span>
+                    <span class="wish-item font-semibold">${name}${projVal}</span>
                     <button data-w-idx="${idx}" class="btn-del-wish text-slate-500 hover:text-rose-400 font-bold ml-1 text-xs">✕</button>
                 `;
                 
                 badge.querySelector('.wish-item').addEventListener('click', () => {
                     document.getElementById('input-player').value = name;
+                    if (importedPlayerMap[name] !== undefined) {
+                        document.getElementById('input-price').value = importedPlayerMap[name];
+                    }
                 });
 
                 container.appendChild(badge);
@@ -504,12 +681,12 @@
                     let idx = parseInt(e.target.getAttribute('data-w-idx'));
                     wishlist.splice(idx, 1);
                     renderWishlist();
+                    refreshSearchSuggestions();
                     saveState();
                 });
             });
         }
 
-        // Core Render Function
         function render() {
             updateToggleButtons();
 
@@ -642,7 +819,7 @@
                     <td class="p-3 font-bold text-sm text-emerald-400">
                         ${s.cost !== null ? '<span class="text-slate-600">-</span>' : valFormat(adjUSD)}
                     </td>
-                    <td class="p-3 font-medium text-slate-200 truncate max-w-[110px]">
+                    <td class="p-3 font-medium text-slate-200 truncate max-w-[130px]">
                         ${s.player || '<span class="text-slate-600 italic">unfilled</span>'}
                     </td>
                     <td class="${priceColClass}">
@@ -663,6 +840,7 @@
 
             bindTableListeners();
             updateMarketInflation();
+            renderImportedBoard();
             saveState();
         }
 
@@ -714,12 +892,24 @@
                 let realIdx = marketLogs.length - 1 - reversedIdx;
                 let li = document.createElement('li');
                 li.className = 'py-1.5 flex justify-between items-center text-slate-300';
+                
+                let expVal = importedPlayerMap[log.player];
+                let diffBadge = '';
+                if (expVal !== undefined) {
+                    let diff = log.cost - expVal;
+                    let color = diff > 0 ? 'text-rose-400' : (diff < 0 ? 'text-emerald-400' : 'text-slate-500');
+                    diffBadge = `<span class="text-[9px] ${color} ml-1">(${diff >= 0 ? '+' : ''}${diff})</span>`;
+                }
+
                 li.innerHTML = `
                     <div class="flex items-center space-x-2 truncate">
                         <button data-m-idx="${realIdx}" class="btn-delete-market text-rose-400 hover:text-rose-300 font-bold text-xs px-1" title="Delete entry">✕</button>
                         <span class="font-medium text-slate-200 truncate max-w-[130px]">${log.player}</span>
                     </div>
-                    <span class="font-bold text-amber-400">${valFormat(log.cost)}</span>
+                    <div class="flex items-center">
+                        <span class="font-bold text-amber-400">${valFormat(log.cost)}</span>
+                        ${diffBadge}
+                    </div>
                 `;
                 feed.appendChild(li);
             });
@@ -737,9 +927,9 @@
         function initApp() {
             loadState();
             setupTicker();
+            refreshSearchSuggestions();
             renderWishlist();
 
-            // Toggle mode buttons
             document.getElementById('btn-mode-usd').addEventListener('click', () => {
                 displayMode = 'dollars';
                 render();
@@ -763,7 +953,50 @@
                 });
             }
 
-            // Target Wishlist Adding
+          // Target Parser for Compressed Draft Board Lists
+document.getElementById('btn-bulk-import')?.addEventListener('click', () => {
+    const rawTextElement = document.getElementById('bulk-import-text');
+    if (!rawTextElement) return;
+    
+    const rawText = rawTextElement.value;
+    if (!rawText.trim()) {
+        alert("Please paste your list text first!");
+        return;
+    }
+
+    let count = 0;
+    let newWishlist = [];
+
+    // Regex handles index numbers, player names, team/position parentheses, optional status codes (like DTD), and dollar values
+    const regexDraftList = /\d+\.\s*([^(]+?)\s*\(([^)]+)\)(?:[A-Za-z]+)?\s*\$(\d+)/g;
+
+    let match;
+    while ((match = regexDraftList.exec(rawText)) !== null) {
+        let pName = match[1].trim();
+        let rawPosTag = match[2].trim();
+        let pVal = parseInt(match[3], 10);
+
+        if (pName && !isNaN(pVal)) {
+            let normP = normalizePos(rawPosTag);
+            importedPlayerMap[pName] = pVal;
+            importedPlayerDetails[pName] = { value: pVal, pos: normP };
+            if (count < 20) newWishlist.push(pName);
+            count++;
+        }
+    }
+
+    if (count > 0) {
+        if (newWishlist.length > 0) wishlist = newWishlist;
+        rawTextElement.value = '';
+        refreshSearchSuggestions();
+        renderWishlist();
+        render();
+        alert(`Successfully imported ${count} players and generated auto-tiers!`);
+    } else {
+        alert("Could not automatically parse the format. Please check the text layout.");
+    }
+});
+
             let addWishBtn = document.getElementById('btn-add-wish');
             if (addWishBtn) {
                 addWishBtn.addEventListener('click', () => {
@@ -772,13 +1005,20 @@
                     if (val) {
                         wishlist.push(val);
                         wishInput.value = '';
+                        refreshSearchSuggestions();
                         renderWishlist();
                         saveState();
                     }
                 });
             }
 
-            // Position Filters
+            document.getElementById('input-player')?.addEventListener('input', (e) => {
+                let name = e.target.value.trim();
+                if (importedPlayerMap[name] !== undefined) {
+                    document.getElementById('input-price').value = importedPlayerMap[name];
+                }
+            });
+
             document.querySelectorAll('.pos-filter-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     document.querySelectorAll('.pos-filter-btn').forEach(b => {
@@ -787,6 +1027,17 @@
                     e.target.className = "pos-filter-btn px-2.5 py-0.5 rounded font-bold bg-emerald-600 text-white";
                     activePosFilter = e.target.getAttribute('data-pos');
                     render();
+                });
+            });
+
+            document.querySelectorAll('.imp-filter-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.imp-filter-btn').forEach(b => {
+                        b.className = "imp-filter-btn px-2 py-0.5 rounded font-bold bg-slate-900 text-slate-300 hover:bg-slate-700";
+                    });
+                    e.target.className = "imp-filter-btn px-2.5 py-0.5 rounded font-bold bg-indigo-600 text-white";
+                    activeImportedFilter = e.target.getAttribute('data-pos');
+                    renderImportedBoard();
                 });
             });
 
@@ -869,9 +1120,12 @@
                         slots = JSON.parse(JSON.stringify(defaultSlots));
                         marketLogs = [];
                         wishlist = [];
+                        importedPlayerMap = {};
+                        importedPlayerDetails = {};
                         totalBudget = 200;
                         displayMode = 'dollars';
                         if (budgetInput) budgetInput.value = 200;
+                        refreshSearchSuggestions();
                         render();
                         renderMarketFeed();
                         renderWishlist();
