@@ -1,0 +1,549 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fantasy Football Auction Assistant</title>
+	
+	<!-- PWA / App Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0f172a">
+    <link rel="manifest" href="manifest.json">
+	
+    <!-- Tailwind CSS for modern responsive dark-mode styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Modern backdrop scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #475569;
+            border-radius: 4px;
+        }
+        /* Touch friendly sizing for inputs */
+        input, select, button {
+            min-height: 2.2rem;
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
+
+    <!-- Top Navigation Bar -->
+    <nav class="bg-slate-950 border-b border-slate-800 py-3 px-4 sticky top-0 z-50 shadow-lg">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <span class="text-xl">🏈</span>
+                <h1 class="text-lg font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+                    Draft Assistant Pro
+                </h1>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Budget Pool:</span>
+                <div class="relative flex items-center">
+                    <span class="absolute left-2.5 text-emerald-400 font-bold">$</span>
+                    <input id="input-total-budget" type="number" value="200" 
+                           class="w-20 pl-6 pr-2 py-1 bg-slate-900 border border-slate-700 rounded-lg text-sm text-emerald-400 font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none text-center">
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main App Container -->
+    <main class="max-w-4xl mx-auto p-4 space-y-4 pb-24">
+
+        <!-- Real-Time Metrics Banner -->
+        <section class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
+            <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-xl shadow-md text-center">
+                <span class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">REMAINING CASH</span>
+                <span id="stat-remaining" class="text-xl sm:text-2xl font-extrabold text-emerald-400">$200</span>
+            </div>
+            <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-xl shadow-md text-center">
+                <span id="label-max-bid" class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">MAX BID ALLOWED</span>
+                <span id="stat-maxbid" class="text-xl sm:text-2xl font-extrabold text-amber-400">$184</span>
+            </div>
+            <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-xl shadow-md text-center">
+                <span class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">PLANNED TOTAL</span>
+                <span id="stat-planned" class="text-xl sm:text-2xl font-extrabold text-sky-400">$200</span>
+            </div>
+            <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-xl shadow-md text-center">
+                <span id="label-unallocated" class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">UNALLOCATED PLAN</span>
+                <span id="stat-unallocated" class="text-xl sm:text-2xl font-extrabold text-emerald-400">$0</span>
+            </div>
+        </section>
+
+        <!-- Main Workspace -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+            
+            <!-- Left Panel: Logging & Controls -->
+            <div class="lg:col-span-5 space-y-4">
+                
+                <!-- Log Drafted Player Box -->
+                <section class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
+                    <div class="flex items-center space-x-2 mb-3">
+                        <span class="text-emerald-400">📝</span>
+                        <h2 class="text-sm font-bold text-slate-200">Log Roster Pick</h2>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Target Roster Slot</label>
+                            <select id="input-slot" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:ring-1 focus:ring-emerald-500 focus:outline-none"></select>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Player Name</label>
+                                <input id="input-player" type="text" placeholder="e.g. Lamar" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-200 focus:ring-1 focus:ring-emerald-500 focus:outline-none">
+                            </div>
+                            <div>
+                                <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Actual Cost ($)</label>
+                                <input id="input-price" type="number" placeholder="e.g. 30" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-200 focus:ring-1 focus:ring-emerald-500 focus:outline-none">
+                            </div>
+                        </div>
+                        <button id="btn-save" class="w-full bg-emerald-600 hover:bg-emerald-500 font-bold py-2 rounded-lg transition text-sm shadow-lg text-white">
+                            Lock & Save Pick
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Add New Custom Slot Box -->
+                <section class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
+                    <div class="flex items-center space-x-2 mb-3">
+                        <span class="text-blue-400">➕</span>
+                        <h2 class="text-sm font-bold text-slate-200">Add Custom Position / Slot</h2>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Position Name</label>
+                            <input id="add-slot-name" type="text" placeholder="e.g. SUPERFLEX" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Plan Target ($)</label>
+                            <input id="add-slot-plan" type="number" placeholder="e.g. 24" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                    </div>
+                    <button id="btn-add-slot" class="w-full bg-blue-600 hover:bg-blue-500 font-bold py-2 rounded-lg transition text-xs shadow-md text-white">
+                        Insert New Slot
+                    </button>
+                </section>
+
+                <!-- Market Tracker: Log Other Teams' Picks -->
+                <section class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-purple-400">📊</span>
+                            <h2 class="text-sm font-bold text-slate-200">Room Sales Log</h2>
+                        </div>
+                        <span class="text-[10px] bg-purple-900/40 text-purple-300 font-bold px-2 py-0.5 rounded-full border border-purple-800/40">Market Trends</span>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-2 gap-2">
+                            <input id="market-player" type="text" placeholder="e.g. Bijan Robinson" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-purple-500 focus:outline-none">
+                            <input id="market-cost" type="number" placeholder="Cost ($)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-purple-500 focus:outline-none">
+                        </div>
+                        <button id="btn-market-save" class="w-full bg-purple-600 hover:bg-purple-500 font-bold py-1.5 rounded-lg transition text-xs shadow-md text-white">
+                            Log Room Purchase
+                        </button>
+                        <!-- Dynamic Feed List -->
+                        <div class="bg-slate-900/50 rounded-lg p-2 max-h-36 overflow-y-auto border border-slate-850">
+                            <ul id="market-feed" class="divide-y divide-slate-800 text-[11px] text-slate-300">
+                                <li class="py-1 text-center text-slate-500 italic">No room sales logged yet</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- Right Panel: Roster & Targets Grid -->
+            <div class="lg:col-span-7">
+                <section class="bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden">
+                    <div class="p-4 bg-slate-800 border-b border-slate-700 flex justify-between items-center">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-emerald-400">📋</span>
+                            <h2 class="text-sm font-bold text-slate-200">Roster, Plan, and Live Projections</h2>
+                        </div>
+                        <button id="btn-reset" class="text-xs bg-rose-950/40 hover:bg-rose-900 text-rose-300 font-bold px-3 py-1.5 rounded-lg border border-rose-800/40 transition">
+                            Reset Board
+                        </button>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[10px] font-bold border-b border-slate-700">
+                                <tr>
+                                    <th class="p-3">Slot (Edit Name)</th>
+                                    <th class="p-3">Plan $</th>
+                                    <th class="p-3">Adj Target</th>
+                                    <th class="p-3">Player Drafted</th>
+                                    <th class="p-3">Spent</th>
+                                    <th class="p-3 text-center">Drop</th>
+                                </tr>
+                            </thead>
+                            <tbody id="roster-tbody" class="divide-y divide-slate-700/60">
+                                <!-- Dynamically generated rows go here -->
+                            </tbody>
+                            <!-- Live Totals Footer -->
+                            <tfoot class="bg-slate-900/90 text-slate-300 font-bold border-t-2 border-slate-700 text-xs">
+                                <tr>
+                                    <td class="p-3 uppercase text-[10px] text-slate-400">Total:</td>
+                                    <td id="foot-plan-sum" class="p-3 text-sky-400">$0</td>
+                                    <td id="foot-adj-sum" class="p-3 text-emerald-400">$0</td>
+                                    <td class="p-3 text-slate-500 italic">Roster Summary</td>
+                                    <td id="foot-spent-sum" class="p-3 text-amber-400">$0</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- App Instructions / Footer Bar -->
+    <footer class="bg-slate-950 border-t border-slate-800 text-slate-400 text-center py-4 text-xs fixed bottom-0 left-0 w-full z-40">
+        💡 <span class="text-slate-300 font-medium">Pro-Tip:</span> Watch the <span class="text-emerald-400 font-bold">UNALLOCATED PLAN</span> box at top right to make sure your custom targets match your total budget!
+    </footer>
+
+    <!-- Core App Logic -->
+    <script>
+        const defaultSlots = [
+            { id: "QB1", planUSD: 20, player: "", cost: null },
+            { id: "RB1", planUSD: 36, player: "", cost: null },
+            { id: "RB2", planUSD: 22, player: "", cost: null },
+            { id: "WR/RB", planUSD: 13, player: "", cost: null },
+            { id: "WR1", planUSD: 35, player: "", cost: null },
+            { id: "WR2", planUSD: 24, player: "", cost: null },
+            { id: "WR3", planUSD: 16, player: "", cost: null },
+            { id: "QB2", planUSD: 6, player: "", cost: null },
+            { id: "FLEX1", planUSD: 12, player: "", cost: null },
+            { id: "FLEX2", planUSD: 8, player: "", cost: null },
+            { id: "KICKER", planUSD: 1, player: "", cost: null },
+            { id: "DEFENSE", planUSD: 1, player: "", cost: null },
+            { id: "Bench1", planUSD: 2, player: "", cost: null },
+            { id: "Bench2", planUSD: 1, player: "", cost: null },
+            { id: "Bench3", planUSD: 1, player: "", cost: null },
+            { id: "Bench4", planUSD: 1, player: "", cost: null },
+            { id: "Bench5", planUSD: 1, player: "", cost: null },
+        ];
+
+        let totalBudget = 200;
+        let slots = JSON.parse(JSON.stringify(defaultSlots));
+        let marketLogs = [];
+
+        // Core Render Function
+        function render() {
+            let totalSpent = slots.reduce((acc, s) => acc + (s.cost !== null ? s.cost : 0), 0);
+            let totalPlanned = slots.reduce((acc, s) => acc + s.planUSD, 0);
+            let unallocatedPlan = totalBudget - totalPlanned;
+
+            let remainingBudget = totalBudget - totalSpent;
+            let openSlots = slots.filter(s => s.cost === null);
+            let openSlotsCount = openSlots.length;
+            let maxBid = openSlotsCount > 0 ? remainingBudget - (openSlotsCount - 1) : 0;
+
+            // Render top stats cards
+            document.getElementById('stat-remaining').innerText = '$' + remainingBudget;
+            document.getElementById('stat-maxbid').innerText = '$' + Math.max(0, maxBid);
+            document.getElementById('stat-planned').innerText = '$' + totalPlanned;
+            
+            // Render Unallocated Plan tracker
+            let unallocElem = document.getElementById('stat-unallocated');
+            let unallocLabel = document.getElementById('label-unallocated');
+            if (unallocatedPlan < 0) {
+                unallocElem.innerText = '-$' + Math.abs(unallocatedPlan);
+                unallocElem.className = "text-xl sm:text-2xl font-extrabold text-rose-400";
+                unallocLabel.innerText = "PLAN OVER BUDGET";
+                unallocLabel.className = "text-[10px] sm:text-xs text-rose-400 font-bold uppercase tracking-wider block mb-1 animate-pulse";
+            } else if (unallocatedPlan > 0) {
+                unallocElem.innerText = '+$' + unallocatedPlan;
+                unallocElem.className = "text-xl sm:text-2xl font-extrabold text-amber-400";
+                unallocLabel.innerText = "UNALLOCATED CASH";
+                unallocLabel.className = "text-[10px] sm:text-xs text-amber-400 font-bold uppercase tracking-wider block mb-1";
+            } else {
+                unallocElem.innerText = '$0';
+                unallocElem.className = "text-xl sm:text-2xl font-extrabold text-emerald-400";
+                unallocLabel.innerText = "PLAN BALANCED";
+                unallocLabel.className = "text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1";
+            }
+
+            // Render Max Bid labels
+            let labelMaxBid = document.getElementById('label-max-bid');
+            if (maxBid < 1) {
+                labelMaxBid.innerText = "OVER BUDGET WARNING";
+                labelMaxBid.className = "text-[10px] sm:text-xs text-red-400 font-bold uppercase tracking-wider block mb-1 animate-pulse";
+            } else {
+                labelMaxBid.innerText = "MAX BID ALLOWED";
+                labelMaxBid.className = "text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1";
+            }
+
+            // Sum up baseline plan of open slots to distribute difference
+            let sumBaseOpen = openSlots.reduce((acc, s) => acc + s.planUSD, 0);
+
+            // Pre-calculate rounded targets and absorb rounding drift on top slot
+            let totalAdjTargetSum = 0;
+            let highestPlanIdx = -1;
+            let maxPlanVal = -1;
+
+            slots.forEach((s, idx) => {
+                if (s.cost === null && sumBaseOpen > 0) {
+                    let rawAdj = (s.planUSD / sumBaseOpen) * remainingBudget;
+                    let adjUSD = Math.round(rawAdj);
+                    s._calculatedAdj = adjUSD;
+                    totalAdjTargetSum += adjUSD;
+
+                    if (s.planUSD > maxPlanVal) {
+                        maxPlanVal = s.planUSD;
+                        highestPlanIdx = idx;
+                    }
+                } else {
+                    s._calculatedAdj = null;
+                }
+            });
+
+            // Adjust rounding difference onto the highest-value open target
+            if (openSlotsCount > 0 && sumBaseOpen > 0) {
+                let drift = remainingBudget - totalAdjTargetSum;
+                if (drift !== 0 && highestPlanIdx !== -1) {
+                    slots[highestPlanIdx]._calculatedAdj += drift;
+                    totalAdjTargetSum += drift;
+                }
+            }
+
+            let tbody = document.getElementById('roster-tbody');
+            let select = document.getElementById('input-slot');
+            tbody.innerHTML = '';
+            select.innerHTML = '';
+
+            slots.forEach((s, idx) => {
+                let planUSD = s.planUSD;
+                let adjUSD = s._calculatedAdj !== null ? s._calculatedAdj : planUSD;
+
+                // Append select options for open slots
+                if (s.cost === null) {
+                    let opt = document.createElement('option');
+                    opt.value = idx;
+                    opt.innerText = `${s.id} (Adj Target: $${adjUSD})`;
+                    select.appendChild(opt);
+                }
+
+                // Generate table row
+                let tr = document.createElement('tr');
+                let rowBg = s.cost !== null ? 'bg-slate-900/40 text-slate-400' : 'hover:bg-slate-800/40 transition-colors duration-150';
+                tr.className = `${rowBg}`;
+
+                // Spent variance calculation
+                let priceColClass = "p-3 text-slate-400 font-medium";
+                let varianceText = "";
+                if (s.cost !== null) {
+                    let diff = s.cost - s.planUSD;
+                    if (diff > 0) {
+                        varianceText = `<span class="text-[10px] text-rose-400 block">+ $${diff}</span>`;
+                    } else if (diff < 0) {
+                        varianceText = `<span class="text-[10px] text-emerald-400 block">- $${Math.abs(diff)}</span>`;
+                    } else {
+                        varianceText = `<span class="text-[10px] text-slate-500 block">even</span>`;
+                    }
+                    priceColClass = "p-3 font-extrabold text-amber-400 text-sm";
+                }
+
+                tr.innerHTML = `
+                    <td class="p-3">
+                        <input type="text" value="${s.id}" data-idx="${idx}" class="slot-name-input w-full bg-transparent border-b border-dashed border-slate-700 focus:border-emerald-500 focus:ring-0 outline-none text-slate-200 font-semibold text-xs py-0.5">
+                    </td>
+                    <td class="p-3">
+                        <div class="flex items-center space-x-1">
+                            <span class="text-slate-500">$</span>
+                            <input type="number" value="${s.planUSD}" data-idx="${idx}" class="plan-input w-12 bg-slate-900/50 border border-slate-700/60 rounded px-1.5 py-0.5 text-slate-200 font-semibold text-xs focus:ring-1 focus:ring-emerald-500 focus:outline-none">
+                        </div>
+                    </td>
+                    <td class="p-3 font-bold text-sm text-emerald-400">
+                        ${s.cost !== null ? '<span class="text-slate-600">-</span>' : '$' + adjUSD}
+                    </td>
+                    <td class="p-3 font-medium text-slate-200 truncate max-w-[110px]">
+                        ${s.player || '<span class="text-slate-600 italic">unfilled</span>'}
+                    </td>
+                    <td class="${priceColClass}">
+                        ${s.cost !== null ? '$' + s.cost + varianceText : '<span class="text-slate-600">-</span>'}
+                    </td>
+                    <td class="p-3 text-center">
+                        <button data-idx="${idx}" class="btn-delete-slot text-rose-400 hover:text-rose-300 font-bold text-base px-2 py-1 transition-transform active:scale-90" title="Delete slot">
+                            ✕
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Update Footer Totals Row
+            document.getElementById('foot-plan-sum').innerText = '$' + totalPlanned;
+            document.getElementById('foot-adj-sum').innerText = '$' + totalAdjTargetSum;
+            document.getElementById('foot-spent-sum').innerText = '$' + totalSpent;
+
+            bindTableListeners();
+        }
+
+        // Live Table Bindings
+        function bindTableListeners() {
+            document.querySelectorAll('.slot-name-input').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    let idx = e.target.getAttribute('data-idx');
+                    let name = e.target.value.trim();
+                    if (name) {
+                        slots[idx].id = name;
+                        render();
+                    }
+                });
+            });
+
+            document.querySelectorAll('.plan-input').forEach(input => {
+                input.addEventListener('change', (e) => {
+                    let idx = e.target.getAttribute('data-idx');
+                    let val = parseInt(e.target.value);
+                    if (!isNaN(val) && val >= 0) {
+                        slots[idx].planUSD = val;
+                        render();
+                    }
+                });
+            });
+
+            document.querySelectorAll('.btn-delete-slot').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    let idx = parseInt(e.target.getAttribute('data-idx'));
+                    slots.splice(idx, 1);
+                    render();
+                });
+            });
+        }
+
+        // Render Room market sales feed WITH DELETE BUTTONS
+        function renderMarketFeed() {
+            let feed = document.getElementById('market-feed');
+            if (marketLogs.length === 0) {
+                feed.innerHTML = `<li class="py-1 text-center text-slate-500 italic">No room sales logged yet</li>`;
+                return;
+            }
+            feed.innerHTML = '';
+            
+            marketLogs.slice().reverse().forEach((log, reversedIdx) => {
+                let realIdx = marketLogs.length - 1 - reversedIdx;
+                
+                let li = document.createElement('li');
+                li.className = 'py-1.5 flex justify-between items-center text-slate-300';
+                li.innerHTML = `
+                    <div class="flex items-center space-x-2 truncate">
+                        <button data-m-idx="${realIdx}" class="btn-delete-market text-rose-400 hover:text-rose-300 font-bold text-xs px-1" title="Delete entry">✕</button>
+                        <span class="font-medium text-slate-200 truncate max-w-[130px]">${log.player}</span>
+                    </div>
+                    <span class="font-bold text-amber-400">$${log.cost}</span>
+                `;
+                feed.appendChild(li);
+            });
+
+            document.querySelectorAll('.btn-delete-market').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    let idx = parseInt(e.target.getAttribute('data-m-idx'));
+                    marketLogs.splice(idx, 1);
+                    renderMarketFeed();
+                });
+            });
+        }
+
+        // Main App Initializer
+        function initApp() {
+            let budgetInput = document.getElementById('input-total-budget');
+            if (budgetInput) {
+                budgetInput.addEventListener('change', (e) => {
+                    let val = parseInt(e.target.value);
+                    if (!isNaN(val) && val > 0) {
+                        totalBudget = val;
+                        render();
+                    }
+                });
+            }
+
+            let addBtn = document.getElementById('btn-add-slot');
+            if (addBtn) {
+                addBtn.addEventListener('click', () => {
+                    let nameInput = document.getElementById('add-slot-name');
+                    let planInput = document.getElementById('add-slot-plan');
+                    let name = nameInput.value.trim() || 'SLOT';
+                    let plan = parseInt(planInput.value) || 1;
+
+                    slots.push({ id: name, planUSD: plan, player: "", cost: null });
+                    nameInput.value = '';
+                    planInput.value = '';
+                    render();
+                });
+            }
+
+            let saveBtn = document.getElementById('btn-save');
+            if (saveBtn) {
+                saveBtn.addEventListener('click', () => {
+                    let slotIdx = document.getElementById('input-slot').value;
+                    let playerInput = document.getElementById('input-player');
+                    let priceInput = document.getElementById('input-price');
+                    
+                    let player = playerInput.value.trim();
+                    let price = parseInt(priceInput.value);
+
+                    if (slotIdx !== "" && player && !isNaN(price)) {
+                        slots[slotIdx].player = player;
+                        slots[slotIdx].cost = price;
+                        playerInput.value = '';
+                        priceInput.value = '';
+                        render();
+                    }
+                });
+            }
+
+            let marketBtn = document.getElementById('btn-market-save');
+            if (marketBtn) {
+                marketBtn.addEventListener('click', () => {
+                    let mPlayer = document.getElementById('market-player');
+                    let mCost = document.getElementById('market-cost');
+                    let player = mPlayer.value.trim();
+                    let cost = parseInt(mCost.value);
+
+                    if (player && !isNaN(cost)) {
+                        marketLogs.push({ player, cost });
+                        mPlayer.value = '';
+                        mCost.value = '';
+                        renderMarketFeed();
+                    }
+                });
+            }
+
+            let resetBtn = document.getElementById('btn-reset');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', () => {
+                    if (confirm("Are you sure you want to reset all drafted players and restore default slots?")) {
+                        slots = JSON.parse(JSON.stringify(defaultSlots));
+                        marketLogs = [];
+                        totalBudget = 200;
+                        if (budgetInput) budgetInput.value = 200;
+                        render();
+                        renderMarketFeed();
+                    }
+                });
+            }
+
+            render();
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initApp);
+        } else {
+            initApp();
+        }
+    </script>
+</body>
+</html>
+
