@@ -953,7 +953,9 @@
                 });
             }
 
-          // Target Parser for Compressed Draft Board Lists
+        // ==========================================
+// UNIFIED DRAFT BOARD IMPORTER (Supports Both Formats)
+// ==========================================
 document.getElementById('btn-bulk-import')?.addEventListener('click', () => {
     const rawTextElement = document.getElementById('bulk-import-text');
     if (!rawTextElement) return;
@@ -966,32 +968,80 @@ document.getElementById('btn-bulk-import')?.addEventListener('click', () => {
 
     let count = 0;
     let newWishlist = [];
+    const lines = rawText.split('\n').map(l => l.trim());
+    
+    // Detect whether the input is the multi-line structured block format
+    const isMultiLine = lines.some(l => /^\d+\.\s*\([^)]+\)$/.test(l));
 
-    // Regex handles index numbers, player names, team/position parentheses, optional status codes (like DTD), and dollar values
-    const regexDraftList = /\d+\.\s*([^(]+?)\s*\(([^)]+)\)(?:[A-Za-z]+)?\s*\$(\d+)/g;
+    if (isMultiLine) {
+        let i = 0;
+        while (i < lines.length) {
+            const headerMatch = lines[i].match(/^\d+\.\s*\(([^)]+)\)$/);
+            
+            if (headerMatch && i + 2 < lines.length) {
+                const posRank = headerMatch[1]; // e.g., "RB1", "DST1"
+                const nameTeamLine = lines[i+1]; // e.g., "Jahmyr Gibbs, DET"
+                const valLine = lines[i+2]; // e.g., "$57"
+                
+                const lastCommaIndex = nameTeamLine.lastIndexOf(',');
+                let pName = nameTeamLine;
+                if (lastCommaIndex !== -1) {
+                    pName = nameTeamLine.substring(0, lastCommaIndex).trim();
+                }
+                
+                const valMatch = valLine.match(/\$(\d+)/);
+                if (valMatch) {
+                    let pVal = parseInt(valMatch[1], 10);
+                    let rawPos = posRank.replace(/[0-9]/g, ''); 
+                    let normP = normalizePos(rawPos);
+                    
+                    if (pName && !isNaN(pVal)) {
+                        importedPlayerMap[pName] = pVal;
+                        importedPlayerDetails[pName] = { value: pVal, pos: normP };
+                        if (count < 20) newWishlist.push(pName);
+                        count++;
+                    }
+                }
+                i += 4;
+            } else {
+                i++;
+            }
+        }
+    } else {
+        // Compact/Inline string format (e.g., "1.Jahmyr Gibbs (DET - RB)$61" or with DTD tags)
+        const inlineRegex = /(\d+)\.\s*([^()]+?)\s*\(([^)]+)\)\s*(?:[A-Z]+\s*)?\$(\d+)/g;
+        let match;
+        
+        while ((match = inlineRegex.exec(rawText)) !== null) {
+            const pName = match[2].trim();
+            const teamPos = match[3]; // e.g., "DET - RB"
+            const pVal = parseInt(match[4], 10);
+            
+            let normP = "FLEX";
+            if (teamPos.includes("-")) {
+                const parts = teamPos.split("-").map(p => p.trim());
+                normP = normalizePos(parts[parts.length - 1]);
+            } else {
+                normP = normalizePos(teamPos);
+            }
 
-    let match;
-    while ((match = regexDraftList.exec(rawText)) !== null) {
-        let pName = match[1].trim();
-        let rawPosTag = match[2].trim();
-        let pVal = parseInt(match[3], 10);
-
-        if (pName && !isNaN(pVal)) {
-            let normP = normalizePos(rawPosTag);
-            importedPlayerMap[pName] = pVal;
-            importedPlayerDetails[pName] = { value: pVal, pos: normP };
-            if (count < 20) newWishlist.push(pName);
-            count++;
+            if (pName && !isNaN(pVal)) {
+                importedPlayerMap[pName] = pVal;
+                importedPlayerDetails[pName] = { value: pVal, pos: normP };
+                if (count < 20) newWishlist.push(pName);
+                count++;
+            }
         }
     }
 
+    // Finalize import process
     if (count > 0) {
         if (newWishlist.length > 0) wishlist = newWishlist;
         rawTextElement.value = '';
         refreshSearchSuggestions();
         renderWishlist();
         render();
-        alert(`Successfully imported ${count} players and generated auto-tiers!`);
+        alert(`Successfully imported ${count} players!`);
     } else {
         alert("Could not automatically parse the format. Please check the text layout.");
     }
