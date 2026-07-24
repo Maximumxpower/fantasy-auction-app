@@ -35,7 +35,7 @@
         .animate-ticker {
             display: flex;
             width: max-content;
-            animation: ticker 180s linear infinite;
+            animation: ticker 150s linear infinite;
         }
         .animate-ticker:hover {
             animation-play-state: paused;
@@ -118,24 +118,58 @@
 
         <!-- Main Workspace Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
-            
+
             <!-- Left Panel: Logging, Target Wishlist, Controls -->
             <div class="lg:col-span-5 space-y-4">
 
                 <!-- Bulk Importer -->
                 <section class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
-                    <div class="flex items-center space-x-2 mb-2">
-                        <span class="text-sky-400">📋</span>
-                        <h2 class="text-sm font-bold text-slate-200">External List Bulk Importer</h2>
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-sky-400">📋</span>
+                            <h2 class="text-sm font-bold text-slate-200">External List Bulk Importer</h2>
+                        </div>
                     </div>
+
+                    <!-- Quick-open links -->
+                    <div class="mb-3 bg-slate-900/70 border border-slate-700/60 rounded-lg p-2.5">
+                        <div class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">Open FantasyPros → Copy → Paste below</div>
+                        <div class="flex flex-wrap gap-1.5 mb-2">
+                            <a href="https://www.fantasypros.com/nfl/auction-values/calculator.php" target="_blank" rel="noopener"
+                               class="inline-flex items-center space-x-1 bg-indigo-700 hover:bg-indigo-600 text-white font-bold text-[11px] px-2.5 py-1 rounded-lg transition shadow-sm">
+                                <span>⭐</span><span>All Auction Values</span>
+                            </a>
+                        </div>
+                        <div class="flex flex-wrap gap-1">
+                            <a href="https://www.fantasypros.com/nfl/projections/qb.php" target="_blank" rel="noopener"
+                               class="inline-flex items-center bg-purple-900/60 hover:bg-purple-800/80 border border-purple-700/40 text-purple-300 font-bold text-[10px] px-2 py-0.5 rounded transition">QB</a>
+                            <a href="https://www.fantasypros.com/nfl/projections/rb.php" target="_blank" rel="noopener"
+                               class="inline-flex items-center bg-emerald-900/60 hover:bg-emerald-800/80 border border-emerald-700/40 text-emerald-300 font-bold text-[10px] px-2 py-0.5 rounded transition">RB</a>
+                            <a href="https://www.fantasypros.com/nfl/projections/wr.php" target="_blank" rel="noopener"
+                               class="inline-flex items-center bg-sky-900/60 hover:bg-sky-800/80 border border-sky-700/40 text-sky-300 font-bold text-[10px] px-2 py-0.5 rounded transition">WR</a>
+                            <a href="https://www.fantasypros.com/nfl/projections/te.php" target="_blank" rel="noopener"
+                               class="inline-flex items-center bg-amber-900/60 hover:bg-amber-800/80 border border-amber-700/40 text-amber-300 font-bold text-[10px] px-2 py-0.5 rounded transition">TE</a>
+                            <a href="https://www.fantasypros.com/nfl/projections/dst.php" target="_blank" rel="noopener"
+                               class="inline-flex items-center bg-rose-900/60 hover:bg-rose-800/80 border border-rose-700/40 text-rose-300 font-bold text-[10px] px-2 py-0.5 rounded transition">DST</a>
+                            <a href="https://www.fantasypros.com/nfl/projections/k.php" target="_blank" rel="noopener"
+                               class="inline-flex items-center bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-300 font-bold text-[10px] px-2 py-0.5 rounded transition">K</a>
+                            <span class="text-slate-600 text-[10px] mx-1 self-center">·</span>
+                            <a href="https://www.fantasypros.com/nfl/cheatsheets/auction-values.php" target="_blank" rel="noopener"
+                               class="inline-flex items-center bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-400 font-bold text-[10px] px-2 py-0.5 rounded transition">ESPN Format</a>
+                        </div>
+                        <div class="mt-2 text-[10px] text-slate-500 leading-relaxed">
+                            Tip: On the FantasyPros page, press <kbd class="bg-slate-800 border border-slate-600 rounded px-1 py-0.5 text-slate-300 font-mono">Ctrl+A</kbd> then <kbd class="bg-slate-800 border border-slate-600 rounded px-1 py-0.5 text-slate-300 font-mono">Ctrl+C</kbd>, then paste below. Works even if the page is partially locked.
+                        </div>
+                    </div>
+
                     <div class="space-y-2">
-                        <textarea id="bulk-import-text" rows="3" placeholder="Paste continuous or formatted text list here..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-slate-200 focus:ring-1 focus:ring-sky-500 focus:outline-none resize-none"></textarea>
+                        <textarea id="bulk-import-text" rows="3" placeholder="Paste FantasyPros or ESPN cheat sheet text here..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-slate-200 focus:ring-1 focus:ring-sky-500 focus:outline-none resize-none"></textarea>
                         <button id="btn-bulk-import" class="w-full bg-sky-600 hover:bg-sky-500 font-bold py-1.5 rounded-lg transition text-xs shadow-md text-white">
                             Parse & Import Values (Auto Tiers & D/ST)
                         </button>
                     </div>
                 </section>
-                
+
                 <!-- Log Drafted Player Box -->
                 <section class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
                     <div class="flex items-center space-x-2 mb-3">
@@ -157,30 +191,38 @@
                                 <input id="input-price" type="number" placeholder="e.g. 1" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-200 focus:ring-1 focus:ring-emerald-500 focus:outline-none">
                             </div>
                         </div>
-                        <button id="btn-save" class="w-full bg-emerald-600 hover:bg-emerald-500 font-bold py-2 rounded-lg transition text-sm shadow-lg text-white">
-                            Lock & Save Pick
-                        </button>
+                        <div class="flex space-x-2">
+                            <button id="btn-save" class="flex-1 bg-emerald-600 hover:bg-emerald-500 font-bold py-2 rounded-lg transition text-sm shadow-lg text-white">
+                                Lock & Save Pick
+                            </button>
+                            <button id="btn-undo" class="bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold px-3 py-2 rounded-lg transition text-xs" title="Undo last pick">
+                                ↩️ Undo
+                            </button>
+                        </div>
                     </div>
                 </section>
 
-                <!-- Quick Target / Wishlist Clipboard -->
+                <!-- Nomination Queue -->
                 <section class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
                     <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center space-x-2">
                             <span class="text-teal-400">🎯</span>
-                            <h2 class="text-sm font-bold text-slate-200">Quick-Select Target Board</h2>
+                            <h2 class="text-sm font-bold text-slate-200">Nomination Queue</h2>
                         </div>
-                        <span class="text-[10px] text-slate-400">Click name to fill logging form</span>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-[10px] text-slate-400">Click name → fills form</span>
+                            <button id="btn-clear-queue" class="text-[10px] text-rose-400 hover:text-rose-300 font-bold px-1.5 py-0.5 rounded border border-rose-800/40 hover:bg-rose-950/30 transition">Clear All</button>
+                        </div>
                     </div>
                     <div class="space-y-2">
                         <div class="flex space-x-2">
-                            <input id="input-wish-name" type="text" list="global-player-datalist" placeholder="Add target (e.g. San Francisco 49ers)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1 text-xs text-slate-200 focus:ring-1 focus:ring-teal-500 focus:outline-none">
+                            <input id="input-wish-name" type="text" list="global-player-datalist" placeholder="Add player to queue..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1 text-xs text-slate-200 focus:ring-1 focus:ring-teal-500 focus:outline-none">
                             <button id="btn-add-wish" class="bg-teal-600 hover:bg-teal-500 px-3 py-1 rounded-lg text-xs font-bold text-white transition">
                                 Add
                             </button>
                         </div>
-                        <div id="wishlist-container" class="flex flex-wrap gap-1.5 pt-1">
-                            <!-- Target badges dynamically generated here -->
+                        <div id="wishlist-container" class="space-y-1 pt-1">
+                            <!-- Nomination queue items dynamically generated here -->
                         </div>
                     </div>
                 </section>
@@ -194,7 +236,7 @@
                         </div>
                         <span id="imported-count-badge" class="text-[10px] bg-slate-900 text-indigo-300 font-bold px-2 py-0.5 rounded-full border border-indigo-900/50">0 Players</span>
                     </div>
-                    
+
                     <!-- Position Sub-Filter Tabs for Imported Board -->
                     <div class="flex flex-wrap gap-1 mb-3 text-[11px]">
                         <button class="imp-filter-btn px-2 py-0.5 rounded font-bold bg-indigo-600 text-white" data-pos="ALL">ALL</button>
@@ -204,6 +246,11 @@
                         <button class="imp-filter-btn px-2 py-0.5 rounded font-bold bg-slate-900 text-slate-300 hover:bg-slate-700" data-pos="TE">TE</button>
                         <button class="imp-filter-btn px-2 py-0.5 rounded font-bold bg-slate-900 text-slate-300 hover:bg-slate-700" data-pos="DEF">DEF</button>
                         <button class="imp-filter-btn px-2 py-0.5 rounded font-bold bg-slate-900 text-slate-300 hover:bg-slate-700" data-pos="K">K</button>
+                    </div>
+
+                    <!-- Live Search -->
+                    <div class="mb-2">
+                        <input id="import-search" type="text" placeholder="🔍 Search players..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-indigo-500 focus:outline-none">
                     </div>
 
                     <!-- Scrollable Container for Auto-Tiered Position Lists -->
@@ -269,7 +316,10 @@
                             <span class="text-emerald-400">📋</span>
                             <h2 class="text-sm font-bold text-slate-200">Roster, Plan, and Live Projections</h2>
                         </div>
-                        <div class="flex space-x-2">
+                        <div class="flex flex-wrap gap-2">
+                            <button id="btn-export-csv" class="text-xs bg-sky-700 hover:bg-sky-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition" title="Export roster to CSV">
+                                📤 Export CSV
+                            </button>
                             <button id="btn-clear-data" class="text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold px-2.5 py-1.5 rounded-lg transition" title="Clear LocalStorage memory">
                                 Clear Storage
                             </button>
@@ -290,7 +340,7 @@
                         <button class="pos-filter-btn px-2 py-0.5 rounded font-bold bg-slate-800 text-slate-300 hover:bg-slate-700" data-pos="FLEX">FLEX</button>
                         <button class="pos-filter-btn px-2 py-0.5 rounded font-bold bg-slate-800 text-slate-300 hover:bg-slate-700" data-pos="BENCH">BENCH</button>
                     </div>
-                    
+
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs">
                             <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[10px] font-bold border-b border-slate-700">
@@ -320,6 +370,16 @@
                         </table>
                     </div>
                 </section>
+
+                <!-- Draft Recap Panel (auto-shows when picks are logged) -->
+                <section id="recap-section" class="hidden bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden">
+                    <div class="p-4 bg-slate-800 border-b border-slate-700 flex items-center space-x-2">
+                        <span class="text-yellow-400">🏆</span>
+                        <h2 class="text-sm font-bold text-slate-200">Draft Recap</h2>
+                        <span class="text-[10px] text-slate-500">— updates live as you log picks</span>
+                    </div>
+                    <div id="recap-content" class="p-4 space-y-3 text-xs"></div>
+                </section>
             </div>
 
         </div>
@@ -328,12 +388,30 @@
     <!-- Global Datalist for Autocomplete Suggestions -->
     <datalist id="global-player-datalist"></datalist>
 
+    <!-- Player Notes Modal -->
+    <div id="notes-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/70 backdrop-blur-sm">
+        <div class="bg-slate-800 border border-slate-600 rounded-2xl p-5 w-full max-w-sm mx-4 shadow-2xl">
+            <div class="flex items-center justify-between mb-3">
+                <div class="flex items-center space-x-2">
+                    <span class="text-amber-400">📝</span>
+                    <h3 id="notes-modal-title" class="text-sm font-bold text-slate-200">Player Note</h3>
+                </div>
+                <button id="btn-close-notes" class="text-slate-400 hover:text-slate-200 text-lg font-bold leading-none">✕</button>
+            </div>
+            <textarea id="notes-textarea" rows="4" placeholder="Add scouting notes, injury concerns, bidding ceiling..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:ring-1 focus:ring-amber-500 focus:outline-none resize-none mb-3"></textarea>
+            <div class="flex space-x-2">
+                <button id="btn-save-note" class="flex-1 bg-amber-600 hover:bg-amber-500 text-white font-bold py-1.5 rounded-lg text-xs transition">Save Note</button>
+                <button id="btn-delete-note" class="bg-slate-700 hover:bg-rose-900 text-slate-300 hover:text-rose-300 font-bold px-3 py-1.5 rounded-lg text-xs transition">Delete</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Infinite Scrolling Pro Tips Banner Footer -->
     <footer class="bg-slate-950 border-t border-slate-800 py-2.5 fixed bottom-0 left-0 w-full z-40 overflow-hidden shadow-2xl flex items-center">
         <div class="bg-emerald-500 text-slate-950 font-black text-[10px] uppercase tracking-widest px-3 py-1.5 z-10 flex-shrink-0 flex items-center space-x-1 shadow-lg ml-2 rounded">
             <span>💡</span> <span>PRO TIPS TICKER</span>
         </div>
-        
+
         <div class="overflow-hidden w-full relative flex items-center ml-2">
             <div id="ticker-content" class="animate-ticker text-xs font-medium text-slate-300 space-x-8 whitespace-nowrap cursor-pointer">
                 <!-- Dynamic Ticker Tips -->
@@ -344,22 +422,31 @@
     <!-- App Logic -->
     <script>
         const proTipsList = [
-            "📱 <strong class='text-emerald-400'>ADJ TARGET COLUMN:</strong> Shows real-time budget for open slots based on surplus cash from prior bargains.",
-            "📋 <strong class='text-sky-400'>BULK IMPORTER:</strong> Copy-paste raw text lists directly from external sites to load player auction values!",
-            "🔀 <strong class='text-teal-400'>TOGGLE MODE:</strong> Switch between $ USD and % Budget anytime in the top navigation bar!",
-            "📊 <strong class='text-purple-400'>ROOM SALES LOG:</strong> Log room sales to automatically calculate actual room inflation based on player projections.",
-            "🎯 <strong class='text-teal-400'>TARGET BOARD:</strong> Add top sleepers or defenses to your Wishlist board and click any name to auto-fill logging forms!",
-            "🛡️ <strong class='text-amber-400'>MAX BID ALLOWED:</strong> Calculates the absolute maximum you can bid while keeping $1 for remaining open slots.",
-            "⚠️ <strong class='text-rose-400'>UNALLOCATED PLAN:</strong> Flashes red when planned targets exceed total budget. Keep it balanced at $0 / 0%!",
-            "✏️ <strong class='text-sky-400'>EDIT ON THE FLY:</strong> Click directly into any Slot Name or Plan box to adjust targets mid-draft.",
-            "➕ <strong class='text-blue-400'>CUSTOM SLOTS:</strong> Add Superflex, TE Premium, or extra bench spots instantly.",
-            "🗑️ <strong class='text-rose-400'>SLOT REMOVAL:</strong> Click '✕' beside any row to remove unnecessary slots and re-allocate funds.",
-            "💵 <strong class='text-emerald-400'>SPENT VARIANCE:</strong> Green bargains show under budget! Red alerts warn you when you've overspent your plan.",
-            "⚙️ <strong class='text-teal-400'>BUDGET POOL TOP-BAR:</strong> Adjust the default budget if your league uses custom amounts ($100, $500, etc.).",
-            "💾 <strong class='text-emerald-400'>AUTO-SAVE:</strong> All picks, targets, and custom slots automatically save to your browser in real time!",
-            "⏸️ <strong class='text-amber-400'>PAUSE TICKER:</strong> Hover or tap and hold on this ticker anytime to pause scrolling text and read!",
-            "🔥 <strong class='text-emerald-400'>HERO STARTER STRATEGY:</strong> Pay up for 1-2 premier studs to anchor your team, then dominate $1-$5 value picks.",
-            "💰 <strong class='text-amber-400'>BENCH DISCIPLINE:</strong> Keep bench spending strictly to 1-2% to maximize starting lineup firepower."
+            "📊 <strong class='text-indigo-400'>ADJ TARGET COLUMN:</strong> Dynamically recalculates your per-slot budget in real time — snag a bargain and every open slot's target grows automatically.",
+            "📋 <strong class='text-sky-400'>BULK IMPORTER:</strong> Supports both ESPN and FantasyPros formats — just paste and hit Import. The app auto-detects the source.",
+            "🔀 <strong class='text-teal-400'>TOGGLE MODE:</strong> Switch between $ USD and % of Budget in the top bar — great for leagues with non-standard budgets.",
+            "📈 <strong class='text-purple-400'>ROOM INFLATION INDEX:</strong> Tracks whether the room is paying over or under projected values. Positive % = overspending room = your cash goes further late.",
+            "🎯 <strong class='text-teal-400'>NOMINATION QUEUE:</strong> Add targets in priority order and use ↑↓ arrows to reorder before the draft. Click any name to auto-fill the logging form.",
+            "🛡️ <strong class='text-amber-400'>MAX BID:</strong> The absolute ceiling you can bid while still leaving $1 per remaining open slot. Never exceed this number.",
+            "⚠️ <strong class='text-rose-400'>PLAN BALANCE:</strong> Keep Unallocated Plan at $0. If it's red you're over budget — adjust slot plans before the draft starts.",
+            "✏️ <strong class='text-sky-400'>LIVE EDITING:</strong> Click any Slot Name or Plan $ directly in the roster table to edit mid-draft without losing your place.",
+            "↩️ <strong class='text-emerald-400'>UNDO PICK:</strong> Accidentally logged the wrong player? Hit Undo Last Pick to instantly reverse it.",
+            "📝 <strong class='text-amber-400'>PLAYER NOTES:</strong> Click the 📝 icon on any imported player to save a private scouting note — injury concerns, ceiling plays, or bidding ceiling.",
+            "📤 <strong class='text-sky-400'>EXPORT CSV:</strong> Download your final roster as a spreadsheet after the draft for easy record keeping or league posting.",
+            "🏆 <strong class='text-emerald-400'>DRAFT RECAP:</strong> Check the Recap panel after the draft to see your efficiency score, biggest bargains, and biggest reaches.",
+            "🔍 <strong class='text-indigo-400'>LIVE SEARCH:</strong> Use the search bar in the player board to instantly filter by name — fast access in any position tab.",
+            "➕ <strong class='text-blue-400'>CUSTOM SLOTS:</strong> Add Superflex, TE Premium, IR, or extra bench spots. Budget re-balances automatically.",
+            "🔥 <strong class='text-rose-400'>HERO STUD STRATEGY:</strong> Spend $55–$70 on one elite RB or WR1, then stack $1–$5 value plays in the remaining slots.",
+            "💧 <strong class='text-sky-400'>POSITIONAL SCARCITY:</strong> In PPR, elite TEs dry up fast — if Bowers or McBride slip past $28, pivot to a $2 streaming stack.",
+            "⚡ <strong class='text-amber-400'>LATE-ROUND QB:</strong> QBs are consistently overpaid in auction. Wait for the $3–$6 window — Mahomes or Herbert at that price is a steal.",
+            "💰 <strong class='text-emerald-400'>BENCH BUDGET:</strong> Cap bench spending at $5 total. Every dollar over $1 on a bench player is a dollar stolen from a starter.",
+            "🧊 <strong class='text-teal-400'>PRICE ENFORCEMENT:</strong> Nominate players you don't want early to drain opponents' budgets — especially studs in positions you've already filled.",
+            "💵 <strong class='text-emerald-400'>VARIANCE COLUMN:</strong> Green = you got a bargain and freed up budget. Red = you overpaid and your remaining targets are squeezed.",
+            "💾 <strong class='text-slate-400'>AUTO-SAVE:</strong> Every pick, note, and plan update saves instantly to your browser. Safe to close and reopen.",
+            "⏸️ <strong class='text-amber-400'>PAUSE TICKER:</strong> Hover over this bar to pause scrolling and read any tip in full.",
+            "🗑️ <strong class='text-rose-400'>REMOVE SLOTS:</strong> Delete any unused slot with ✕ — budget redistributes to remaining open slots automatically.",
+            "📉 <strong class='text-purple-400'>DEFLATED MARKET:</strong> If the Inflation Index is negative, the room is leaving value on the table — attack studs earlier than planned.",
+            "⚙️ <strong class='text-teal-400'>BUDGET SETTING:</strong> Change total budget in the top bar. Works with $100, $200, $250, or any custom league amount."
         ];
 
         const defaultSlots = [
@@ -389,9 +476,12 @@
         let wishlist = ["Jahmyr Gibbs", "Bijan Robinson", "San Francisco 49ers", "Pittsburgh Steelers"];
         let activePosFilter = "ALL";
         let activeImportedFilter = "ALL";
-        
+
         let importedPlayerMap = {}; 
-        let importedPlayerDetails = {}; 
+        let importedPlayerDetails = {};
+        let playerNotes = {};
+        let pickHistory = [];
+        let importSearchQuery = '';
 
         function normalizePos(posTag) {
             if (!posTag) return 'UTIL';
@@ -447,7 +537,9 @@
                 localStorage.setItem('draft_display_mode', displayMode);
                 localStorage.setItem('draft_player_map', JSON.stringify(importedPlayerMap));
                 localStorage.setItem('draft_player_details', JSON.stringify(importedPlayerDetails));
-                
+                localStorage.setItem('draft_notes', JSON.stringify(playerNotes));
+                localStorage.setItem('draft_history', JSON.stringify(pickHistory));
+
                 const saveBadge = document.getElementById('save-status');
                 if (saveBadge) {
                     saveBadge.classList.remove('hidden');
@@ -460,21 +552,25 @@
 
         function loadState() {
             try {
-                const savedSlots = localStorage.getItem('draft_slots');
-                const savedMarket = localStorage.getItem('draft_market');
-                const savedWish = localStorage.getItem('draft_wishlist');
-                const savedBudget = localStorage.getItem('draft_budget');
-                const savedMode = localStorage.getItem('draft_display_mode');
-                const savedMap = localStorage.getItem('draft_player_map');
-                const savedDetails = localStorage.getItem('draft_player_details');
+                const savedSlots    = localStorage.getItem('draft_slots');
+                const savedMarket   = localStorage.getItem('draft_market');
+                const savedWish     = localStorage.getItem('draft_wishlist');
+                const savedBudget   = localStorage.getItem('draft_budget');
+                const savedMode     = localStorage.getItem('draft_display_mode');
+                const savedMap      = localStorage.getItem('draft_player_map');
+                const savedDetails  = localStorage.getItem('draft_player_details');
+                const savedNotes    = localStorage.getItem('draft_notes');
+                const savedHistory  = localStorage.getItem('draft_history');
 
-                if (savedSlots) slots = JSON.parse(savedSlots);
-                if (savedMarket) marketLogs = JSON.parse(savedMarket);
-                if (savedWish) wishlist = JSON.parse(savedWish);
-                if (savedBudget) totalBudget = parseInt(savedBudget);
-                if (savedMode) displayMode = savedMode;
-                if (savedMap) importedPlayerMap = JSON.parse(savedMap);
+                if (savedSlots)   slots = JSON.parse(savedSlots);
+                if (savedMarket)  marketLogs = JSON.parse(savedMarket);
+                if (savedWish)    wishlist = JSON.parse(savedWish);
+                if (savedBudget)  totalBudget = parseInt(savedBudget);
+                if (savedMode)    displayMode = savedMode;
+                if (savedMap)     importedPlayerMap = JSON.parse(savedMap);
                 if (savedDetails) importedPlayerDetails = JSON.parse(savedDetails);
+                if (savedNotes)   playerNotes = JSON.parse(savedNotes);
+                if (savedHistory) pickHistory = JSON.parse(savedHistory);
             } catch (e) {
                 console.error("Error loading stored data:", e);
             }
@@ -483,7 +579,7 @@
         function updateToggleButtons() {
             const btnUsd = document.getElementById('btn-mode-usd');
             const btnPct = document.getElementById('btn-mode-pct');
-            
+
             if (displayMode === 'dollars') {
                 btnUsd.className = "px-2.5 py-1 rounded-md transition text-emerald-400 bg-slate-800 shadow font-bold";
                 btnPct.className = "px-2.5 py-1 rounded-md transition text-slate-400 hover:text-slate-200 font-bold";
@@ -532,75 +628,149 @@
             Object.keys(importedPlayerDetails).forEach(name => {
                 let info = importedPlayerDetails[name];
                 let p = groups[info.pos] ? info.pos : 'UTIL';
-                groups[p].push({ name: name, value: info.value });
+                groups[p].push({ name: name, value: info.value, rank: info.rank || 9999 });
             });
 
             container.innerHTML = '';
-            let filteredPositions = activeImportedFilter === 'ALL' ? ['QB', 'RB', 'WR', 'TE', 'DEF', 'K', 'UTIL'] : [activeImportedFilter];
 
-            filteredPositions.forEach(pos => {
-                let players = groups[pos];
-                if (!players || players.length === 0) return;
-
-                players.sort((a, b) => b.value - a.value);
-
-                let tiers = [];
-                let currentTier = 1;
-                let currentTierList = [];
-                let prevVal = players[0].value;
-
-                players.forEach((p, idx) => {
-                    if (idx > 0 && (prevVal - p.value >= 3) && currentTierList.length > 0) {
-                        tiers.push({ tier: currentTier, players: currentTierList });
-                        currentTier++;
-                        currentTierList = [];
-                    }
-                    currentTierList.push(p);
-                    prevVal = p.value;
+            if (activeImportedFilter === 'ALL') {
+                // Flat list of all players sorted by dollar value descending
+                let allPlayers = [];
+                Object.keys(importedPlayerDetails).forEach(name => {
+                    let info = importedPlayerDetails[name];
+                    allPlayers.push({ name, value: info.value, pos: info.pos, rank: info.rank || 9999 });
                 });
-                if (currentTierList.length > 0) {
-                    tiers.push({ tier: currentTier, players: currentTierList });
-                }
+                allPlayers.sort((a, b) => b.value - a.value || a.rank - b.rank);
 
                 let posDiv = document.createElement('div');
-                posDiv.className = "space-y-2 mb-3 pb-2 border-b border-slate-800 last:border-0";
-                
-                let headerHTML = `<div class="flex items-center justify-between bg-slate-950/60 px-2 py-1 rounded font-bold text-slate-300">
-                    <span>${pos} Tier Breakdown</span>
-                    <span class="text-[10px] text-slate-500">${players.length} players</span>
+                posDiv.className = "space-y-1";
+
+                let headerHTML = `<div class="flex items-center justify-between bg-slate-950/60 px-2 py-1 rounded font-bold text-slate-300 mb-2">
+                    <span>All Players by Value</span>
+                    <span class="text-[10px] text-slate-500">${allPlayers.length} players</span>
                 </div>`;
-                
-                let tiersHTML = '';
-                tiers.forEach(t => {
-                    let playerBadges = t.players.map(pl => {
-                        let drafted = isPlayerDrafted(pl.name);
-                        let badgeStyle = drafted 
-                            ? "bg-slate-900/40 text-slate-600 border-slate-800 line-through opacity-40" 
-                            : "bg-slate-900 text-slate-300 border-slate-700 hover:border-indigo-500 cursor-pointer";
-                        
-                        return `<span data-p-name="${pl.name}" class="imp-player-badge inline-flex items-center space-x-1 px-2 py-0.5 rounded border text-[11px] transition ${badgeStyle}" title="Click to select">
-                            <span>${pl.name}</span>
-                            <span class="text-indigo-400 font-semibold">(${valFormat(pl.value)})</span>
-                        </span>`;
-                    }).join(' ');
 
-                    tiersHTML += `<div class="space-y-1">
-                        <div class="text-[10px] font-extrabold text-indigo-400 uppercase tracking-wider">Tier ${t.tier}</div>
-                        <div class="flex flex-wrap gap-1">${playerBadges}</div>
-                    </div>`;
-                });
+                const posColors = {
+                    QB: "text-purple-400",
+                    RB: "text-emerald-400",
+                    WR: "text-sky-400",
+                    TE: "text-amber-400",
+                    DEF: "text-rose-400",
+                    K: "text-slate-400",
+                    UTIL: "text-slate-400"
+                };
 
-                posDiv.innerHTML = headerHTML + `<div class="space-y-2 pl-1">${tiersHTML}</div>`;
+                let visibleAll = importSearchQuery
+                    ? allPlayers.filter(pl => pl.name.toLowerCase().includes(importSearchQuery.toLowerCase()))
+                    : allPlayers;
+
+                let playerBadges = visibleAll.map(pl => {
+                    let drafted = isPlayerDrafted(pl.name);
+                    let badgeStyle = drafted
+                        ? "bg-slate-900/40 text-slate-600 border-slate-800 line-through opacity-40"
+                        : "bg-slate-900 text-slate-300 border-slate-700 hover:border-indigo-500 cursor-pointer";
+                    let posColor = posColors[pl.pos] || "text-slate-400";
+                    let hasNote = !!playerNotes[pl.name];
+                    let noteDot = hasNote ? `<span class="text-amber-400 text-[8px]">●</span>` : '';
+
+                    return `<span data-p-name="${pl.name}" class="imp-player-badge inline-flex items-center gap-1 px-2 py-0.5 rounded border text-[11px] transition ${badgeStyle}" title="Click to select">
+                        <span class="${posColor} font-bold text-[10px]">${pl.pos}</span>
+                        <span>${pl.name}</span>
+                        <span class="text-indigo-400 font-semibold">(${valFormat(pl.value)})</span>
+                        ${noteDot}
+                        <button data-p-name="${pl.name}" class="btn-note-icon text-slate-600 hover:text-amber-400 text-[10px] transition leading-none" title="Note">📝</button>
+                    </span>`;
+                }).join(' ');
+
+                posDiv.innerHTML = headerHTML + `<div class="flex flex-wrap gap-1">${playerBadges}</div>`;
                 container.appendChild(posDiv);
-            });
+            } else {
+                let filteredPositions = [activeImportedFilter];
+                filteredPositions.forEach(pos => {
+                    let players = groups[pos];
+                    if (!players || players.length === 0) return;
+
+                    players.sort((a, b) => b.value - a.value || a.rank - b.rank);
+
+                    let tiers = [];
+                    let currentTier = 1;
+                    let currentTierList = [];
+                    let prevVal = players[0].value;
+
+                    players.forEach((p, idx) => {
+                        if (idx > 0 && (prevVal - p.value >= 3) && currentTierList.length > 0) {
+                            tiers.push({ tier: currentTier, players: currentTierList });
+                            currentTier++;
+                            currentTierList = [];
+                        }
+                        currentTierList.push(p);
+                        prevVal = p.value;
+                    });
+                    if (currentTierList.length > 0) {
+                        tiers.push({ tier: currentTier, players: currentTierList });
+                    }
+
+                    let posDiv = document.createElement('div');
+                    posDiv.className = "space-y-2 mb-3 pb-2 border-b border-slate-800 last:border-0";
+
+                    let headerHTML = `<div class="flex items-center justify-between bg-slate-950/60 px-2 py-1 rounded font-bold text-slate-300">
+                        <span>${pos} Tier Breakdown</span>
+                        <span class="text-[10px] text-slate-500">${players.length} players</span>
+                    </div>`;
+
+                    // Apply search filter within tiers
+                    if (importSearchQuery) {
+                        tiers = tiers.map(t => ({
+                            ...t,
+                            players: t.players.filter(p => p.name.toLowerCase().includes(importSearchQuery.toLowerCase()))
+                        })).filter(t => t.players.length > 0);
+                    }
+
+                    let tiersHTML = '';
+                    tiers.forEach(t => {
+                        let playerBadges = t.players.map(pl => {
+                            let drafted = isPlayerDrafted(pl.name);
+                            let badgeStyle = drafted
+                                ? "bg-slate-900/40 text-slate-600 border-slate-800 line-through opacity-40"
+                                : "bg-slate-900 text-slate-300 border-slate-700 hover:border-indigo-500 cursor-pointer";
+                            let hasNote = !!playerNotes[pl.name];
+                            let noteDot = hasNote ? `<span class="text-amber-400 text-[8px]">●</span>` : '';
+
+                            return `<span data-p-name="${pl.name}" class="imp-player-badge inline-flex items-center gap-1 px-2 py-0.5 rounded border text-[11px] transition ${badgeStyle}" title="Click to select">
+                                <span>${pl.name}</span>
+                                <span class="text-indigo-400 font-semibold">(${valFormat(pl.value)})</span>
+                                ${noteDot}
+                                <button data-p-name="${pl.name}" class="btn-note-icon text-slate-600 hover:text-amber-400 text-[10px] transition leading-none" title="Note">📝</button>
+                            </span>`;
+                        }).join(' ');
+
+                        tiersHTML += `<div class="space-y-1">
+                            <div class="text-[10px] font-extrabold text-indigo-400 uppercase tracking-wider">Tier ${t.tier}</div>
+                            <div class="flex flex-wrap gap-1">${playerBadges}</div>
+                        </div>`;
+                    });
+
+                    posDiv.innerHTML = headerHTML + `<div class="space-y-2 pl-1">${tiersHTML}</div>`;
+                    container.appendChild(posDiv);
+                });
+            }
 
             container.querySelectorAll('.imp-player-badge').forEach(badge => {
                 badge.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('btn-note-icon')) return;
                     let name = e.currentTarget.getAttribute('data-p-name');
                     document.getElementById('input-player').value = name;
                     if (importedPlayerMap[name] !== undefined) {
                         document.getElementById('input-price').value = importedPlayerMap[name];
                     }
+                });
+            });
+
+            container.querySelectorAll('.btn-note-icon').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    let name = e.currentTarget.getAttribute('data-p-name');
+                    openNoteModal(name);
                 });
             });
         }
@@ -650,35 +820,65 @@
             container.innerHTML = '';
 
             if (wishlist.length === 0) {
-                container.innerHTML = `<span class="text-xs text-slate-500 italic">No targets added yet</span>`;
+                container.innerHTML = `<span class="text-xs text-slate-500 italic">Queue is empty — add targets above</span>`;
                 return;
             }
 
             wishlist.forEach((name, idx) => {
-                let badge = document.createElement('div');
-                badge.className = "flex items-center space-x-1 bg-slate-900 border border-teal-800/60 text-teal-300 text-xs px-2.5 py-1 rounded-lg cursor-pointer hover:bg-teal-950 transition active:scale-95";
-                
-                let projVal = importedPlayerMap[name] !== undefined ? ` ($${importedPlayerMap[name]})` : '';
+                let row = document.createElement('div');
+                let isDrafted = isPlayerDrafted(name);
+                let projVal = importedPlayerMap[name] !== undefined ? ` <span class="text-indigo-400 font-bold">$${importedPlayerMap[name]}</span>` : '';
+                let draftedStyle = isDrafted ? 'opacity-40 line-through' : '';
 
-                badge.innerHTML = `
-                    <span class="wish-item font-semibold">${name}${projVal}</span>
-                    <button data-w-idx="${idx}" class="btn-del-wish text-slate-500 hover:text-rose-400 font-bold ml-1 text-xs">✕</button>
+                row.className = `flex items-center space-x-1.5 bg-slate-900 border border-teal-800/40 rounded-lg px-2 py-1 text-xs`;
+                row.innerHTML = `
+                    <span class="text-slate-500 font-bold text-[10px] w-4 text-right flex-shrink-0">${idx + 1}.</span>
+                    <span class="wish-item flex-1 font-semibold text-teal-300 cursor-pointer hover:text-teal-100 transition truncate ${draftedStyle}">${name}${projVal}</span>
+                    <div class="flex items-center space-x-1 flex-shrink-0">
+                        <button data-w-idx="${idx}" class="btn-wish-up text-slate-500 hover:text-slate-200 font-bold text-[10px] px-1 py-0.5 rounded hover:bg-slate-700 transition" title="Move up">▲</button>
+                        <button data-w-idx="${idx}" class="btn-wish-down text-slate-500 hover:text-slate-200 font-bold text-[10px] px-1 py-0.5 rounded hover:bg-slate-700 transition" title="Move down">▼</button>
+                        <button data-w-idx="${idx}" class="btn-del-wish text-slate-500 hover:text-rose-400 font-bold text-xs px-1 transition" title="Remove">✕</button>
+                    </div>
                 `;
-                
-                badge.querySelector('.wish-item').addEventListener('click', () => {
+
+                row.querySelector('.wish-item').addEventListener('click', () => {
                     document.getElementById('input-player').value = name;
                     if (importedPlayerMap[name] !== undefined) {
                         document.getElementById('input-price').value = importedPlayerMap[name];
                     }
                 });
 
-                container.appendChild(badge);
+                container.appendChild(row);
             });
 
-            document.querySelectorAll('.btn-del-wish').forEach(btn => {
+            container.querySelectorAll('.btn-wish-up').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    let idx = parseInt(e.target.getAttribute('data-w-idx'));
+                    let idx = parseInt(e.currentTarget.getAttribute('data-w-idx'));
+                    if (idx > 0) {
+                        [wishlist[idx - 1], wishlist[idx]] = [wishlist[idx], wishlist[idx - 1]];
+                        renderWishlist();
+                        saveState();
+                    }
+                });
+            });
+
+            container.querySelectorAll('.btn-wish-down').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    let idx = parseInt(e.currentTarget.getAttribute('data-w-idx'));
+                    if (idx < wishlist.length - 1) {
+                        [wishlist[idx + 1], wishlist[idx]] = [wishlist[idx], wishlist[idx + 1]];
+                        renderWishlist();
+                        saveState();
+                    }
+                });
+            });
+
+            container.querySelectorAll('.btn-del-wish').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    let idx = parseInt(e.currentTarget.getAttribute('data-w-idx'));
                     wishlist.splice(idx, 1);
                     renderWishlist();
                     refreshSearchSuggestions();
@@ -702,7 +902,7 @@
             document.getElementById('stat-remaining').innerText = valFormat(remainingBudget);
             document.getElementById('stat-maxbid').innerText = valFormat(Math.max(0, maxBid));
             document.getElementById('stat-planned').innerText = valFormat(totalPlanned);
-            
+
             let unallocElem = document.getElementById('stat-unallocated');
             let unallocLabel = document.getElementById('label-unallocated');
             if (unallocatedPlan < 0) {
@@ -768,7 +968,7 @@
 
             slots.forEach((s, idx) => {
                 let pos = getPosTag(s.id);
-                
+
                 if (activePosFilter !== "ALL" && pos.code !== activePosFilter) {
                     return;
                 }
@@ -841,7 +1041,78 @@
             bindTableListeners();
             updateMarketInflation();
             renderImportedBoard();
+            renderWishlist();
+            renderRecap();
             saveState();
+        }
+
+        function renderRecap() {
+            const section = document.getElementById('recap-section');
+            const content = document.getElementById('recap-content');
+            if (!section || !content) return;
+
+            let filledSlots = slots.filter(s => s.cost !== null && s.player);
+            if (filledSlots.length < 1) { section.classList.add('hidden'); return; }
+            section.classList.remove('hidden');
+
+            let totalSpent   = filledSlots.reduce((a, s) => a + s.cost, 0);
+            let totalPlanned = filledSlots.reduce((a, s) => a + s.planUSD, 0);
+            let vsPlannedPct = totalPlanned > 0 ? Math.round((totalSpent / totalPlanned) * 100) : 100;
+
+            let bargains = [], reaches = [];
+            filledSlots.forEach(s => {
+                let proj = importedPlayerMap[s.player] !== undefined ? importedPlayerMap[s.player] : s.planUSD;
+                let diff = s.cost - proj;
+                if (diff < 0) bargains.push({ name: s.player, cost: s.cost, proj, saved: Math.abs(diff) });
+                else if (diff > 0) reaches.push({ name: s.player, cost: s.cost, proj, over: diff });
+            });
+            bargains.sort((a, b) => b.saved - a.saved);
+            reaches.sort((a, b) => b.over - a.over);
+
+            let totalSaved    = bargains.reduce((a, b) => a + b.saved, 0);
+            let totalOver     = reaches.reduce((a, r) => a + r.over, 0);
+            let netValue      = totalSaved - totalOver;
+            let netColor      = netValue >= 0 ? 'text-emerald-400' : 'text-rose-400';
+            let vsColor       = vsPlannedPct <= 100 ? 'text-emerald-400' : 'text-rose-400';
+
+            content.innerHTML = `
+                <div class="grid grid-cols-4 gap-2 mb-1">
+                    <div class="bg-slate-900/70 rounded-lg p-2 text-center">
+                        <div class="text-[9px] text-slate-400 uppercase font-bold mb-1">Picks</div>
+                        <div class="text-base font-extrabold text-slate-200">${filledSlots.length}</div>
+                    </div>
+                    <div class="bg-slate-900/70 rounded-lg p-2 text-center">
+                        <div class="text-[9px] text-slate-400 uppercase font-bold mb-1">Spent</div>
+                        <div class="text-base font-extrabold text-amber-400">${valFormat(totalSpent)}</div>
+                    </div>
+                    <div class="bg-slate-900/70 rounded-lg p-2 text-center">
+                        <div class="text-[9px] text-slate-400 uppercase font-bold mb-1">Vs Plan</div>
+                        <div class="text-base font-extrabold ${vsColor}">${vsPlannedPct}%</div>
+                    </div>
+                    <div class="bg-slate-900/70 rounded-lg p-2 text-center">
+                        <div class="text-[9px] text-slate-400 uppercase font-bold mb-1">Net Value</div>
+                        <div class="text-base font-extrabold ${netColor}">${netValue >= 0 ? '+' : ''}${valFormat(netValue)}</div>
+                    </div>
+                </div>
+                ${bargains.length > 0 ? `
+                <div>
+                    <div class="text-[10px] font-extrabold text-emerald-400 uppercase tracking-wider mb-1">🟢 Bargains — saved ${valFormat(totalSaved)} total</div>
+                    ${bargains.slice(0, 5).map(b => `
+                        <div class="flex justify-between items-center bg-emerald-950/30 border border-emerald-900/40 rounded px-2 py-1 mb-0.5">
+                            <span class="font-medium text-slate-200 truncate max-w-[55%]">${b.name}</span>
+                            <span class="text-emerald-400 font-bold text-[11px]">paid ${valFormat(b.cost)} · proj ${valFormat(b.proj)} · <span class="text-emerald-300">saved ${valFormat(b.saved)}</span></span>
+                        </div>`).join('')}
+                </div>` : ''}
+                ${reaches.length > 0 ? `
+                <div>
+                    <div class="text-[10px] font-extrabold text-rose-400 uppercase tracking-wider mb-1">🔴 Reaches — overpaid ${valFormat(totalOver)} total</div>
+                    ${reaches.slice(0, 5).map(r => `
+                        <div class="flex justify-between items-center bg-rose-950/30 border border-rose-900/40 rounded px-2 py-1 mb-0.5">
+                            <span class="font-medium text-slate-200 truncate max-w-[55%]">${r.name}</span>
+                            <span class="text-rose-400 font-bold text-[11px]">paid ${valFormat(r.cost)} · proj ${valFormat(r.proj)} · <span class="text-rose-300">+${valFormat(r.over)}</span></span>
+                        </div>`).join('')}
+                </div>` : ''}
+            `;
         }
 
         function bindTableListeners() {
@@ -887,12 +1158,12 @@
                 return;
             }
             feed.innerHTML = '';
-            
+
             marketLogs.slice().reverse().forEach((log, reversedIdx) => {
                 let realIdx = marketLogs.length - 1 - reversedIdx;
                 let li = document.createElement('li');
                 li.className = 'py-1.5 flex justify-between items-center text-slate-300';
-                
+
                 let expVal = importedPlayerMap[log.player];
                 let diffBadge = '';
                 if (expVal !== undefined) {
@@ -955,12 +1226,12 @@
 
       // ==========================================
 // ROBUST GLOBAL REGEX DRAFT BOARD IMPORTER
-// (Handles multi-column, side-by-side, and stacked formats)
+// (Auto-detects ESPN and FantasyPros formats)
 // ==========================================
 document.getElementById('btn-bulk-import')?.addEventListener('click', () => {
     const rawTextElement = document.getElementById('bulk-import-text');
     if (!rawTextElement) return;
-    
+
     const rawText = rawTextElement.value;
     if (!rawText.trim()) {
         alert("Please paste your list text first!");
@@ -970,32 +1241,62 @@ document.getElementById('btn-bulk-import')?.addEventListener('click', () => {
     let count = 0;
     let newWishlist = [];
 
-    // Global regex to find player entries anywhere in the text stream,
-    // matching formats like: "1. (RB1) Jahmyr Gibbs, DET $57 6"
-    const globalPlayerRegex = /\d+\.\s*\(([^)]+)\)\s+([^$]+?)\s+\$(\d+)\s+\d+/g;
-    
+    // --- FORMAT 1: ESPN  ---
+    // e.g. "1. (RB1) Jahmyr Gibbs, DET $57 6"
+    const espnRegex = /(\d+)\.\s*\(([^)]+)\)\s+([^$]+?)\s+\$(\d+)\s+\d+/g;
+
+    // --- FORMAT 2: FantasyPros ---
+    // e.g. "1.  Jahmyr Gibbs (DET - RB)  $61"
+    // Also handles DTD/OUT/IR/Q tags after the closing paren:
+    // e.g. "13. De'Von Achane (MIA - RB)DTD  $33"
+    const fpRegex = /(\d+)\.\s+(.+?)\s*\([^-]*-\s*([A-Z,/]+)\)[^$]*\$(\d+)/g;
+
+    // Detect format: ESPN has "(RB1)" style position tags before the name
+    const isESPN = espnRegex.test(rawText);
+    espnRegex.lastIndex = 0; // reset after .test()
+
     let match;
-    while ((match = globalPlayerRegex.exec(rawText)) !== null) {
-        const posRank = match[1];              // e.g., "RB1"
-        const nameTeamBlock = match[2].trim(); // e.g., "Jahmyr Gibbs, DET"
-        const pVal = parseInt(match[3], 10);   // e.g., 57
-        
-        // Extract player name by splitting off the team suffix after the last comma
-        let pName = nameTeamBlock;
-        const lastCommaIndex = nameTeamBlock.lastIndexOf(',');
-        if (lastCommaIndex !== -1) {
-            pName = nameTeamBlock.substring(0, lastCommaIndex).trim();
+    if (isESPN) {
+        // ---- ESPN parsing ----
+        while ((match = espnRegex.exec(rawText)) !== null) {
+            const sheetRank    = parseInt(match[1], 10); // e.g., 1
+            const posRank      = match[2];               // e.g., "RB1"
+            const nameTeamBlock = match[3].trim();       // e.g., "Jahmyr Gibbs, DET"
+            const pVal         = parseInt(match[4], 10); // e.g., 57
+
+            // Strip team suffix (last comma-separated token)
+            let pName = nameTeamBlock;
+            const lastComma = nameTeamBlock.lastIndexOf(',');
+            if (lastComma !== -1) pName = nameTeamBlock.substring(0, lastComma).trim();
+
+            let rawPos = posRank.replace(/[0-9]/g, '');
+            let normP  = normalizePos(rawPos);
+
+            if (pName && !isNaN(pVal)) {
+                importedPlayerMap[pName] = pVal;
+                importedPlayerDetails[pName] = { value: pVal, pos: normP, rank: sheetRank };
+                if (count < 20) newWishlist.push(pName);
+                count++;
+            }
         }
-        
-        // Normalize position (e.g., "RB1" -> "RB")
-        let rawPos = posRank.replace(/[0-9]/g, ''); 
-        let normP = normalizePos(rawPos);
-        
-        if (pName && !isNaN(pVal)) {
-            importedPlayerMap[pName] = pVal;
-            importedPlayerDetails[pName] = { value: pVal, pos: normP };
-            if (count < 20) newWishlist.push(pName);
-            count++;
+    } else {
+        // ---- FantasyPros parsing ----
+        while ((match = fpRegex.exec(rawText)) !== null) {
+            const sheetRank = parseInt(match[1], 10); // e.g., 1
+            const pName     = match[2].trim();        // e.g., "Jahmyr Gibbs"
+            const posBlock  = match[3];               // e.g., "RB" or "WR,CB"
+            const pVal      = parseInt(match[4], 10); // e.g., 61
+
+            // Use first position when multiple listed (e.g. WR,CB)
+            let rawPos = posBlock.split(',')[0].trim();
+            let normP  = normalizePos(rawPos);
+
+            if (pName && !isNaN(pVal)) {
+                importedPlayerMap[pName] = pVal;
+                importedPlayerDetails[pName] = { value: pVal, pos: normP, rank: sheetRank };
+                if (count < 20) newWishlist.push(pName);
+                count++;
+            }
         }
     }
 
@@ -1006,7 +1307,8 @@ document.getElementById('btn-bulk-import')?.addEventListener('click', () => {
         refreshSearchSuggestions();
         renderWishlist();
         render();
-        alert(`Successfully imported ${count} players from the multi-column list!`);
+        const src = isESPN ? 'ESPN' : 'FantasyPros';
+        alert(`Successfully imported ${count} players from the ${src} list!`);
     } else {
         alert("Could not automatically parse the format. Please check the text layout.");
     }
@@ -1079,11 +1381,15 @@ document.getElementById('btn-bulk-import')?.addEventListener('click', () => {
                     let slotIdx = document.getElementById('input-slot').value;
                     let playerInput = document.getElementById('input-player');
                     let priceInput = document.getElementById('input-price');
-                    
+
                     let player = playerInput.value.trim();
                     let rawPrice = parseFloat(priceInput.value);
 
                     if (slotIdx !== "" && player && !isNaN(rawPrice)) {
+                        // Push snapshot to undo history before saving
+                        pickHistory.push({ slotIdx: parseInt(slotIdx), prev: JSON.parse(JSON.stringify(slots[parseInt(slotIdx)])) });
+                        if (pickHistory.length > 20) pickHistory.shift();
+
                         let finalCostUSD = displayMode === 'percent' ? Math.round((rawPrice / 100) * totalBudget) : Math.round(rawPrice);
                         slots[slotIdx].player = player;
                         slots[slotIdx].cost = finalCostUSD;
@@ -1093,6 +1399,14 @@ document.getElementById('btn-bulk-import')?.addEventListener('click', () => {
                     }
                 });
             }
+
+            document.getElementById('btn-undo')?.addEventListener('click', () => {
+                if (pickHistory.length === 0) { alert("Nothing to undo."); return; }
+                let last = pickHistory.pop();
+                slots[last.slotIdx] = last.prev;
+                saveState();
+                render();
+            });
 
             let marketBtn = document.getElementById('btn-market-save');
             if (marketBtn) {
@@ -1137,6 +1451,8 @@ document.getElementById('btn-bulk-import')?.addEventListener('click', () => {
                         wishlist = [];
                         importedPlayerMap = {};
                         importedPlayerDetails = {};
+                        playerNotes = {};
+                        pickHistory = [];
                         totalBudget = 200;
                         displayMode = 'dollars';
                         if (budgetInput) budgetInput.value = 200;
@@ -1147,6 +1463,75 @@ document.getElementById('btn-bulk-import')?.addEventListener('click', () => {
                     }
                 });
             }
+
+            // Export CSV
+            document.getElementById('btn-export-csv')?.addEventListener('click', () => {
+                let rows = ['Slot,Position,Player,Plan ($),Actual ($),Variance ($),Projected Value ($)'];
+                slots.forEach(s => {
+                    let pos = getPosTag(s.id).code;
+                    let player = s.player || '';
+                    let actual = s.cost !== null ? s.cost : '';
+                    let variance = s.cost !== null ? (s.cost - s.planUSD) : '';
+                    let projVal = (s.player && importedPlayerMap[s.player] !== undefined) ? importedPlayerMap[s.player] : '';
+                    rows.push(`"${s.id}","${pos}","${player}","${s.planUSD}","${actual}","${variance}","${projVal}"`);
+                });
+                let blob = new Blob([rows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+                let link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'auction_draft_results.csv';
+                link.click();
+            });
+
+            // Live search
+            document.getElementById('import-search')?.addEventListener('input', (e) => {
+                importSearchQuery = e.target.value.trim();
+                renderImportedBoard();
+            });
+
+            // Clear nomination queue
+            document.getElementById('btn-clear-queue')?.addEventListener('click', () => {
+                if (wishlist.length === 0) return;
+                if (confirm("Clear all nomination queue targets?")) {
+                    wishlist = [];
+                    renderWishlist();
+                    refreshSearchSuggestions();
+                    saveState();
+                }
+            });
+
+            // Notes modal
+            let activeNotePlayer = '';
+            function openNoteModal(name) {
+                activeNotePlayer = name;
+                document.getElementById('notes-modal-title').innerText = `Note: ${name}`;
+                document.getElementById('notes-textarea').value = playerNotes[name] || '';
+                document.getElementById('notes-modal').classList.remove('hidden');
+                setTimeout(() => document.getElementById('notes-textarea').focus(), 50);
+            }
+            window.openNoteModal = openNoteModal;
+
+            document.getElementById('btn-close-notes')?.addEventListener('click', () => {
+                document.getElementById('notes-modal').classList.add('hidden');
+            });
+            document.getElementById('notes-modal')?.addEventListener('click', (e) => {
+                if (e.target === document.getElementById('notes-modal')) {
+                    document.getElementById('notes-modal').classList.add('hidden');
+                }
+            });
+            document.getElementById('btn-save-note')?.addEventListener('click', () => {
+                let text = document.getElementById('notes-textarea').value.trim();
+                if (text) playerNotes[activeNotePlayer] = text;
+                else delete playerNotes[activeNotePlayer];
+                saveState();
+                document.getElementById('notes-modal').classList.add('hidden');
+                renderImportedBoard();
+            });
+            document.getElementById('btn-delete-note')?.addEventListener('click', () => {
+                delete playerNotes[activeNotePlayer];
+                saveState();
+                document.getElementById('notes-modal').classList.add('hidden');
+                renderImportedBoard();
+            });
 
             renderMarketFeed();
             render();
