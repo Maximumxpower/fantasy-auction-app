@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fantasy Football Auction Assistant Pro</title>
+    <title>Draft Assistant Pro — Fantasy Football Auction War Room</title>
 
     <!-- PWA / App Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -46,6 +46,66 @@
             animation-play-state: paused;
         }
         .autocomplete-dd { -webkit-overflow-scrolling: touch; }
+
+        /* Draft-room navigation: the original controls remain in the DOM and
+           are simply reorganized into focused workspaces at runtime. */
+        .workspace-tabs {
+            display: flex;
+            align-items: center;
+            gap: .25rem;
+            overflow-x: auto;
+            padding: .25rem;
+            background: rgba(15, 23, 42, .82);
+            border: 1px solid rgba(71, 85, 105, .8);
+            border-radius: .85rem;
+            scrollbar-width: none;
+        }
+        .workspace-tabs::-webkit-scrollbar { display: none; }
+        .workspace-tab-btn {
+            flex: 0 0 auto;
+            border: 1px solid transparent;
+            border-radius: .6rem;
+            padding: .55rem .9rem;
+            color: #94a3b8;
+            background: transparent;
+            font-size: .72rem;
+            font-weight: 800;
+            transition: .18s ease;
+        }
+        .workspace-tab-btn:hover { color: #e2e8f0; background: rgba(51, 65, 85, .7); }
+        .workspace-tab-btn.active {
+            color: #f8fafc;
+            border-color: rgba(16, 185, 129, .35);
+            background: rgba(16, 185, 129, .18);
+            box-shadow: 0 5px 16px rgba(16, 185, 129, .08);
+        }
+        .workspace-tab-btn .tab-count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 1.15rem;
+            height: 1.15rem;
+            margin-left: .25rem;
+            padding: 0 .25rem;
+            border-radius: 999px;
+            color: #a7f3d0;
+            background: rgba(16, 185, 129, .2);
+            font-size: .62rem;
+        }
+        #workspace-grid { transition: opacity .16s ease; }
+        #workspace-grid.workspace-switching { opacity: .45; }
+        #workspace-grid.workspace-single > #left-workspace { grid-column: 1 / -1; }
+        #workspace-grid.workspace-single > #right-workspace { display: none; }
+        #workspace-grid.workspace-roster > #left-workspace { display: none; }
+        #workspace-grid.workspace-roster > #right-workspace { grid-column: 1 / -1; }
+        #workspace-grid.workspace-recap > #left-workspace { display: none; }
+        #workspace-grid.workspace-recap > #right-workspace { grid-column: 1 / -1; }
+        #workspace-grid.workspace-recap #recap-section { width: 100%; }
+        #room-insights-panel .room-insight-value { font-size: 1.25rem; font-weight: 900; }
+        @media (max-width: 640px) {
+            .workspace-tab-btn { padding-left: .7rem; padding-right: .7rem; }
+            #workspace-grid.workspace-recap > #right-workspace { display: block; }
+        }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
@@ -76,6 +136,21 @@
                 <p class="text-sm text-slate-200">
                     Draft Assistant Pro gives you a real-time mathematical edge during auction drafts by dynamically recalculating your open roster targets after every dollar spent.
                 </p>
+
+                <!-- Importer lives in the opening splash so setup happens once, before drafting. -->
+                <section class="bg-slate-800 border border-sky-800/60 rounded-xl p-4 shadow-lg text-left space-y-2">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sky-400">📋</span>
+                        <div>
+                            <h3 class="text-sm font-bold text-slate-100">Start with your player values</h3>
+                            <p class="text-[11px] text-slate-400">Paste a FantasyPros or ESPN auction sheet to build your target board and queue.</p>
+                        </div>
+                    </div>
+                    <textarea id="bulk-import-text" rows="4" placeholder="Paste FantasyPros or ESPN cheat sheet text here..." class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-200 focus:ring-1 focus:ring-sky-500 focus:outline-none resize-none"></textarea>
+                    <button id="btn-bulk-import" class="w-full bg-sky-600 hover:bg-sky-500 font-bold py-2 rounded-lg transition text-xs shadow-md text-white">
+                        Parse & Import Values (Auto Tiers & D/ST)
+                    </button>
+                </section>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <!-- Top Bar & Metrics -->
@@ -220,31 +295,24 @@
             </div>
         </section>
 
+        <!-- Focused workspaces keep every original feature available without
+             forcing the drafter to scroll through all panels at once. -->
+        <nav class="workspace-tabs" aria-label="Draft assistant workspaces">
+            <button class="workspace-tab-btn active" data-workspace-tab="draft" type="button">Draft</button>
+            <button class="workspace-tab-btn" data-workspace-tab="roster" type="button">Roster</button>
+            <button class="workspace-tab-btn" data-workspace-tab="targets" type="button">Targets <span class="tab-count" id="workspace-target-count">0</span></button>
+            <button class="workspace-tab-btn" data-workspace-tab="room" type="button">Room</button>
+            <button class="workspace-tab-btn" data-workspace-tab="recap" type="button">Recap</button>
+        </nav>
+
         <!-- Main Workspace Grid -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4">
+        <div id="workspace-grid" class="grid grid-cols-1 lg:grid-cols-12 gap-4">
 
             <!-- Left Panel: Logging, Target Wishlist, Controls -->
-            <div class="lg:col-span-5 space-y-4">
-
-                <!-- Bulk Importer -->
-                <section class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="flex items-center space-x-2">
-                            <span class="text-sky-400">📋</span>
-                            <h2 class="text-sm font-bold text-slate-200">External List Bulk Importer</h2>
-                        </div>
-                    </div>
-
-                    <div class="space-y-2">
-                        <textarea id="bulk-import-text" rows="3" placeholder="Paste FantasyPros or ESPN cheat sheet text here..." class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-xs text-slate-200 focus:ring-1 focus:ring-sky-500 focus:outline-none resize-none"></textarea>
-                        <button id="btn-bulk-import" class="w-full bg-sky-600 hover:bg-sky-500 font-bold py-1.5 rounded-lg transition text-xs shadow-md text-white">
-                            Parse & Import Values (Auto Tiers & D/ST)
-                        </button>
-                    </div>
-                </section>
+            <div id="left-workspace" class="lg:col-span-5 space-y-4">
 
                 <!-- Log Drafted Player Box -->
-                <section class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
+                <section id="log-pick-panel" class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
                     <div class="flex items-center space-x-2 mb-3">
                         <span class="text-emerald-400">📝</span>
                         <h2 class="text-sm font-bold text-slate-200">Log Roster Pick</h2>
@@ -276,7 +344,7 @@
                 </section>
 
                 <!-- Nomination Queue -->
-                <section class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
+                <section id="queue-panel" class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
                     <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center space-x-2">
                             <span class="text-teal-400">🎯</span>
@@ -301,7 +369,7 @@
                 </section>
 
                 <!-- Imported Position Tiers Board -->
-                <section class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
+                <section id="imported-panel" class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center space-x-2">
                             <span class="text-indigo-400">📊</span>
@@ -333,7 +401,7 @@
                 </section>
 
                 <!-- Add Custom Slot Box -->
-                <section class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
+                <section id="custom-slot-panel" class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
                     <div class="flex items-center space-x-2 mb-3">
                         <span class="text-blue-400">➕</span>
                         <h2 class="text-sm font-bold text-slate-200">Add Custom Position / Slot</h2>
@@ -354,7 +422,7 @@
                 </section>
 
                 <!-- Market Tracker: Log Other Teams' Picks -->
-                <section class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
+                <section id="market-panel" class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center space-x-2">
                             <span class="text-purple-400">📊</span>
@@ -385,8 +453,8 @@
             </div>
 
             <!-- Right Panel: Roster & Targets Grid -->
-            <div class="lg:col-span-7 space-y-4">
-                <section class="bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden">
+            <div id="right-workspace" class="lg:col-span-7 space-y-4">
+                <section id="roster-panel" class="bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden">
                     <div class="p-4 bg-slate-800 border-b border-slate-700 flex flex-wrap justify-between items-center gap-2">
                         <div class="flex items-center space-x-2">
                             <span class="text-emerald-400">📋</span>
@@ -455,6 +523,33 @@
                         <span class="text-[10px] text-slate-500">— updates live as you log picks</span>
                     </div>
                     <div id="recap-content" class="p-4 space-y-3 text-xs"></div>
+                </section>
+
+                <section id="room-insights-panel" class="hidden bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden">
+                    <div class="p-4 bg-slate-800 border-b border-slate-700 flex items-center space-x-2">
+                        <span class="text-purple-400">◈</span>
+                        <div>
+                            <h2 class="text-sm font-bold text-slate-200">Room strategy</h2>
+                            <p class="text-[10px] text-slate-500">A quick read on the market you are drafting against</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 p-4 text-center">
+                        <div class="bg-slate-900/70 rounded-lg p-3">
+                            <div class="text-[9px] text-slate-400 uppercase font-bold mb-1">Sales logged</div>
+                            <div id="room-sales-count" class="room-insight-value text-slate-200">0</div>
+                        </div>
+                        <div class="bg-slate-900/70 rounded-lg p-3">
+                            <div class="text-[9px] text-slate-400 uppercase font-bold mb-1">Avg. sale</div>
+                            <div id="room-average-sale" class="room-insight-value text-amber-400">$0</div>
+                        </div>
+                        <div class="bg-slate-900/70 rounded-lg p-3 col-span-2 sm:col-span-1">
+                            <div class="text-[9px] text-slate-400 uppercase font-bold mb-1">Signal</div>
+                            <div id="room-signal" class="room-insight-value text-emerald-400 text-sm">Balanced</div>
+                        </div>
+                    </div>
+                    <p id="room-guidance" class="px-4 pb-4 text-xs leading-relaxed text-slate-400">
+                        Log competitor purchases to turn this space into a live market dashboard.
+                    </p>
                 </section>
             </div>
 
@@ -1312,6 +1407,11 @@
             renderImportedBoard();
             renderWishlist();
             renderRecap();
+            updateRoomInsights();
+            const targetCount = document.getElementById('workspace-target-count');
+            if (targetCount) {
+                targetCount.innerText = Object.keys(importedPlayerDetails).length;
+            }
             saveState();
         }
 
@@ -1321,8 +1421,16 @@
             if (!section || !content) return;
 
             let filledSlots = slots.filter(s => s.cost !== null && s.player);
-            if (filledSlots.length < 1) { section.classList.add('hidden'); return; }
-            section.classList.remove('hidden');
+            if (filledSlots.length < 1) {
+                content.innerHTML = `
+                    <div class="rounded-xl border border-dashed border-slate-700 bg-slate-900/40 p-8 text-center">
+                        <div class="text-3xl mb-2">🏆</div>
+                        <div class="font-bold text-slate-200 mb-1">No picks logged yet</div>
+                        <div class="text-slate-500">Log your first roster pick and this tab will build your live draft recap.</div>
+                    </div>
+                `;
+                return;
+            }
 
             let totalSpent   = filledSlots.reduce((a, s) => a + s.cost, 0);
             let totalPlanned = filledSlots.reduce((a, s) => a + s.planUSD, 0);
@@ -1513,9 +1621,108 @@
             });
         }
 
+        function updateRoomInsights() {
+            const countElem = document.getElementById('room-sales-count');
+            const averageElem = document.getElementById('room-average-sale');
+            const signalElem = document.getElementById('room-signal');
+            const guidanceElem = document.getElementById('room-guidance');
+            if (!countElem || !averageElem || !signalElem || !guidanceElem) return;
+
+            const totalSpentRoom = marketLogs.reduce((sum, log) => sum + (Number(log.cost) || 0), 0);
+            const averageSale = marketLogs.length ? Math.round(totalSpentRoom / marketLogs.length) : 0;
+            countElem.innerText = marketLogs.length;
+            averageElem.innerText = valFormat(averageSale);
+
+            if (marketLogs.length === 0) {
+                signalElem.innerText = 'Balanced';
+                signalElem.className = 'room-insight-value text-emerald-400 text-sm';
+                guidanceElem.innerText = 'Log competitor purchases to turn this space into a live market dashboard.';
+                return;
+            }
+
+            let totalExpected = 0;
+            marketLogs.forEach(log => {
+                totalExpected += importedPlayerMap[log.player] !== undefined
+                    ? importedPlayerMap[log.player]
+                    : log.cost;
+            });
+            const diffPct = totalExpected > 0
+                ? Math.round(((totalSpentRoom - totalExpected) / totalExpected) * 100)
+                : 0;
+
+            if (diffPct > 3) {
+                signalElem.innerText = 'Bidding high';
+                signalElem.className = 'room-insight-value text-rose-400 text-sm';
+                guidanceElem.innerText = 'The room is spending above projections. Protect surplus cash and look for value after the next position run.';
+            } else if (diffPct < -3) {
+                signalElem.innerText = 'Value open';
+                signalElem.className = 'room-insight-value text-teal-400 text-sm';
+                guidanceElem.innerText = 'The room is leaving value on the table. Consider attacking your highest-priority targets earlier than planned.';
+            } else {
+                signalElem.innerText = 'Balanced';
+                signalElem.className = 'room-insight-value text-emerald-400 text-sm';
+                guidanceElem.innerText = 'Room spending is tracking projections. Stay disciplined and let your adjusted targets guide the next bid.';
+            }
+        }
+
+        function updateWorkspaceVisibility(workspace) {
+            const grid = document.getElementById('workspace-grid');
+            if (!grid) return;
+
+            const panels = {
+                logPick: document.getElementById('log-pick-panel'),
+                queue: document.getElementById('queue-panel'),
+                imported: document.getElementById('imported-panel'),
+                customSlot: document.getElementById('custom-slot-panel'),
+                market: document.getElementById('market-panel'),
+                roster: document.getElementById('roster-panel'),
+                recap: document.getElementById('recap-section'),
+                roomInsights: document.getElementById('room-insights-panel')
+            };
+
+            const visibleByWorkspace = {
+                draft: ['logPick', 'queue'],
+                roster: ['roster'],
+                targets: ['imported', 'customSlot'],
+                room: ['market', 'roomInsights'],
+                recap: ['recap']
+            };
+            const visible = visibleByWorkspace[workspace] || visibleByWorkspace.draft;
+
+            Object.entries(panels).forEach(([key, element]) => {
+                if (!element) return;
+                element.classList.toggle('hidden', !visible.includes(key));
+            });
+
+            grid.classList.toggle('workspace-single', workspace === 'targets');
+            grid.classList.toggle('workspace-roster', workspace === 'roster');
+            grid.classList.toggle('workspace-recap', workspace === 'recap');
+            grid.classList.add('workspace-switching');
+            window.setTimeout(() => grid.classList.remove('workspace-switching'), 120);
+
+            document.querySelectorAll('[data-workspace-tab]').forEach(button => {
+                const isActive = button.getAttribute('data-workspace-tab') === workspace;
+                button.classList.toggle('active', isActive);
+                button.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            });
+        }
+
+        function setupWorkspaceTabs() {
+            const tabButtons = document.querySelectorAll('[data-workspace-tab]');
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const workspace = button.getAttribute('data-workspace-tab') || 'draft';
+                    updateWorkspaceVisibility(workspace);
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            });
+            updateWorkspaceVisibility('draft');
+        }
+
         function initApp() {
             loadState();
             setupTicker();
+            setupWorkspaceTabs();
             refreshSearchSuggestions();
             renderWishlist();
 
@@ -1816,6 +2023,11 @@
                         render();
                         renderMarketFeed();
                         renderWishlist();
+                        const splash = document.getElementById('welcome-splash');
+                        if (splash) splash.classList.remove('hidden');
+                        updateWorkspaceVisibility('targets');
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                        showToast("Storage cleared. Import a fresh player list above.", "info");
                     }
                 });
             }
