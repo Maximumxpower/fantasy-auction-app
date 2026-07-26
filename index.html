@@ -9,11 +9,16 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0f172a">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230f172a'/><rect x='6' y='6' width='20' height='20' rx='5' fill='none' stroke='%2310b981' stroke-width='2.5'/><path d='M10 20l4-8 3 4 5-6' fill='none' stroke='%2310b981' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'/></svg>" />
     <link rel="manifest" href="manifest.json">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
+        body { font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif; }
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -52,9 +57,11 @@
             <!-- Header -->
             <div class="flex items-start justify-between border-b border-slate-800 pb-4 mb-4">
                 <div class="flex items-center space-x-3">
-                    <span class="text-3xl">🏈</span>
+                    <span class="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg flex-shrink-0">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-950"><path d="M3 17l6-6 4 4 7-7"/><path d="M14 8h7v7"/></svg>
+                    </span>
                     <div>
-                        <h2 class="text-xl font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+                        <h2 class="text-xl font-bold tracking-tight bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
                             Welcome to Draft Assistant Pro
                         </h2>
                         <p class="text-xs text-slate-400">Your ultimate real-time fantasy football auction war room</p>
@@ -142,9 +149,11 @@
     <!-- Top Navigation Bar -->
     <nav class="bg-slate-950 border-b border-slate-800 py-3 px-4 sticky top-0 z-40 shadow-lg">
         <div class="flex flex-wrap justify-between items-center gap-3">
-            <div class="flex items-center space-x-2">
-                <span class="text-xl">🏈</span>
-                <h1 class="text-lg font-bold bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
+            <div class="flex items-center space-x-2.5">
+                <span class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 shadow-md flex-shrink-0">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-950"><path d="M3 17l6-6 4 4 7-7"/><path d="M14 8h7v7"/></svg>
+                </span>
+                <h1 class="text-lg font-bold tracking-tight bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
                     Draft Assistant Pro
                 </h1>
                 <span id="save-status" class="hidden sm:inline-block text-[10px] bg-slate-800 text-emerald-400 border border-slate-700 font-bold px-2 py-0.5 rounded-full ml-2">
@@ -223,37 +232,6 @@
                         <div class="flex items-center space-x-2">
                             <span class="text-sky-400">📋</span>
                             <h2 class="text-sm font-bold text-slate-200">External List Bulk Importer</h2>
-                        </div>
-                    </div>
-
-                    <!-- Quick-open links -->
-                    <div class="mb-3 bg-slate-900/70 border border-slate-700/60 rounded-lg p-2.5">
-                        <div class="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider mb-2">Open FantasyPros → Copy → Paste below</div>
-                        <div class="flex flex-wrap gap-1.5 mb-2">
-                            <a href="https://www.fantasypros.com/nfl/auction-values/calculator.php" target="_blank" rel="noopener"
-                               class="inline-flex items-center space-x-1 bg-indigo-700 hover:bg-indigo-600 text-white font-bold text-[11px] px-2.5 py-1 rounded-lg transition shadow-sm">
-                                <span>⭐</span><span>All Auction Values</span>
-                            </a>
-                        </div>
-                        <div class="flex flex-wrap gap-1">
-                            <a href="https://www.fantasypros.com/nfl/projections/qb.php" target="_blank" rel="noopener"
-                               class="inline-flex items-center bg-purple-900/60 hover:bg-purple-800/80 border border-purple-700/40 text-purple-300 font-bold text-[10px] px-2 py-0.5 rounded transition">QB</a>
-                            <a href="https://www.fantasypros.com/nfl/projections/rb.php" target="_blank" rel="noopener"
-                               class="inline-flex items-center bg-emerald-900/60 hover:bg-emerald-800/80 border border-emerald-700/40 text-emerald-300 font-bold text-[10px] px-2 py-0.5 rounded transition">RB</a>
-                            <a href="https://www.fantasypros.com/nfl/projections/wr.php" target="_blank" rel="noopener"
-                               class="inline-flex items-center bg-sky-900/60 hover:bg-sky-800/80 border border-sky-700/40 text-sky-300 font-bold text-[10px] px-2 py-0.5 rounded transition">WR</a>
-                            <a href="https://www.fantasypros.com/nfl/projections/te.php" target="_blank" rel="noopener"
-                               class="inline-flex items-center bg-amber-900/60 hover:bg-amber-800/80 border border-amber-700/40 text-amber-300 font-bold text-[10px] px-2 py-0.5 rounded transition">TE</a>
-                            <a href="https://www.fantasypros.com/nfl/projections/dst.php" target="_blank" rel="noopener"
-                               class="inline-flex items-center bg-rose-900/60 hover:bg-rose-800/80 border border-rose-700/40 text-rose-300 font-bold text-[10px] px-2 py-0.5 rounded transition">DST</a>
-                            <a href="https://www.fantasypros.com/nfl/projections/k.php" target="_blank" rel="noopener"
-                               class="inline-flex items-center bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-300 font-bold text-[10px] px-2 py-0.5 rounded transition">K</a>
-                            <span class="text-slate-600 text-[10px] mx-1 self-center">·</span>
-                            <a href="https://www.fantasypros.com/nfl/cheatsheets/auction-values.php" target="_blank" rel="noopener"
-                               class="inline-flex items-center bg-slate-800 hover:bg-slate-700 border border-slate-600 text-slate-400 font-bold text-[10px] px-2 py-0.5 rounded transition">ESPN Format</a>
-                        </div>
-                        <div class="mt-2 text-[10px] text-slate-500 leading-relaxed">
-                            Tip: On the FantasyPros page, press <kbd class="bg-slate-800 border border-slate-600 rounded px-1 py-0.5 text-slate-300 font-mono">Ctrl+A</kbd> then <kbd class="bg-slate-800 border border-slate-600 rounded px-1 py-0.5 text-slate-300 font-mono">Ctrl+C</kbd>, then paste below. Works even if the page is partially locked.
                         </div>
                     </div>
 
@@ -486,6 +464,9 @@
     <!-- Global Datalist for Autocomplete Suggestions (legacy, unused) -->
     <datalist id="global-player-datalist"></datalist>
 
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="fixed top-4 right-4 z-[60] space-y-2 pointer-events-none w-[calc(100%-2rem)] max-w-sm"></div>
+
     <!-- Player Notes Modal -->
     <div id="notes-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/70 backdrop-blur-sm">
         <div class="bg-slate-800 border border-slate-600 rounded-2xl p-5 w-full max-w-sm mx-4 shadow-2xl">
@@ -609,6 +590,27 @@
             if (!tickerElem) return;
             const fullSet = proTipsList.map(tip => `<span>${tip}</span>`).join('');
             tickerElem.innerHTML = fullSet + fullSet;
+        }
+
+        function showToast(message, type) {
+            type = type || 'info';
+            const container = document.getElementById('toast-container');
+            if (!container) { alert(message); return; }
+            const colors = {
+                success: "bg-emerald-600/95 border-emerald-400",
+                error: "bg-rose-700/95 border-rose-500",
+                info: "bg-slate-700/95 border-slate-500"
+            };
+            const icons = { success: "✓", error: "✕", info: "ℹ" };
+            let toast = document.createElement('div');
+            toast.className = `pointer-events-auto flex items-center gap-2.5 text-white text-sm font-semibold px-4 py-2.5 rounded-xl border shadow-2xl translate-x-full opacity-0 transition-all duration-300 ${colors[type] || colors.info}`;
+            toast.innerHTML = `<span class="font-bold text-base leading-none">${icons[type] || icons.info}</span><span>${message}</span>`;
+            container.appendChild(toast);
+            requestAnimationFrame(() => { toast.classList.remove('translate-x-full', 'opacity-0'); });
+            setTimeout(() => {
+                toast.classList.add('translate-x-full', 'opacity-0');
+                setTimeout(() => toast.remove(), 300);
+            }, 3200);
         }
 
         function refreshSearchSuggestions() {
@@ -1241,7 +1243,15 @@
 
                 let tr = document.createElement('tr');
                 let rowBg = s.cost !== null ? 'bg-slate-900/40 text-slate-400' : 'hover:bg-slate-800/40 transition-colors duration-150';
-                tr.className = `${rowBg}`;
+                tr.setAttribute('data-idx', idx);
+                if (s.cost === null) {
+                    tr.className = `cursor-grab ${rowBg}`;
+                    tr.setAttribute('draggable', 'true');
+                    tr.title = "Drag to reorder";
+                } else {
+                    tr.className = `${rowBg}`;
+                    tr.title = "Filled slot — locked (undo the pick to move)";
+                }
 
                 let priceColClass = "p-3 text-slate-400 font-medium";
                 let varianceText = "";
@@ -1282,9 +1292,12 @@
                         ${s.cost !== null ? valFormat(s.cost) + varianceText : '<span class="text-slate-600">-</span>'}
                     </td>
                     <td class="p-3 text-center">
-                        <button data-idx="${idx}" class="btn-delete-slot text-rose-400 hover:text-rose-300 font-bold text-base px-2 py-1 transition-transform active:scale-90" title="Delete slot">
-                            ✕
-                        </button>
+                        <div class="flex items-center justify-center gap-0.5">
+                            ${s.cost === null ? `
+                            <button data-idx="${idx}" class="btn-move-up text-slate-500 hover:text-emerald-400 font-bold text-xs px-1.5 py-1 rounded hover:bg-slate-700/60 transition" title="Move up">▲</button>
+                            <button data-idx="${idx}" class="btn-move-down text-slate-500 hover:text-emerald-400 font-bold text-xs px-1.5 py-1 rounded hover:bg-slate-700/60 transition" title="Move down">▼</button>` : `<span class="text-slate-600 text-xs px-1" title="Locked — pick recorded">🔒</span>`}
+                            <button data-idx="${idx}" class="btn-delete-slot text-rose-400 hover:text-rose-300 font-bold text-sm px-1.5 py-1 transition-transform active:scale-90" title="Delete slot">✕</button>
+                        </div>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -1405,6 +1418,55 @@
                     render();
                 });
             });
+
+            document.querySelectorAll('.btn-move-up').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    let idx = parseInt(e.currentTarget.getAttribute('data-idx'));
+                    if (idx > 0) {
+                        [slots[idx - 1], slots[idx]] = [slots[idx], slots[idx - 1]];
+                        render();
+                    }
+                });
+            });
+            document.querySelectorAll('.btn-move-down').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    let idx = parseInt(e.currentTarget.getAttribute('data-idx'));
+                    if (idx < slots.length - 1) {
+                        [slots[idx + 1], slots[idx]] = [slots[idx], slots[idx + 1]];
+                        render();
+                    }
+                });
+            });
+
+            // Drag-and-drop row reordering
+            let dragSrcIdx = null;
+            document.querySelectorAll('#roster-tbody tr[draggable="true"]').forEach(tr => {
+                tr.addEventListener('dragstart', (e) => {
+                    dragSrcIdx = parseInt(tr.getAttribute('data-idx'));
+                    tr.classList.add('opacity-50');
+                    e.dataTransfer.effectAllowed = 'move';
+                    e.dataTransfer.setData('text/plain', String(dragSrcIdx));
+                });
+                tr.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'move';
+                    document.querySelectorAll('#roster-tbody tr').forEach(r => r.classList.remove('ring-2','ring-emerald-500/70'));
+                    tr.classList.add('ring-2','ring-emerald-500/70');
+                });
+                tr.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    let destIdx = parseInt(tr.getAttribute('data-idx'));
+                    if (dragSrcIdx === null || isNaN(dragSrcIdx) || dragSrcIdx === destIdx) { dragSrcIdx = null; return; }
+                    let moved = slots.splice(dragSrcIdx, 1)[0];
+                    slots.splice(destIdx, 0, moved);
+                    dragSrcIdx = null;
+                    render();
+                });
+                tr.addEventListener('dragend', () => {
+                    dragSrcIdx = null;
+                    document.querySelectorAll('#roster-tbody tr').forEach(r => r.classList.remove('opacity-50','ring-2','ring-emerald-500/70'));
+                });
+            });
         }
 
         function renderMarketFeed() {
@@ -1499,7 +1561,7 @@
 
                 const rawText = rawTextElement.value;
                 if (!rawText.trim()) {
-                    alert("Please paste your list text first!");
+                    showToast("Please paste your list text first.", "error");
                     return;
                 }
 
@@ -1562,9 +1624,9 @@
                     renderWishlist();
                     render();
                     const src = isESPN ? 'ESPN' : 'FantasyPros';
-                    alert(`Successfully imported ${count} players from the ${src} list!`);
+                    showToast(`Imported ${count} players from ${src}`, "success");
                 } else {
-                    alert("Could not automatically parse the format. Please check the text layout.");
+                    showToast("Could not parse the format — check the text layout.", "error");
                 }
             });
 
@@ -1656,7 +1718,7 @@
             }
 
             document.getElementById('btn-undo')?.addEventListener('click', () => {
-                if (pickHistory.length === 0) { alert("Nothing to undo."); return; }
+                if (pickHistory.length === 0) { showToast("Nothing to undo.", "info"); return; }
                 let last = pickHistory.pop();
                 slots[last.slotIdx] = last.prev;
                 saveState();
@@ -1665,7 +1727,7 @@
             });
 
             document.getElementById('btn-market-undo')?.addEventListener('click', () => {
-                if (marketHistory.length === 0) { alert("Nothing to undo."); return; }
+                if (marketHistory.length === 0) { showToast("Nothing to undo.", "info"); return; }
                 marketLogs = marketHistory.pop();
                 saveState();
                 renderMarketFeed();
