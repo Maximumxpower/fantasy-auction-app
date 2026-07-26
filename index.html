@@ -40,6 +40,7 @@
         .animate-ticker:hover {
             animation-play-state: paused;
         }
+        .autocomplete-dd { -webkit-overflow-scrolling: touch; }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
@@ -278,7 +279,7 @@
                         <div class="grid grid-cols-2 gap-2">
                             <div>
                                 <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Player / Defense Name</label>
-                                <input id="input-player" type="text" list="global-player-datalist" placeholder="e.g. San Francisco 49ers" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-200 focus:ring-1 focus:ring-emerald-500 focus:outline-none">
+                                <input id="input-player" type="text" placeholder="e.g. San Francisco 49ers" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-sm text-slate-200 focus:ring-1 focus:ring-emerald-500 focus:outline-none">
                             </div>
                             <div>
                                 <label id="label-actual-cost" class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Actual Cost ($)</label>
@@ -310,7 +311,7 @@
                     </div>
                     <div class="space-y-2">
                         <div class="flex space-x-2">
-                            <input id="input-wish-name" type="text" list="global-player-datalist" placeholder="Add player to queue..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1 text-xs text-slate-200 focus:ring-1 focus:ring-teal-500 focus:outline-none">
+                            <input id="input-wish-name" type="text" placeholder="Add player to queue..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1 text-xs text-slate-200 focus:ring-1 focus:ring-teal-500 focus:outline-none">
                             <button id="btn-add-wish" class="bg-teal-600 hover:bg-teal-500 px-3 py-1 rounded-lg text-xs font-bold text-white transition">
                                 Add
                             </button>
@@ -388,8 +389,8 @@
                     </div>
                     <div class="space-y-3">
                         <div class="grid grid-cols-2 gap-2">
-                            <input id="market-player" type="text" list="global-player-datalist" placeholder="e.g. Pittsburgh Steelers" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-purple-500 focus:outline-none">
-                            <input id="market-cost" type="number" placeholder="Cost ($)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-purple-500 focus:outline-none">
+                            <input id="market-player" type="text" placeholder="e.g. Pittsburgh Steelers" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-1.5 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-purple-500 focus:outline-none">
+                            <input id="market-cost" type="number" placeholder="Cost ($)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-1.5 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-purple-500 focus:outline-none">
                         </div>
                         <button id="btn-market-save" class="w-full bg-purple-600 hover:bg-purple-500 font-bold py-1.5 rounded-lg transition text-xs shadow-md text-white">
                             Log Room Purchase
@@ -482,7 +483,7 @@
         </div>
     </main>
 
-    <!-- Global Datalist for Autocomplete Suggestions -->
+    <!-- Global Datalist for Autocomplete Suggestions (legacy, unused) -->
     <datalist id="global-player-datalist"></datalist>
 
     <!-- Player Notes Modal -->
@@ -720,6 +721,108 @@
             return draftedToRoster || draftedToMarket;
         }
 
+        function playerPosBadgeClass(pos) {
+            const map = {
+                QB: "bg-purple-900/60 text-purple-300 border-purple-700",
+                RB: "bg-emerald-900/60 text-emerald-300 border-emerald-700",
+                WR: "bg-sky-900/60 text-sky-300 border-sky-700",
+                TE: "bg-amber-900/60 text-amber-300 border-amber-700",
+                DEF: "bg-rose-900/60 text-rose-300 border-rose-700",
+                K: "bg-slate-800 text-slate-300 border-slate-700",
+                UTIL: "bg-slate-800 text-slate-400 border-slate-700"
+            };
+            return map[pos] || map.UTIL;
+        }
+
+        function getEligibleSlotPosCodes(slotName) {
+            let s = (slotName || "").toUpperCase();
+            if (s.includes("BENCH")) return ['QB','RB','WR','TE','DEF','K','UTIL'];
+            if (s.includes("FLEX") || s.includes("/")) return ['RB','WR','TE'];
+            if (s.includes("QB")) return ['QB'];
+            if (s.includes("TE")) return ['TE'];
+            if (s.includes("RB")) return ['RB'];
+            if (s.includes("WR")) return ['WR'];
+            if (s.includes("DEF") || s.includes("DST")) return ['DEF'];
+            if (s.includes("KICKER") || s === "K") return ['K'];
+            return ['QB','RB','WR','TE','DEF','K','UTIL'];
+        }
+
+        function autoSwitchSlotForPlayer(playerName) {
+            const details = importedPlayerDetails[playerName];
+            if (!details || !details.pos || details.pos === 'UTIL') return;
+            const pos = details.pos;
+            const select = document.getElementById('input-slot');
+            if (!select) return;
+            for (let i = 0; i < slots.length; i++) {
+                if (slots[i].cost !== null) continue;
+                if (getEligibleSlotPosCodes(slots[i].id).includes(pos)) {
+                    select.value = String(i);
+                    return;
+                }
+            }
+        }
+
+        function attachAutocomplete(inputId) {
+            const input = document.getElementById(inputId);
+            if (!input || !input.parentElement) return;
+            input.parentElement.style.position = 'relative';
+            let dropdown = document.createElement('div');
+            dropdown.className = 'autocomplete-dd absolute left-0 right-0 top-full z-50 bg-slate-800 border border-slate-600 rounded-lg mt-1 max-h-52 overflow-y-auto shadow-xl hidden';
+            input.parentElement.appendChild(dropdown);
+
+            function getMatches(query) {
+                const taken = new Set();
+                slots.forEach(s => { if (s.player) taken.add(s.player.trim().toLowerCase()); });
+                marketLogs.forEach(l => { if (l.player) taken.add(l.player.trim().toLowerCase()); });
+                let names = new Set([...Object.keys(importedPlayerMap), ...wishlist]);
+                let q = query.trim().toLowerCase();
+                let results = [];
+                names.forEach(name => {
+                    if (taken.has(name.trim().toLowerCase())) return;
+                    if (!q || name.toLowerCase().includes(q)) results.push(name);
+                });
+                results.sort((a, b) => {
+                    let aStarts = a.toLowerCase().startsWith(q);
+                    let bStarts = b.toLowerCase().startsWith(q);
+                    if (aStarts && !bStarts) return -1;
+                    if (!aStarts && bStarts) return 1;
+                    return a.localeCompare(b);
+                });
+                return results.slice(0, 30);
+            }
+
+            function showDropdown() {
+                let matches = getMatches(input.value);
+                if (matches.length === 0) { dropdown.classList.add('hidden'); return; }
+                dropdown.innerHTML = matches.map(name => {
+                    let info = importedPlayerDetails[name];
+                    let posTag = (info && info.pos) ? `<span class="text-[9px] font-bold px-1 py-0.5 rounded border ${playerPosBadgeClass(info.pos)} flex-shrink-0">${info.pos}</span>` : '';
+                    let val = importedPlayerMap[name] !== undefined ? `<span class="text-indigo-400 text-[10px] ml-auto font-bold">$${importedPlayerMap[name]}</span>` : '';
+                    return `<div class="ac-item flex items-center gap-1.5 px-2 py-1.5 text-xs text-slate-200 hover:bg-slate-700 active:bg-slate-600 cursor-pointer border-b border-slate-700/40 last:border-0" data-name="${name}"><span class="font-medium truncate">${name}</span>${posTag}${val}</div>`;
+                }).join('');
+                dropdown.classList.remove('hidden');
+            }
+
+            input.addEventListener('focus', showDropdown);
+            input.addEventListener('input', showDropdown);
+            input.addEventListener('blur', () => { setTimeout(() => dropdown.classList.add('hidden'), 160); });
+            dropdown.addEventListener('mousedown', (e) => { e.preventDefault(); });
+            dropdown.addEventListener('click', (e) => {
+                let item = e.target.closest('.ac-item');
+                if (!item) return;
+                let name = item.getAttribute('data-name');
+                input.value = name;
+                dropdown.classList.add('hidden');
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+                input.dispatchEvent(new Event('change', { bubbles: true }));
+            });
+            document.addEventListener('click', (e) => {
+                if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.classList.add('hidden');
+                }
+            });
+        }
+
         function renderImportedBoard() {
             const container = document.getElementById('imported-board-container');
             const badge = document.getElementById('imported-count-badge');
@@ -902,6 +1005,7 @@
                     if (importedPlayerMap[name] !== undefined) {
                         document.getElementById('input-price').value = importedPlayerMap[name];
                     }
+                    autoSwitchSlotForPlayer(name);
                 });
                 badge.addEventListener('dragstart', (e) => {
                     let name = badge.getAttribute('data-p-name');
@@ -977,10 +1081,13 @@
                 let isDrafted = isPlayerDrafted(name);
                 let projVal = importedPlayerMap[name] !== undefined ? ` <span class="text-indigo-400 font-bold">$${importedPlayerMap[name]}</span>` : '';
                 let draftedStyle = isDrafted ? 'opacity-40 line-through' : '';
+                let posInfo = importedPlayerDetails[name];
+                let posBadge = (posInfo && posInfo.pos) ? `<span class="text-[9px] font-bold px-1 py-0.5 rounded border ${playerPosBadgeClass(posInfo.pos)} flex-shrink-0">${posInfo.pos}</span>` : '';
 
                 row.className = `flex items-center space-x-1.5 bg-slate-900 border border-teal-800/40 rounded-lg px-2 py-1 text-xs`;
                 row.innerHTML = `
                     <span class="text-slate-500 font-bold text-[10px] w-4 text-right flex-shrink-0">${idx + 1}.</span>
+                    ${posBadge}
                     <span class="wish-item flex-1 font-semibold text-teal-300 cursor-pointer hover:text-teal-100 transition truncate ${draftedStyle}">${name}${projVal}</span>
                     <div class="flex items-center space-x-1 flex-shrink-0">
                         <button data-w-idx="${idx}" class="btn-wish-up text-slate-500 hover:text-slate-200 font-bold text-[10px] px-1 py-0.5 rounded hover:bg-slate-700 transition" title="Move up">▲</button>
@@ -994,6 +1101,7 @@
                     if (importedPlayerMap[name] !== undefined) {
                         document.getElementById('input-price').value = importedPlayerMap[name];
                     }
+                    autoSwitchSlotForPlayer(name);
                 });
 
                 container.appendChild(row);
@@ -1479,6 +1587,7 @@
                 let name = e.target.value.trim();
                 if (importedPlayerMap[name] !== undefined) {
                     document.getElementById('input-price').value = importedPlayerMap[name];
+                    autoSwitchSlotForPlayer(name);
                 }
             });
 
@@ -1745,6 +1854,11 @@
                 document.getElementById('notes-modal').classList.add('hidden');
                 renderImportedBoard();
             });
+
+            // Custom autocomplete dropdowns (mobile-friendly replacement for <datalist>)
+            attachAutocomplete('input-player');
+            attachAutocomplete('input-wish-name');
+            attachAutocomplete('market-player');
 
             renderMarketFeed();
             render();
