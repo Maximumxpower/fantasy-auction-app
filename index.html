@@ -111,111 +111,133 @@
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
 
     <!-- Welcome / Instructions Splash Modal -->
-    <div id="welcome-splash" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 overflow-y-auto">
-        <div class="bg-slate-900 border border-slate-700 rounded-2xl max-w-3xl w-full shadow-2xl p-6 text-slate-100 flex flex-col max-h-[90vh] relative my-auto">
-            
+    <div id="welcome-splash" class="fixed inset-0 z-50 flex items-center justify-center bg-black/88 backdrop-blur-md p-4 overflow-y-auto">
+        <div class="bg-slate-900 border border-slate-700/80 rounded-2xl max-w-2xl w-full shadow-2xl text-slate-100 flex flex-col relative my-auto overflow-hidden">
+
+            <!-- Decorative top glow -->
+            <div class="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-emerald-950/70 via-slate-900/40 to-transparent pointer-events-none"></div>
+
             <!-- Header -->
-            <div class="flex items-start justify-between border-b border-slate-800 pb-4 mb-4">
-                <div class="flex items-center space-x-3">
-                    <span class="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg flex-shrink-0">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-950"><path d="M3 17l6-6 4 4 7-7"/><path d="M14 8h7v7"/></svg>
-                    </span>
+            <div class="relative flex items-center justify-between px-6 pt-5 pb-4 border-b border-slate-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg flex items-center justify-center flex-shrink-0 text-2xl select-none">🏈</div>
                     <div>
-                        <h2 class="text-xl font-bold tracking-tight bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">
-                            Welcome to Draft Assistant Pro
-                        </h2>
-                        <p class="text-xs text-slate-400">Your ultimate real-time fantasy football auction war room</p>
+                        <h2 class="text-xl font-black tracking-tight text-white">Draft Assistant <span class="text-emerald-400">Pro</span></h2>
+                        <p class="text-[11px] text-slate-400 font-medium">Real-time auction intelligence · Fantasy Football War Room</p>
                     </div>
                 </div>
-                <button id="btn-close-splash" class="text-slate-400 hover:text-white text-2xl font-bold p-1 leading-none rounded-lg hover:bg-slate-800 transition" title="Close Splash Screen">✕</button>
+                <button id="btn-close-splash" class="text-slate-500 hover:text-white text-xl font-bold p-1.5 leading-none rounded-lg hover:bg-slate-800 transition flex-shrink-0" title="Close">✕</button>
             </div>
 
-            <!-- Scrollable Guide Body -->
-            <div class="overflow-y-auto pr-2 space-y-4 text-xs text-slate-300 leading-relaxed max-h-[60vh]">
-                
-                <p class="text-sm text-slate-200">
-                    Draft Assistant Pro gives you a real-time mathematical edge during auction drafts by dynamically recalculating your open roster targets after every dollar spent.
+            <!-- Body -->
+            <div class="overflow-y-auto px-6 py-5 space-y-5 max-h-[76vh]">
+
+                <!-- Tagline -->
+                <p class="text-[13px] text-slate-300 leading-relaxed">
+                    Win your auction draft with a live mathematical edge. Every pick you log instantly recalculates your Max Bid and per-slot targets — so you always know the exact most you can spend without going broke.
                 </p>
 
-                <!-- Importer lives in the opening splash so setup happens once, before drafting. -->
-                <section class="bg-slate-800 border border-sky-800/60 rounded-xl p-4 shadow-lg text-left space-y-2">
-                    <div class="flex items-center space-x-2">
-                        <span class="text-sky-400">📋</span>
+                <!-- ── Import CTA ───────────────────────────────────────── -->
+                <section class="bg-slate-800/70 border border-sky-700/50 rounded-xl p-4 space-y-3 shadow-lg">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-sky-600/25 border border-sky-600/40 flex items-center justify-center text-sm flex-shrink-0">📋</div>
                         <div>
-                            <h3 class="text-sm font-bold text-slate-100">Start with your player values</h3>
-                            <p class="text-[11px] text-slate-400">Paste a FantasyPros or ESPN auction sheet to build your target board and queue.</p>
+                            <h3 class="text-sm font-extrabold text-sky-300">Step 1 — Import Your Cheat Sheet</h3>
+                            <p class="text-[10px] text-slate-500">Paste from FantasyPros or ESPN — the app auto-detects the format and builds your tiered target board.</p>
                         </div>
                     </div>
-                    <textarea id="bulk-import-text" rows="4" placeholder="Paste FantasyPros or ESPN cheat sheet text here..." class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2 text-xs text-slate-200 focus:ring-1 focus:ring-sky-500 focus:outline-none resize-none"></textarea>
-                    <button id="btn-bulk-import" class="w-full bg-sky-600 hover:bg-sky-500 font-bold py-2 rounded-lg transition text-xs shadow-md text-white">
-                        Parse & Import Values (Auto Tiers & D/ST)
+                    <textarea id="bulk-import-text" rows="3" placeholder="Paste FantasyPros or ESPN auction values here…" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:ring-1 focus:ring-sky-500 focus:outline-none resize-none placeholder-slate-600"></textarea>
+                    <div class="grid grid-cols-2 gap-2.5">
+                        <div>
+                            <label class="text-[10px] text-slate-400 font-bold block mb-1">💵 Auction Budget</label>
+                            <div class="relative">
+                                <span class="absolute left-2.5 top-1/2 -translate-y-1/2 text-emerald-400 text-xs font-bold pointer-events-none">$</span>
+                                <input id="splash-budget" type="number" min="50" max="9999" value="200" class="w-full pl-6 pr-2 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-emerald-400 font-bold focus:ring-1 focus:ring-emerald-500 focus:outline-none text-center">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-[10px] text-slate-400 font-bold block mb-1">👥 Teams in League</label>
+                            <input id="splash-league-size" type="number" min="8" max="20" value="10" class="w-full px-2 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-sky-400 font-bold focus:ring-1 focus:ring-sky-500 focus:outline-none text-center">
+                        </div>
+                    </div>
+                    <button id="btn-bulk-import" class="w-full bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 active:from-sky-700 active:to-blue-700 font-extrabold py-2.5 rounded-lg transition text-sm shadow-md text-white tracking-wide">
+                        ⚡ Parse & Import Values
                     </button>
                 </section>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <!-- Top Bar & Metrics -->
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-3 rounded-xl space-y-1.5">
-                        <div class="flex items-center space-x-2 text-emerald-400 font-bold text-sm">
-                            <span>📊</span> <h3>1. Header & Live Metrics</h3>
-                        </div>
-                        <p class="text-slate-400 text-[11px] leading-normal">
-                            • <strong>Max Bid Allowed:</strong> The exact ceiling you can bid while keeping $1 for every remaining open slot.<br>
-                            • <strong>Dynamic Target Adj:</strong> Re-allocates remaining budget across open slots automatically as you hit bargains or reaches.<br>
-                            • <strong>Display Toggle:</strong> Switch between <strong>$ USD</strong> and <strong>% Budget</strong> for custom league budgets.
-                        </p>
-                    </div>
+                <!-- ── How It Works ─────────────────────────────────────── -->
+                <div>
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2.5">How to use this app during the draft</p>
+                    <div class="grid grid-cols-2 gap-2">
 
-                    <!-- Bulk Importer & Tiers -->
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-3 rounded-xl space-y-1.5">
-                        <div class="flex items-center space-x-2 text-sky-400 font-bold text-sm">
-                            <span>📋</span> <h3>2. Bulk Importer & Auto-Tiers</h3>
+                        <div class="bg-slate-800/50 border border-emerald-800/30 rounded-xl p-3 space-y-1.5">
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-[15px]">🎯</span>
+                                <span class="text-[11px] font-extrabold text-emerald-400">Targets Tab</span>
+                            </div>
+                            <p class="text-[10px] text-slate-400 leading-relaxed">Players sorted by auction value, grouped into position tiers. Drag any player card into your Nomination Queue. NFL team colors let you spot players at a glance.</p>
                         </div>
-                        <p class="text-slate-400 text-[11px] leading-normal">
-                            • <strong>Instant Import:</strong> Copy/paste whole cheat sheets directly from FantasyPros or ESPN.<br>
-                            • <strong>Position Tiers:</strong> Auto-groups players into positional tiers using VORP cliff detection.<br>
-                            • <strong>Interactive Queue:</strong> Drag & drop player badges straight into your Nomination Queue.
-                        </p>
-                    </div>
 
-                    <!-- Live Roster & Draft Recap -->
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-3 rounded-xl space-y-1.5">
-                        <div class="flex items-center space-x-2 text-indigo-400 font-bold text-sm">
-                            <span>📋</span> <h3>3. Live Roster & Draft Recap</h3>
+                        <div class="bg-slate-800/50 border border-amber-800/30 rounded-xl p-3 space-y-1.5">
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-[15px]">⚡</span>
+                                <span class="text-[11px] font-extrabold text-amber-400">Draft Tab — Log Picks</span>
+                            </div>
+                            <p class="text-[10px] text-slate-400 leading-relaxed">Type the player name and final price, hit Log Pick. Your <strong class="text-amber-300">Max Bid</strong> and per-position adjusted targets recalculate automatically after every entry.</p>
                         </div>
-                        <p class="text-slate-400 text-[11px] leading-normal">
-                            • <strong>Inline Table Editing:</strong> Click slot names or target plans directly in the table to edit mid-draft.<br>
-                            • <strong>Variance Tracking:</strong> Highlights bargains (green) and overpays (red) instantly.<br>
-                            • <strong>Recap Board:</strong> Analyzes net drafting value, efficiency scores, and biggest bargains.
-                        </p>
-                    </div>
 
-                    <!-- Room Inflation Index -->
-                    <div class="bg-slate-800/80 border border-slate-700/80 p-3 rounded-xl space-y-1.5">
-                        <div class="flex items-center space-x-2 text-purple-400 font-bold text-sm">
-                            <span>📈</span> <h3>4. Room Sales & Market Trends</h3>
+                        <div class="bg-slate-800/50 border border-purple-800/30 rounded-xl p-3 space-y-1.5">
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-[15px]">📊</span>
+                                <span class="text-[11px] font-extrabold text-purple-400">Room Tab — Market Intel</span>
+                            </div>
+                            <p class="text-[10px] text-slate-400 leading-relaxed">Log what opponents are paying. The <strong class="text-purple-300">Inflation Index</strong> tells you if the room is running hot — an overpaying room makes your remaining budget more powerful.</p>
                         </div>
-                        <p class="text-slate-400 text-[11px] leading-normal">
-                            • <strong>Log Room Sales:</strong> Record competitor picks to track overall league spending.<br>
-                            • <strong>Room Inflation Index:</strong> Live gauge indicating whether managers are overspending or leaving market value on the table.
-                        </p>
+
+                        <div class="bg-slate-800/50 border border-sky-800/30 rounded-xl p-3 space-y-1.5">
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-[15px]">🏆</span>
+                                <span class="text-[11px] font-extrabold text-sky-400">Recap Tab — Draft Grade</span>
+                            </div>
+                            <p class="text-[10px] text-slate-400 leading-relaxed">After the draft, get your letter grade, net value vs. spend, biggest bargains, and biggest reaches — shareable as plain text.</p>
+                        </div>
                     </div>
                 </div>
 
-                <div class="bg-emerald-950/40 border border-emerald-800/50 p-3 rounded-xl flex items-start space-x-2">
-                    <span class="text-emerald-400 text-base">💡</span>
-                    <div>
-                        <span class="font-bold text-emerald-300">Pro Tip Ticker:</span>
-                        <span class="text-slate-300">
-                            Check the scrolling ticker at the bottom of the app for real-time tactical auction strategies!
-                        </span>
+                <!-- ── Three golden rules ───────────────────────────────── -->
+                <div>
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2.5">Three rules that win auction drafts</p>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div class="bg-rose-950/30 border border-rose-800/40 rounded-xl px-3 py-2.5 text-center space-y-1">
+                            <div class="text-xl">🛡️</div>
+                            <div class="text-[10px] font-extrabold text-rose-400">Respect Max Bid</div>
+                            <p class="text-[9px] text-slate-500 leading-snug">Never bid more than this number or you will literally not be able to fill your roster.</p>
+                        </div>
+                        <div class="bg-emerald-950/30 border border-emerald-800/40 rounded-xl px-3 py-2.5 text-center space-y-1">
+                            <div class="text-xl">💵</div>
+                            <div class="text-[10px] font-extrabold text-emerald-400">$1 Minimum Rule</div>
+                            <p class="text-[9px] text-slate-500 leading-snug">Every open slot must be filled for at least $1. The app bakes this into every calculation.</p>
+                        </div>
+                        <div class="bg-amber-950/30 border border-amber-800/40 rounded-xl px-3 py-2.5 text-center space-y-1">
+                            <div class="text-xl">🧊</div>
+                            <div class="text-[10px] font-extrabold text-amber-400">Price Enforce</div>
+                            <p class="text-[9px] text-slate-500 leading-snug">Nominate players you don't want to drain opponents' cash before your targets come up.</p>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Ticker note -->
+                <div class="flex items-start gap-2 bg-slate-800/40 border border-slate-700/40 rounded-xl px-3 py-2.5">
+                    <span class="text-base flex-shrink-0">🏈</span>
+                    <p class="text-[10px] text-slate-400 leading-relaxed"><strong class="text-slate-300">Auction Intel Ticker</strong> — scroll the bottom bar during your draft for live auction strategy tips. Hover to pause.</p>
+                </div>
+
             </div>
 
-            <!-- Modal Footer -->
-            <div class="mt-5 pt-3 border-t border-slate-800 flex justify-end">
-                <button id="btn-start-draft" class="w-full sm:w-auto bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold px-6 py-2.5 rounded-xl transition shadow-lg text-sm">
-                    Got It, Let's Draft! 🚀
+            <!-- Footer CTA -->
+            <div class="px-6 py-4 border-t border-slate-800 bg-slate-950/50">
+                <button id="btn-start-draft" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 active:from-emerald-600 active:to-teal-600 text-slate-950 font-black px-6 py-3 rounded-xl transition shadow-lg text-sm tracking-wide">
+                    🏈 Enter the War Room
                 </button>
             </div>
         </div>
@@ -256,6 +278,7 @@
                                class="w-24 pl-5 pr-4 py-1 bg-slate-900 border border-slate-700 rounded-lg text-xs text-emerald-400 font-bold focus:ring-2 focus:ring-emerald-500 focus:outline-none text-center">
                     </div>
                 </div>
+                <!-- Teams input moved to splash setup -->
             </div>
         </div>
     </nav>
@@ -272,6 +295,7 @@
             <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-xl shadow-md text-center">
                 <span id="label-max-bid" class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">MAX BID ALLOWED</span>
                 <span id="stat-maxbid" class="text-xl sm:text-2xl font-extrabold text-amber-400">$184</span>
+                <div id="stat-posbid-detail" class="mt-1 text-[9px] text-slate-500 leading-tight truncate"></div>
             </div>
             <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-xl shadow-md text-center">
                 <span class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">PLANNED TOTAL</span>
@@ -387,6 +411,7 @@
                         <button class="imp-filter-btn px-2 py-0.5 rounded font-bold bg-slate-900 text-slate-300 hover:bg-slate-700" data-pos="TE">TE</button>
                         <button class="imp-filter-btn px-2 py-0.5 rounded font-bold bg-slate-900 text-slate-300 hover:bg-slate-700" data-pos="DEF">DEF</button>
                         <button class="imp-filter-btn px-2 py-0.5 rounded font-bold bg-slate-900 text-slate-300 hover:bg-slate-700" data-pos="K">K</button>
+                        <button class="imp-filter-btn px-2 py-0.5 rounded font-bold bg-slate-900 text-slate-300 hover:bg-slate-700" data-pos="IDP">IDP</button>
                     </div>
 
                     <!-- Live Search -->
@@ -398,27 +423,6 @@
                     <div id="imported-board-container" class="bg-slate-900/60 rounded-lg p-2.5 max-h-96 overflow-y-auto border border-slate-800 space-y-4 text-xs">
                         <div class="text-center text-slate-500 italic py-6">Import player data to populate position tiers</div>
                     </div>
-                </section>
-
-                <!-- Add Custom Slot Box -->
-                <section id="custom-slot-panel" class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
-                    <div class="flex items-center space-x-2 mb-3">
-                        <span class="text-blue-400">➕</span>
-                        <h2 class="text-sm font-bold text-slate-200">Add Custom Position / Slot</h2>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2 mb-3">
-                        <div>
-                            <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Position / Name</label>
-                            <input id="add-slot-name" type="text" placeholder="e.g. SUPERFLEX" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:outline-none">
-                        </div>
-                        <div>
-                            <label id="label-add-plan" class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Plan Target ($)</label>
-                            <input id="add-slot-plan" type="number" placeholder="e.g. 24" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:outline-none">
-                        </div>
-                    </div>
-                    <button id="btn-add-slot" class="w-full bg-blue-600 hover:bg-blue-500 font-bold py-2 rounded-lg transition text-xs shadow-md text-white">
-                        Insert New Slot
-                    </button>
                 </section>
 
                 <!-- Market Tracker: Log Other Teams' Picks -->
@@ -464,6 +468,12 @@
                             <button id="btn-export-csv" class="text-xs bg-sky-700 hover:bg-sky-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition" title="Export roster to CSV">
                                 📤 Export CSV
                             </button>
+                            <button id="btn-redistribute-values" class="text-xs bg-indigo-700 hover:bg-indigo-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition" title="Adjust imported values for this roster">
+                                ⚖️ Redistribute Values
+                            </button>
+                            <button id="btn-reset-values" class="text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold px-2.5 py-1.5 rounded-lg transition hidden" title="Restore imported source values">
+                                Restore Source Values
+                            </button>
                             <button id="btn-clear-data" class="text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold px-2.5 py-1.5 rounded-lg transition" title="Clear LocalStorage memory">
                                 Clear Storage
                             </button>
@@ -483,6 +493,8 @@
                         <button class="pos-filter-btn px-2 py-0.5 rounded font-bold bg-slate-800 text-slate-300 hover:bg-slate-700" data-pos="TE">TE</button>
                         <button class="pos-filter-btn px-2 py-0.5 rounded font-bold bg-slate-800 text-slate-300 hover:bg-slate-700" data-pos="FLEX">FLEX</button>
                         <button class="pos-filter-btn px-2 py-0.5 rounded font-bold bg-slate-800 text-slate-300 hover:bg-slate-700" data-pos="BENCH">BENCH</button>
+                        <button class="pos-filter-btn px-2 py-0.5 rounded font-bold bg-slate-800 text-slate-300 hover:bg-slate-700" data-pos="DST/K">DST/K</button>
+                        <button class="pos-filter-btn px-2 py-0.5 rounded font-bold bg-slate-800 text-slate-300 hover:bg-slate-700" data-pos="IDP">IDP</button>
                     </div>
 
                     <div class="overflow-x-auto">
@@ -515,12 +527,53 @@
                     </div>
                 </section>
 
+                <!-- Custom roster slots belong with roster configuration. -->
+                <section id="custom-slot-panel" class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center space-x-2">
+                            <span class="text-blue-400">➕</span>
+                            <h2 class="text-sm font-bold text-slate-200">Add Custom Position / Slot</h2>
+                        </div>
+                        <span class="text-[10px] text-slate-500">Used for filters and value redistribution</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-3">
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Slot Name</label>
+                            <input id="add-slot-name" type="text" placeholder="e.g. QB3" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Position Category</label>
+                            <select id="add-slot-pos" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:outline-none">
+                                <option value="QB">QB</option>
+                                <option value="RB">RB</option>
+                                <option value="WR">WR</option>
+                                <option value="TE">TE</option>
+                                <option value="FLEX">FLEX</option>
+                                <option value="K">K</option>
+                                <option value="DEF">DST / D</option>
+                                <option value="IDP">IDP</option>
+                                <option value="BENCH">Bench</option>
+                                <option value="UTIL">UTIL</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label id="label-add-plan" class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Plan Target ($)</label>
+                            <input id="add-slot-plan" type="number" placeholder="e.g. 24" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-blue-500 focus:outline-none">
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-slate-500 mb-3">Choose the category explicitly so QB3, IDP, and other custom slots appear in the right filter.</p>
+                    <button id="btn-add-slot" class="w-full bg-blue-600 hover:bg-blue-500 font-bold py-2 rounded-lg transition text-xs shadow-md text-white">
+                        Insert New Slot
+                    </button>
+                </section>
+
                 <!-- Draft Recap Panel (auto-shows when picks are logged) -->
                 <section id="recap-section" class="hidden bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden">
                     <div class="p-4 bg-slate-800 border-b border-slate-700 flex items-center space-x-2">
                         <span class="text-yellow-400">🏆</span>
                         <h2 class="text-sm font-bold text-slate-200">Draft Recap</h2>
                         <span class="text-[10px] text-slate-500">— updates live as you log picks</span>
+                        <button id="btn-copy-recap" class="ml-auto text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold px-2.5 py-1 rounded-lg transition" title="Copy recap to clipboard">📋 Copy</button>
                     </div>
                     <div id="recap-content" class="p-4 space-y-3 text-xs"></div>
                 </section>
@@ -580,15 +633,25 @@
         </div>
     </div>
 
-    <!-- Infinite Scrolling Pro Tips Banner Footer -->
-    <footer class="bg-slate-950 border-t border-slate-800 py-2.5 fixed bottom-0 left-0 w-full z-30 overflow-hidden shadow-2xl flex items-center">
-        <div class="bg-emerald-500 text-slate-950 font-black text-[10px] uppercase tracking-widest px-3 py-1.5 z-10 flex-shrink-0 flex items-center space-x-1 shadow-lg ml-2 rounded">
-            <span>💡</span> <span>PRO TIPS TICKER</span>
+    <!-- Infinite Scrolling Auction Intel Ticker Footer -->
+    <footer class="bg-slate-950 border-t border-slate-800 py-0 fixed bottom-0 left-0 w-full z-30 overflow-hidden shadow-2xl flex items-stretch">
+        <!-- Label -->
+        <div class="flex items-center gap-1.5 bg-gradient-to-br from-emerald-600 to-teal-700 text-slate-950 font-black text-[9px] uppercase tracking-widest px-3 flex-shrink-0 shadow-lg">
+            <svg width="13" height="13" viewBox="0 0 32 32" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <!-- football shape -->
+                <ellipse cx="16" cy="16" rx="15" ry="9" transform="rotate(-35 16 16)" rx="14" ry="8"/>
+                <path d="M16 2 Q26 8 30 16 Q26 24 16 30 Q6 24 2 16 Q6 8 16 2Z" opacity="0.18"/>
+                <line x1="10" y1="13" x2="22" y2="13" stroke="rgba(0,0,0,0.35)" stroke-width="1.2"/>
+                <line x1="10" y1="16" x2="22" y2="16" stroke="rgba(0,0,0,0.35)" stroke-width="1.2"/>
+                <line x1="10" y1="19" x2="22" y2="19" stroke="rgba(0,0,0,0.35)" stroke-width="1.2"/>
+            </svg>
+            <span>AUCTION<br>INTEL</span>
         </div>
-
-        <div class="overflow-hidden w-full relative flex items-center ml-2">
-            <div id="ticker-content" class="animate-ticker text-xs font-medium text-slate-300 space-x-8 whitespace-nowrap cursor-pointer">
-                <!-- Dynamic Ticker Tips -->
+        <!-- Divider pip -->
+        <div class="w-px bg-teal-700/60 flex-shrink-0"></div>
+        <div class="overflow-hidden w-full relative flex items-center py-2 ml-3">
+            <div id="ticker-content" class="animate-ticker text-[11px] font-medium text-slate-300 whitespace-nowrap cursor-pointer" style="display:inline-flex;gap:2.5rem;">
+                <!-- Populated by JS -->
             </div>
         </div>
     </footer>
@@ -596,54 +659,70 @@
     <!-- App Logic -->
     <script>
         const proTipsList = [
-            "📊 <strong class='text-indigo-400'>ADJ TARGET COLUMN:</strong> Dynamically recalculates your per-slot budget in real time — snag a bargain and every open slot's target grows automatically.",
-            "📋 <strong class='text-sky-400'>BULK IMPORTER:</strong> Supports both ESPN and FantasyPros formats — just paste and hit Import. The app auto-detects the source.",
-            "🔀 <strong class='text-teal-400'>TOGGLE MODE:</strong> Switch between $ USD and % of Budget in the top bar — great for leagues with non-standard budgets.",
-            "📈 <strong class='text-purple-400'>ROOM INFLATION INDEX:</strong> Tracks whether the room is paying over or under projected values. Positive % = overspending room = your cash goes further late.",
-            "🎯 <strong class='text-teal-400'>NOMINATION QUEUE:</strong> Add targets in priority order and use ↑↓ arrows to reorder before the draft. Click any name to auto-fill the logging form.",
-            "🛡️ <strong class='text-amber-400'>MAX BID:</strong> The absolute ceiling you can bid while still leaving $1 per remaining open slot. Never exceed this number.",
-            "⚠️ <strong class='text-rose-400'>PLAN BALANCE:</strong> Keep Unallocated Plan at $0. If it's red you're over budget — adjust slot plans before the draft starts.",
-            "✏️ <strong class='text-sky-400'>LIVE EDITING:</strong> Click any Slot Name or Plan $ directly in the roster table to edit mid-draft without losing your place.",
-            "↩️ <strong class='text-emerald-400'>UNDO PICK:</strong> Accidentally logged the wrong player? Hit Undo Last Pick to instantly reverse it.",
-            "📝 <strong class='text-amber-400'>PLAYER NOTES:</strong> Click the 📝 icon on any imported player to save a private scouting note — injury concerns, ceiling plays, or bidding ceiling.",
-            "📤 <strong class='text-sky-400'>EXPORT CSV:</strong> Download your final roster as a spreadsheet after the draft for easy record keeping or league posting.",
-            "🏆 <strong class='text-emerald-400'>DRAFT RECAP:</strong> Check the Recap panel after the draft to see your efficiency score, biggest bargains, and biggest reaches.",
-            "🔍 <strong class='text-indigo-400'>LIVE SEARCH:</strong> Use the search bar in the player board to instantly filter by name — fast access in any position tab.",
-            "➕ <strong class='text-blue-400'>CUSTOM SLOTS:</strong> Add Superflex, TE Premium, IR, or extra bench spots. Budget re-balances automatically.",
-            "🔥 <strong class='text-rose-400'>HERO STUD STRATEGY:</strong> Spend $55–$70 on one elite RB or WR1, then stack $1–$5 value plays in the remaining slots.",
-            "💧 <strong class='text-sky-400'>POSITIONAL SCARCITY:</strong> In PPR, elite TEs dry up fast — if a top-5 TE slips past $28, pivot to a $2 streaming stack.",
-            "⚡ <strong class='text-amber-400'>LATE-ROUND QB:</strong> QBs are consistently overpaid in auction. Wait for the $3–$6 window — an elite QB at that price is pure value.",
-            "💰 <strong class='text-emerald-400'>BENCH BUDGET:</strong> Cap bench spending at $5 total. Every dollar over $1 on a bench player is a dollar stolen from a starter.",
-            "🧊 <strong class='text-teal-400'>PRICE ENFORCEMENT:</strong> Nominate players you don't want early to drain opponents' budgets — especially studs in positions you've already filled.",
-            "💵 <strong class='text-emerald-400'>VARIANCE COLUMN:</strong> Green = you got a bargain and freed up budget. Red = you overpaid and your remaining targets are squeezed.",
-            "💾 <strong class='text-slate-400'>AUTO-SAVE:</strong> Every pick, note, and plan update saves instantly to your browser. Safe to close and reopen.",
-            "⏸️ <strong class='text-amber-400'>PAUSE TICKER:</strong> Hover over this bar to pause scrolling and read any tip in full.",
-            "🗑️ <strong class='text-rose-400'>REMOVE SLOTS:</strong> Delete any unused slot with ✕ — budget redistributes to remaining open slots automatically.",
-            "📉 <strong class='text-purple-400'>DEFLATED MARKET:</strong> If the Inflation Index is negative, the room is leaving value on the table — attack studs earlier than planned.",
-            "⚙️ <strong class='text-teal-400'>BUDGET SETTING:</strong> Change total budget in the top bar. Works with $100, $200, $250, or any custom league amount."
+            /* ── The math ── */
+            "🛡️ <strong class='text-rose-400'>MAX BID = YOUR LIFE LINE:</strong> It's the most you can pay for one player and still fill every remaining slot for $1. Never go a dollar over — you will literally run out of money.",
+            "💵 <strong class='text-emerald-400'>THE $1 RULE:</strong> Every open roster slot costs a minimum of $1. If you have 5 slots left and $6 remaining, your max bid is $2. The app enforces this on every calculation.",
+            "📊 <strong class='text-indigo-400'>LIVE TARGET RECALC:</strong> Every time you log a pick, your adjusted per-slot targets update instantly. Win a bargain and every remaining slot gets a bigger budget. Overpay and they all shrink.",
+            "⚠️ <strong class='text-amber-400'>UNALLOCATED MUST BE $0:</strong> If your plan totals leave Unallocated in red, you're over budget before the draft even starts. Fix your slot plans now — not mid-draft.",
+
+            /* ── Nomination strategy ── */
+            "🧊 <strong class='text-sky-400'>PRICE ENFORCE EARLY:</strong> Nominate elite players at positions you've already filled. Opponents overpay, you drain their budgets — then your real targets come up cheaper.",
+            "🎰 <strong class='text-purple-400'>NOMINATE TO EXPOSE BUDGETS:</strong> Throw out a top-3 RB in the first 5 picks. See who flinches. Anyone who bids $60+ early is going broke by pick 15 — exploit them.",
+            "⏰ <strong class='text-teal-400'>TIMING YOUR NOMINATIONS:</strong> Drop your high-value targets late — after the room has burned most of its big money. Patience is the most powerful auction weapon.",
+            "🎯 <strong class='text-amber-400'>NOMINATION QUEUE:</strong> Build your queue before the draft starts. Drag players from the Targets board, rank them by priority. One click to auto-fill the logging form when it's your turn.",
+
+            /* ── Roster construction ── */
+            "🔥 <strong class='text-rose-400'>HERO STUD BUILD:</strong> Drop $65–$80 on one elite RB or WR, then fill the rest at $1–$8 each. You only need one mistake to miss playoffs — elite studs minimize variance.",
+            "⚖️ <strong class='text-emerald-400'>BALANCED BUILD:</strong> Spread $30–$45 across three or four top-15 players at different positions. Higher floor, more trade chips, but you need multiple things to go right.",
+            "🏈 <strong class='text-sky-400'>QB STRATEGY:</strong> QBs are chronically overpaid in auction. Skip the $40 QB room and grab a QB1 for $5–$12 in the last third of the draft — the value almost always holds.",
+            "🔒 <strong class='text-purple-400'>TE SCARCITY IS REAL:</strong> Top-5 TEs get bid up fast because everyone knows they'll regret passing. If a Tier-1 TE clears $35 for someone else, pivot to a $2 streamer and use that money on RBs.",
+            "🪑 <strong class='text-amber-400'>BENCH DISCIPLINE:</strong> Bench spots should cost $1 each. Every extra dollar on bench is a dollar pulled from a starter. Cap bench spend at $4–$5 total — no exceptions.",
+            "🛡️ <strong class='text-rose-400'>DEF & KICKER = $1 EACH:</strong> Never pay more than $1 for D/ST or kicker. $2 DSTs finish last in their position as often as first. Save every dollar for skill players.",
+
+            /* ── Reading the room ── */
+            "📈 <strong class='text-purple-400'>HOT ROOM = YOUR EDGE:</strong> If the Inflation Index is strongly positive, the room is burning cash. Stay patient — your $1–$5 late targets will be alone on the block.",
+            "📉 <strong class='text-teal-400'>COLD ROOM = STRIKE EARLY:</strong> Negative inflation means the room is scared to spend. This is when you pounce on studs before they realize what they're leaving on the table.",
+            "👀 <strong class='text-sky-400'>WATCH BUDGETS, NOT PLAYERS:</strong> Track which managers are nearly broke. An opponent with $8 left and 4 slots can't bid above $5. Exploit that window — nominate players they want.",
+            "🗣️ <strong class='text-amber-400'>LOG ROOM SALES:</strong> Tap 🏷 on any player badge to jump to the Room tab and log their final price. Every sale you log sharpens your inflation read.",
+
+            /* ── Live draft tactics ── */
+            "💧 <strong class='text-emerald-400'>LET BIDDING WARS PLAY OUT:</strong> When two opponents are locked in a war, step back. Their depleted budgets are your next pick's discount.",
+            "⚡ <strong class='text-rose-400'>KNOW YOUR WALK-AWAY PRICE:</strong> Use player notes (📝) to set your max before bidding starts. Emotion will push you $5 over value every time without a hard ceiling.",
+            "🎯 <strong class='text-indigo-400'>STUD AT CLIFF POSITIONS:</strong> The value gap between RB5 and RB6, or TE1 and TE2, is massive. Pay up to land above the cliff — the cost of being below it is a whole season of frustration.",
+            "🔢 <strong class='text-teal-400'>SPEND RATE CHECK:</strong> Divide picks logged by budget spent. If you're 30% through your roster and 60% through your budget, you're running hot — tighten up immediately.",
+
+            /* ── App features ── */
+            "🔍 <strong class='text-indigo-400'>LIVE SEARCH:</strong> Use the search bar in the Targets board to filter by name instantly — no scrolling through 200 players mid-draft.",
+            "✏️ <strong class='text-sky-400'>EDIT ON THE FLY:</strong> Click any slot name or plan dollar in the Roster tab to edit it mid-draft without losing your place. Adapt as your strategy shifts.",
+            "↩️ <strong class='text-emerald-400'>UNDO LAST PICK:</strong> Logged the wrong player or wrong price? Hit Undo Last Pick to instantly reverse and re-log correctly.",
+            "📝 <strong class='text-amber-400'>PLAYER NOTES:</strong> Tap 📝 on any player badge to save a private note — injury concerns, bid ceiling, or why you love them. Notes persist through the draft.",
+            "📤 <strong class='text-sky-400'>EXPORT + RECAP:</strong> After the draft, the Recap tab grades your haul A+–F and lets you copy a plain-text summary. Export CSV for your records.",
+            "💾 <strong class='text-slate-400'>AUTO-SAVE:</strong> Every pick, note, and plan change saves instantly to your browser. Close the tab, reopen it — everything is exactly where you left it.",
+            "⏸️ <strong class='text-amber-400'>PAUSE THIS TICKER:</strong> Hover over this bar to pause and read any tip in full.",
         ];
 
         const defaultSlots = [
-            { id: "QB1", planUSD: 20, player: "", cost: null },
-            { id: "RB1", planUSD: 36, player: "", cost: null },
-            { id: "RB2", planUSD: 21, player: "", cost: null },
-            { id: "WR/RB", planUSD: 13, player: "", cost: null },
-            { id: "WR1", planUSD: 35, player: "", cost: null },
-            { id: "WR2", planUSD: 24, player: "", cost: null },
-            { id: "WR3", planUSD: 16, player: "", cost: null },
-            { id: "QB2", planUSD: 6, player: "", cost: null },
-            { id: "FLEX1", planUSD: 12, player: "", cost: null },
-            { id: "FLEX2", planUSD: 8, player: "", cost: null },
-            { id: "KICKER", planUSD: 1, player: "", cost: null },
-            { id: "DEFENSE", planUSD: 1, player: "", cost: null },
-            { id: "Bench1", planUSD: 3, player: "", cost: null },
-            { id: "Bench2", planUSD: 1, player: "", cost: null },
-            { id: "Bench3", planUSD: 1, player: "", cost: null },
-            { id: "Bench4", planUSD: 1, player: "", cost: null },
-            { id: "Bench5", planUSD: 1, player: "", cost: null },
+            { id: "QB1", posCode: "QB", planUSD: 20, player: "", cost: null },
+            { id: "RB1", posCode: "RB", planUSD: 36, player: "", cost: null },
+            { id: "RB2", posCode: "RB", planUSD: 21, player: "", cost: null },
+            { id: "WR/RB", posCode: "FLEX", planUSD: 13, player: "", cost: null },
+            { id: "WR1", posCode: "WR", planUSD: 35, player: "", cost: null },
+            { id: "WR2", posCode: "WR", planUSD: 24, player: "", cost: null },
+            { id: "WR3", posCode: "WR", planUSD: 16, player: "", cost: null },
+            { id: "QB2", posCode: "QB", planUSD: 6, player: "", cost: null },
+            { id: "FLEX1", posCode: "FLEX", planUSD: 12, player: "", cost: null },
+            { id: "FLEX2", posCode: "FLEX", planUSD: 8, player: "", cost: null },
+            { id: "KICKER", posCode: "K", planUSD: 1, player: "", cost: null },
+            { id: "DEFENSE", posCode: "DEF", planUSD: 1, player: "", cost: null },
+            { id: "Bench1", posCode: "BENCH", planUSD: 3, player: "", cost: null },
+            { id: "Bench2", posCode: "BENCH", planUSD: 1, player: "", cost: null },
+            { id: "Bench3", posCode: "BENCH", planUSD: 1, player: "", cost: null },
+            { id: "Bench4", posCode: "BENCH", planUSD: 1, player: "", cost: null },
+            { id: "Bench5", posCode: "BENCH", planUSD: 1, player: "", cost: null },
         ];
 
         let totalBudget = 200;
+        let leagueSize = 10;
         let displayMode = 'dollars'; // 'dollars' | 'percent'
         let slots = JSON.parse(JSON.stringify(defaultSlots));
         let marketLogs = [];
@@ -653,15 +732,87 @@
         let activeImportedFilter = "ALL";
 
         let importedPlayerMap = {}; 
+        let importedPlayerBaseMap = {};
         let importedPlayerDetails = {};
         let playerNotes = {};
         let pickHistory = [];
         let importSearchQuery = '';
         let showTakenPlayers = false;
 
+        /* ── NFL team colors & logos ─────────────────────────────────────── */
+        const NFL_TEAMS = {
+            ARI: { primary: '#97233F', espn: 'ari' },
+            ATL: { primary: '#A71930', espn: 'atl' },
+            BAL: { primary: '#241773', espn: 'bal' },
+            BUF: { primary: '#00338D', espn: 'buf' },
+            CAR: { primary: '#0085CA', espn: 'car' },
+            CHI: { primary: '#C83803', espn: 'chi' },
+            CIN: { primary: '#FB4F14', espn: 'cin' },
+            CLE: { primary: '#FF3C00', espn: 'cle' },
+            DAL: { primary: '#003594', espn: 'dal' },
+            DEN: { primary: '#FB4F14', espn: 'den' },
+            DET: { primary: '#0076B6', espn: 'det' },
+            GB:  { primary: '#203731', espn: 'gb'  },
+            HOU: { primary: '#A71930', espn: 'hou' },
+            IND: { primary: '#002C5F', espn: 'ind' },
+            JAX: { primary: '#006778', espn: 'jax' },
+            JAC: { primary: '#006778', espn: 'jax' },
+            KC:  { primary: '#E31837', espn: 'kc'  },
+            LAC: { primary: '#0080C6', espn: 'lac' },
+            LAR: { primary: '#003594', espn: 'lar' },
+            LV:  { primary: '#A5ACAF', espn: 'lv'  },
+            MIA: { primary: '#008E97', espn: 'mia' },
+            MIN: { primary: '#4F2683', espn: 'min' },
+            NE:  { primary: '#002244', espn: 'ne'  },
+            NO:  { primary: '#9F8958', espn: 'no'  },
+            NYG: { primary: '#0B2265', espn: 'nyg' },
+            NYJ: { primary: '#125740', espn: 'nyj' },
+            PHI: { primary: '#004C54', espn: 'phi' },
+            PIT: { primary: '#FFB612', espn: 'pit' },
+            SEA: { primary: '#002244', espn: 'sea' },
+            SF:  { primary: '#AA0000', espn: 'sf'  },
+            TB:  { primary: '#D50A0A', espn: 'tb'  },
+            TEN: { primary: '#4B92DB', espn: 'ten' },
+            WAS: { primary: '#5A1414', espn: 'was' },
+        };
+
+        function getTeamData(abbr) {
+            if (!abbr) return null;
+            return NFL_TEAMS[abbr.toUpperCase().trim()] || null;
+        }
+
+        function teamLogoImg(team, sizePx = 18) {
+            const td = getTeamData(team);
+            if (!td) return '';
+            return `<img src="https://a.espncdn.com/i/teamlogos/nfl/500/${td.espn}.png" width="${sizePx}" height="${sizePx}" class="object-contain flex-shrink-0 rounded-sm" style="image-rendering:auto" onerror="this.style.display='none'" alt="${team}">`;
+        }
+
+        function teamBadgeStyle(team, drafted) {
+            const td = getTeamData(team);
+            if (!td) return drafted ? 'background:#0f172a;' : 'background:#1e293b;';
+            if (drafted) return `background:linear-gradient(90deg,${td.primary}18 0%,#0f172a 42%);border-left:3px solid ${td.primary}55;`;
+            return `background:linear-gradient(90deg,${td.primary}35 0%,#0f172a 45%);border-left:3px solid ${td.primary};`;
+        }
+        /* ───────────────────────────────────────────────────────────────── */
+
+        /* ── FantasyPros player card popup ───────────────────────────────── */
+        function fpSlug(name) {
+            return String(name)
+                .toLowerCase()
+                .replace(/['.]/g, '')                          // remove apostrophes & periods
+                .replace(/\s+(jr\.?|sr\.?|ii|iii|iv)$/i, '')  // strip common suffixes
+                .replace(/\s+/g, '-')                          // spaces → hyphens
+                .replace(/[^a-z0-9-]/g, '');                   // strip everything else
+        }
+        function fpBtn(name) {
+            return `<button data-fp="${name}" class="btn-fp-card flex-shrink-0 font-black text-[8px] leading-none px-1 py-0.5 rounded border border-orange-600/50 text-orange-500 hover:bg-orange-500 hover:text-white hover:border-orange-400 transition" title="View Player Card on FantasyPros">FP</button>`;
+        }
+        /* ───────────────────────────────────────────────────────────────── */
+
         function normalizePos(posTag) {
             if (!posTag) return 'UTIL';
             let upper = posTag.toUpperCase();
+            if (upper.includes('IDP') || upper.includes('DL') || upper.includes('LB') || upper.includes('DB')) return 'IDP';
             if (upper.includes('QB')) return 'QB';
             if (upper.includes('RB')) return 'RB';
             if (upper.includes('WR')) return 'WR';
@@ -669,6 +820,18 @@
             if (upper.includes('DST') || upper.includes('DEF')) return 'DEF';
             if (upper.includes('K')) return 'K';
             return 'UTIL';
+        }
+
+        function parsePlayerTeamBlock(block) {
+            const text = String(block || '').trim();
+            const commaIndex = text.lastIndexOf(',');
+            if (commaIndex > 0) {
+                return {
+                    name: text.slice(0, commaIndex).trim(),
+                    team: text.slice(commaIndex + 1).trim()
+                };
+            }
+            return { name: text, team: '' };
         }
 
         function valFormat(usdVal) {
@@ -736,8 +899,10 @@
                 localStorage.setItem('draft_market', JSON.stringify(marketLogs));
                 localStorage.setItem('draft_wishlist', JSON.stringify(wishlist));
                 localStorage.setItem('draft_budget', totalBudget);
+                localStorage.setItem('draft_league_size', leagueSize);
                 localStorage.setItem('draft_display_mode', displayMode);
                 localStorage.setItem('draft_player_map', JSON.stringify(importedPlayerMap));
+                localStorage.setItem('draft_player_base_map', JSON.stringify(importedPlayerBaseMap));
                 localStorage.setItem('draft_player_details', JSON.stringify(importedPlayerDetails));
                 localStorage.setItem('draft_notes', JSON.stringify(playerNotes));
                 localStorage.setItem('draft_history', JSON.stringify(pickHistory));
@@ -759,8 +924,10 @@
                 const savedMarket   = localStorage.getItem('draft_market');
                 const savedWish     = localStorage.getItem('draft_wishlist');
                 const savedBudget   = localStorage.getItem('draft_budget');
+                const savedLeague   = localStorage.getItem('draft_league_size');
                 const savedMode     = localStorage.getItem('draft_display_mode');
                 const savedMap      = localStorage.getItem('draft_player_map');
+                const savedBaseMap  = localStorage.getItem('draft_player_base_map');
                 const savedDetails  = localStorage.getItem('draft_player_details');
                 const savedNotes    = localStorage.getItem('draft_notes');
                 const savedHistory  = localStorage.getItem('draft_history');
@@ -770,12 +937,28 @@
                 if (savedMarket)  marketLogs = JSON.parse(savedMarket);
                 if (savedWish)    wishlist = JSON.parse(savedWish);
                 if (savedBudget)  totalBudget = parseInt(savedBudget);
+                if (savedLeague)  leagueSize  = parseInt(savedLeague);
                 if (savedMode)    displayMode = savedMode;
                 if (savedMap)     importedPlayerMap = JSON.parse(savedMap);
+                if (savedBaseMap) importedPlayerBaseMap = JSON.parse(savedBaseMap);
                 if (savedDetails) importedPlayerDetails = JSON.parse(savedDetails);
                 if (savedNotes)   playerNotes = JSON.parse(savedNotes);
                 if (savedHistory) pickHistory = JSON.parse(savedHistory);
                 if (savedMktHist) marketHistory = JSON.parse(savedMktHist);
+
+                slots = slots.map(slot => ({
+                    ...slot,
+                    posCode: slot.posCode || getPosTag(slot.id).code
+                }));
+                Object.keys(importedPlayerMap).forEach(name => {
+                    const details = importedPlayerDetails[name] || {};
+                    if (importedPlayerBaseMap[name] === undefined) {
+                        importedPlayerBaseMap[name] = details.baseValue !== undefined ? details.baseValue : importedPlayerMap[name];
+                    }
+                    if (details.baseValue === undefined) details.baseValue = importedPlayerBaseMap[name];
+                    if (details.value === undefined) details.value = importedPlayerMap[name];
+                    importedPlayerDetails[name] = details;
+                });
             } catch (e) {
                 console.error("Error loading stored data:", e);
             }
@@ -800,14 +983,34 @@
             }
         }
 
-        function getPosTag(slotName) {
-            let s = slotName.toUpperCase();
+        function getPosTag(slotOrName) {
+            const explicitCode = typeof slotOrName === 'object' && slotOrName ? slotOrName.posCode : '';
+            if (explicitCode) {
+                const explicit = String(explicitCode).toUpperCase();
+                const explicitMap = {
+                    QB: { code: "QB", color: "bg-purple-900/60 text-purple-300 border-purple-700" },
+                    RB: { code: "RB", color: "bg-emerald-900/60 text-emerald-300 border-emerald-700" },
+                    WR: { code: "WR", color: "bg-sky-900/60 text-sky-300 border-sky-700" },
+                    TE: { code: "TE", color: "bg-amber-900/60 text-amber-300 border-amber-700" },
+                    FLEX: { code: "FLEX", color: "bg-teal-900/60 text-teal-300 border-teal-700" },
+                    BENCH: { code: "BENCH", color: "bg-slate-800 text-slate-400 border-slate-700" },
+                    K: { code: "K", color: "bg-slate-800 text-slate-300 border-slate-700" },
+                    DEF: { code: "DEF", color: "bg-rose-900/60 text-rose-300 border-rose-700" },
+                    "DST/K": { code: "DST/K", color: "bg-slate-800 text-slate-300 border-slate-700" },
+                    IDP: { code: "IDP", color: "bg-orange-900/60 text-orange-300 border-orange-700" },
+                    UTIL: { code: "UTIL", color: "bg-slate-800 text-slate-300 border-slate-700" }
+                };
+                if (explicitMap[explicit]) return explicitMap[explicit];
+            }
+
+            let s = String(typeof slotOrName === 'object' && slotOrName ? slotOrName.id : slotOrName || '').toUpperCase();
             if (s.includes("QB")) return { code: "QB", color: "bg-purple-900/60 text-purple-300 border-purple-700" };
             if (s.includes("RB")) return { code: "RB", color: "bg-emerald-900/60 text-emerald-300 border-emerald-700" };
             if (s.includes("WR")) return { code: "WR", color: "bg-sky-900/60 text-sky-300 border-sky-700" };
             if (s.includes("TE")) return { code: "TE", color: "bg-amber-900/60 text-amber-300 border-amber-700" };
             if (s.includes("FLEX") || s.includes("/")) return { code: "FLEX", color: "bg-teal-900/60 text-teal-300 border-teal-700" };
             if (s.includes("BENCH")) return { code: "BENCH", color: "bg-slate-800 text-slate-400 border-slate-700" };
+            if (s.includes("IDP")) return { code: "IDP", color: "bg-orange-900/60 text-orange-300 border-orange-700" };
             return { code: "DST/K", color: "bg-slate-800 text-slate-300 border-slate-700" };
         }
 
@@ -826,13 +1029,152 @@
                 TE: "bg-amber-900/60 text-amber-300 border-amber-700",
                 DEF: "bg-rose-900/60 text-rose-300 border-rose-700",
                 K: "bg-slate-800 text-slate-300 border-slate-700",
+                IDP: "bg-orange-900/60 text-orange-300 border-orange-700",
                 UTIL: "bg-slate-800 text-slate-400 border-slate-700"
             };
             return map[pos] || map.UTIL;
         }
 
-        function getEligibleSlotPosCodes(slotName) {
-            let s = (slotName || "").toUpperCase();
+        function getRosterPositionCounts() {
+            const counts = { QB: 0, RB: 0, WR: 0, TE: 0, FLEX: 0, K: 0, DEF: 0, IDP: 0 };
+            slots.forEach(slot => {
+                const code = slot.posCode || getPosTag(slot).code;
+                if (code === 'BENCH' || code === 'UTIL') return;
+                if (code === 'DST/K') {
+                    counts.K += 0.5;
+                    counts.DEF += 0.5;
+                } else if (counts[code] !== undefined) {
+                    counts[code] += 1;
+                }
+            });
+            return counts;
+        }
+
+        function getRosterValueMultipliers() {
+            const counts = getRosterPositionCounts();
+            const flexShare = counts.FLEX / 3;
+            // League-size scarcity: larger leagues draft deeper, raising value of scarce positions.
+            // Standard baselines are calibrated for 12 teams; divide by (leagueSize/12) so that
+            // a 14-team league increases premium-position multipliers and a 10-team league lowers them.
+            const scarcity = leagueSize / 12;
+            const standard = {
+                QB: 1 / scarcity,
+                RB: (2 + (1 / 3)) / scarcity,
+                WR: (3 + (1 / 3)) / scarcity,
+                TE: (1 + (1 / 3)) / scarcity,
+                K: 1,
+                DEF: 1,
+                IDP: 1
+            };
+            const custom = {
+                QB: counts.QB,
+                RB: counts.RB + flexShare,
+                WR: counts.WR + flexShare,
+                TE: counts.TE + flexShare,
+                K: counts.K,
+                DEF: counts.DEF,
+                IDP: counts.IDP
+            };
+            const multipliers = {};
+            Object.keys(standard).forEach(pos => {
+                if (pos === 'IDP') {
+                    multipliers[pos] = custom[pos] > 0 ? Math.max(0.5, custom[pos]) : 0.5;
+                } else {
+                    multipliers[pos] = Math.max(0.5, custom[pos] / standard[pos]);
+                }
+            });
+            multipliers.UTIL = 1;
+            return { counts, multipliers };
+        }
+
+        function valuesAreRedistributed() {
+            return Object.keys(importedPlayerBaseMap).some(name => {
+                const base = Number(importedPlayerBaseMap[name]);
+                const current = Number(importedPlayerMap[name]);
+                return Number.isFinite(base) && Number.isFinite(current) && Math.abs(base - current) > 0.01;
+            });
+        }
+
+        function updateValueControls() {
+            const redistributeBtn = document.getElementById('btn-redistribute-values');
+            const resetBtn = document.getElementById('btn-reset-values');
+            const hasPlayers = Object.keys(importedPlayerMap).length > 0;
+            const adjusted = valuesAreRedistributed();
+            if (redistributeBtn) {
+                redistributeBtn.disabled = !hasPlayers;
+                redistributeBtn.classList.toggle('opacity-50', !hasPlayers);
+                redistributeBtn.classList.toggle('cursor-not-allowed', !hasPlayers);
+            }
+            if (resetBtn) resetBtn.classList.toggle('hidden', !adjusted);
+        }
+
+        function redistributeImportedValues() {
+            const names = Object.keys(importedPlayerBaseMap);
+            if (names.length === 0) {
+                showToast("Import player values before redistributing them.", "error");
+                return;
+            }
+
+            const { counts, multipliers } = getRosterValueMultipliers();
+            const weighted = names.reduce((sum, name) => {
+                const info = importedPlayerDetails[name] || {};
+                const pos = info.pos || 'UTIL';
+                const multiplier = multipliers[pos] || 1;
+                return sum + (Number(importedPlayerBaseMap[name]) || 0) * multiplier;
+            }, 0);
+            const sourceTotal = names.reduce((sum, name) => sum + (Number(importedPlayerBaseMap[name]) || 0), 0);
+            if (weighted <= 0 || sourceTotal <= 0) {
+                showToast("The imported values could not be redistributed.", "error");
+                return;
+            }
+
+            names.forEach(name => {
+                const info = importedPlayerDetails[name] || {};
+                const pos = info.pos || 'UTIL';
+                const multiplier = multipliers[pos] || 1;
+                const adjusted = Math.max(1, Math.round(((Number(importedPlayerBaseMap[name]) || 0) * multiplier / weighted) * sourceTotal));
+                importedPlayerMap[name] = adjusted;
+                importedPlayerDetails[name] = {
+                    ...info,
+                    baseValue: Number(importedPlayerBaseMap[name]) || 0,
+                    value: adjusted
+                };
+            });
+
+            saveState();
+            renderImportedBoard();
+            renderWishlist();
+            render();
+            const detail = `QB ${counts.QB}, RB ${counts.RB}, WR ${counts.WR}, TE ${counts.TE}, FLEX ${counts.FLEX}, K ${counts.K}, DEF ${counts.DEF}, IDP ${counts.IDP}`;
+            showToast(`Values redistributed for your roster (${detail}).`, "success");
+        }
+
+        function restoreImportedValues() {
+            if (!valuesAreRedistributed()) return;
+            Object.keys(importedPlayerBaseMap).forEach(name => {
+                const base = Number(importedPlayerBaseMap[name]) || 0;
+                importedPlayerMap[name] = base;
+                if (importedPlayerDetails[name]) {
+                    importedPlayerDetails[name].value = base;
+                    importedPlayerDetails[name].baseValue = base;
+                }
+            });
+            saveState();
+            renderImportedBoard();
+            renderWishlist();
+            render();
+            showToast("Restored original imported auction values.", "info");
+        }
+
+        function getEligibleSlotPosCodes(slotOrName) {
+            const explicitCode = typeof slotOrName === 'object' && slotOrName ? slotOrName.posCode : '';
+            if (explicitCode === 'BENCH') return ['QB','RB','WR','TE','DEF','K','IDP','UTIL'];
+            if (explicitCode === 'FLEX') return ['RB','WR','TE'];
+            if (explicitCode === 'DST/K') return ['DEF','K'];
+            if (explicitCode === 'IDP') return ['IDP'];
+            if (explicitCode) return [explicitCode];
+
+            let s = String(slotOrName || "").toUpperCase();
             if (s.includes("BENCH")) return ['QB','RB','WR','TE','DEF','K','UTIL'];
             if (s.includes("FLEX") || s.includes("/")) return ['RB','WR','TE'];
             if (s.includes("QB")) return ['QB'];
@@ -841,6 +1183,7 @@
             if (s.includes("WR")) return ['WR'];
             if (s.includes("DEF") || s.includes("DST")) return ['DEF'];
             if (s.includes("KICKER") || s === "K") return ['K'];
+            if (s.includes("IDP")) return ['IDP'];
             return ['QB','RB','WR','TE','DEF','K','UTIL'];
         }
 
@@ -852,7 +1195,7 @@
             if (!select) return;
             for (let i = 0; i < slots.length; i++) {
                 if (slots[i].cost !== null) continue;
-                if (getEligibleSlotPosCodes(slots[i].id).includes(pos)) {
+                if (getEligibleSlotPosCodes(slots[i]).includes(pos)) {
                     select.value = String(i);
                     return;
                 }
@@ -933,11 +1276,11 @@
                 return;
             }
 
-            let groups = { QB: [], RB: [], WR: [], TE: [], DEF: [], K: [], UTIL: [] };
+            let groups = { QB: [], RB: [], WR: [], TE: [], DEF: [], K: [], IDP: [], UTIL: [] };
             Object.keys(importedPlayerDetails).forEach(name => {
                 let info = importedPlayerDetails[name];
                 let p = groups[info.pos] ? info.pos : 'UTIL';
-                groups[p].push({ name: name, value: info.value, rank: info.rank || 9999 });
+                groups[p].push({ name: name, value: info.value, team: info.team || '', rank: info.rank || 9999 });
             });
 
             container.innerHTML = '';
@@ -946,7 +1289,7 @@
                 let allPlayers = [];
                 Object.keys(importedPlayerDetails).forEach(name => {
                     let info = importedPlayerDetails[name];
-                    allPlayers.push({ name, value: info.value, pos: info.pos, rank: info.rank || 9999 });
+                    allPlayers.push({ name, value: info.value, pos: info.pos, team: info.team || '', rank: info.rank || 9999 });
                 });
                 allPlayers.sort((a, b) => b.value - a.value || a.rank - b.rank);
 
@@ -957,6 +1300,7 @@
                     TE: "text-amber-400",
                     DEF: "text-rose-400",
                     K: "text-slate-400",
+                    IDP: "text-orange-400",
                     UTIL: "text-slate-400"
                 };
 
@@ -984,19 +1328,24 @@
 
                 let playerBadges = visibleAll.map(pl => {
                     let drafted = isPlayerDrafted(pl.name);
-                    let badgeStyle = drafted
-                        ? "bg-slate-900/40 text-slate-600 border-slate-800 line-through opacity-40 pointer-events-none"
-                        : "bg-slate-900 text-slate-300 border-slate-700 hover:border-indigo-500 cursor-pointer";
+                    let badgeClasses = drafted
+                        ? "text-slate-600 border-slate-800/60 line-through opacity-40 pointer-events-none"
+                        : "text-slate-300 border-slate-700/50 hover:border-indigo-500 cursor-pointer";
+                    let bStyle = teamBadgeStyle(pl.team, drafted);
                     let posColor = posColors[pl.pos] || "text-slate-400";
                     let hasNote = !!playerNotes[pl.name];
                     let noteDot = hasNote ? `<span class="text-amber-400 text-[8px]">●</span>` : '';
+                    let logo = teamLogoImg(pl.team, 16);
 
-                    return `<div data-p-name="${pl.name}" class="imp-player-badge draggable-player flex items-center gap-1.5 px-2 py-1 rounded border text-[11px] transition cursor-pointer ${badgeStyle}" draggable="true" title="Click to fill form · Drag to queue">
+                    return `<div data-p-name="${pl.name}" class="imp-player-badge draggable-player flex items-center gap-1.5 px-2 py-1 rounded border text-[11px] transition cursor-pointer ${badgeClasses}" style="${bStyle}" draggable="true" title="Click to fill form · Drag to queue">
                         <span class="text-slate-500 text-[9px] cursor-grab select-none">⠿</span>
                         <span class="${posColor} font-bold text-[10px] w-7 flex-shrink-0">${pl.pos}</span>
-                        <span class="flex-1 font-medium">${pl.name}</span>
-                        <span class="text-indigo-400 font-semibold flex-shrink-0">${valFormat(pl.value)}</span>
+                        ${logo}
+                        <span class="flex-1 min-w-0 font-medium truncate">${pl.name}${pl.team && !logo ? `<span class="text-slate-400 text-[10px] ml-1 font-normal">${pl.team}</span>` : (pl.team ? `<span class="text-slate-500 text-[10px] ml-1 font-normal">${pl.team}</span>` : '')}</span>
+                        <span class="text-indigo-300 font-semibold flex-shrink-0">${valFormat(pl.value)}</span>
                         ${noteDot}
+                        ${fpBtn(pl.name)}
+                        <button data-p-name="${pl.name}" data-p-val="${pl.value}" class="btn-sold-market text-slate-600 hover:text-purple-400 text-[10px] transition leading-none flex-shrink-0" title="Log as room sale">🏷</button>
                         <button data-p-name="${pl.name}" class="btn-note-icon text-slate-600 hover:text-amber-400 text-[10px] transition leading-none flex-shrink-0" title="Note">📝</button>
                     </div>`;
                 }).join('');
@@ -1068,17 +1417,22 @@
                     tiers.forEach(t => {
                         let playerBadges = t.players.map(pl => {
                             let drafted = isPlayerDrafted(pl.name);
-                            let badgeStyle = drafted
-                                ? "bg-slate-900/40 text-slate-600 border-slate-800 line-through opacity-40"
-                                : "bg-slate-900 text-slate-300 border-slate-700 hover:border-indigo-500 cursor-pointer";
+                            let badgeClasses = drafted
+                                ? "text-slate-600 border-slate-800/60 line-through opacity-40"
+                                : "text-slate-300 border-slate-700/50 hover:border-indigo-500 cursor-pointer";
+                            let bStyle = teamBadgeStyle(pl.team, drafted);
                             let hasNote = !!playerNotes[pl.name];
                             let noteDot = hasNote ? `<span class="text-amber-400 text-[8px]">●</span>` : '';
+                            let logo = teamLogoImg(pl.team, 16);
 
-                            return `<div data-p-name="${pl.name}" class="imp-player-badge draggable-player flex items-center gap-1.5 px-2 py-1 rounded border text-[11px] transition cursor-pointer ${badgeStyle}" draggable="true" title="Click to fill form · Drag to queue">
+                            return `<div data-p-name="${pl.name}" class="imp-player-badge draggable-player flex items-center gap-1.5 px-2 py-1 rounded border text-[11px] transition cursor-pointer ${badgeClasses}" style="${bStyle}" draggable="true" title="Click to fill form · Drag to queue">
                                 <span class="text-slate-500 text-[9px] cursor-grab select-none">⠿</span>
-                                <span class="flex-1 font-medium">${pl.name}</span>
-                                <span class="text-indigo-400 font-semibold flex-shrink-0">${valFormat(pl.value)}</span>
+                                ${logo}
+                                <span class="flex-1 min-w-0 font-medium truncate">${pl.name}${pl.team ? `<span class="text-slate-500 text-[10px] ml-1 font-normal">${pl.team}</span>` : ''}</span>
+                                <span class="text-indigo-300 font-semibold flex-shrink-0">${valFormat(pl.value)}</span>
                                 ${noteDot}
+                                ${fpBtn(pl.name)}
+                                <button data-p-name="${pl.name}" data-p-val="${pl.value}" class="btn-sold-market text-slate-600 hover:text-purple-400 text-[10px] transition leading-none flex-shrink-0" title="Log as room sale">🏷</button>
                                 <button data-p-name="${pl.name}" class="btn-note-icon text-slate-600 hover:text-amber-400 text-[10px] transition leading-none flex-shrink-0" title="Note">📝</button>
                             </div>`;
                         }).join(' ');
@@ -1097,6 +1451,8 @@
             container.querySelectorAll('.imp-player-badge').forEach(badge => {
                 badge.addEventListener('click', (e) => {
                     if (e.target.classList.contains('btn-note-icon')) return;
+                    if (e.target.classList.contains('btn-sold-market')) return;
+                    if (e.target.classList.contains('btn-fp-card')) return;
                     let name = e.currentTarget.getAttribute('data-p-name');
                     document.getElementById('input-player').value = name;
                     if (importedPlayerMap[name] !== undefined) {
@@ -1120,6 +1476,20 @@
                     e.stopPropagation();
                     let name = e.currentTarget.getAttribute('data-p-name');
                     openNoteModal(name);
+                });
+            });
+
+            container.querySelectorAll('.btn-sold-market').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    let name = e.currentTarget.getAttribute('data-p-name');
+                    let val  = e.currentTarget.getAttribute('data-p-val');
+                    let mPlayer = document.getElementById('market-player');
+                    let mCost   = document.getElementById('market-cost');
+                    if (mPlayer) mPlayer.value = name;
+                    if (mCost && val) mCost.value = val;
+                    document.querySelector('[data-workspace-tab="room"]')?.click();
+                    showToast(`${name} — adjust the price and hit Save Sale.`, "info");
                 });
             });
         }
@@ -1181,12 +1551,19 @@
                 let posInfo = importedPlayerDetails[name];
                 let posBadge = (posInfo && posInfo.pos) ? `<span class="text-[9px] font-bold px-1 py-0.5 rounded border ${playerPosBadgeClass(posInfo.pos)} flex-shrink-0">${posInfo.pos}</span>` : '';
 
-                row.className = `flex items-center space-x-1.5 bg-slate-900 border border-teal-800/40 rounded-lg px-2 py-1 text-xs`;
+                let qTd = (posInfo && posInfo.team) ? getTeamData(posInfo.team) : null;
+                let qTeamStyle = qTd ? `background:linear-gradient(90deg,${qTd.primary}30 0%,#0f172a 45%);border-left:3px solid ${qTd.primary};` : 'background:#0f172a;';
+                let qLogo = (posInfo && posInfo.team) ? teamLogoImg(posInfo.team, 15) : '';
+                row.className = `flex items-center space-x-1.5 border border-teal-800/40 rounded-lg px-2 py-1 text-xs`;
+                row.style.cssText = qTeamStyle;
+                let qTeam = (posInfo && posInfo.team) ? `<span class="text-slate-500 text-[10px] font-normal ml-0.5">${posInfo.team}</span>` : '';
                 row.innerHTML = `
                     <span class="text-slate-500 font-bold text-[10px] w-4 text-right flex-shrink-0">${idx + 1}.</span>
                     ${posBadge}
-                    <span class="wish-item flex-1 font-semibold text-teal-300 cursor-pointer hover:text-teal-100 transition truncate ${draftedStyle}">${name}${projVal}</span>
+                    ${qLogo}
+                    <span class="wish-item flex-1 font-semibold text-teal-300 cursor-pointer hover:text-teal-100 transition truncate ${draftedStyle}">${name}${qTeam}${projVal}</span>
                     <div class="flex items-center space-x-1 flex-shrink-0">
+                        ${fpBtn(name)}
                         <button data-w-idx="${idx}" class="btn-wish-up text-slate-500 hover:text-slate-200 font-bold text-[10px] px-1 py-0.5 rounded hover:bg-slate-700 transition" title="Move up">▲</button>
                         <button data-w-idx="${idx}" class="btn-wish-down text-slate-500 hover:text-slate-200 font-bold text-[10px] px-1 py-0.5 rounded hover:bg-slate-700 transition" title="Move down">▼</button>
                         <button data-w-idx="${idx}" class="btn-del-wish text-slate-500 hover:text-rose-400 font-bold text-xs px-1 transition" title="Remove">✕</button>
@@ -1314,13 +1691,30 @@
                 }
             }
 
+            // Position bid breakdown — shown below max bid card
+            const _posBidEl = document.getElementById('stat-posbid-detail');
+            if (_posBidEl) {
+                const _openByPos = {};
+                openSlots.forEach(s => {
+                    const _pc = getPosTag(s).code;
+                    if (_pc === 'BENCH' || _pc === 'UTIL') return;
+                    if (!_openByPos[_pc]) _openByPos[_pc] = 0;
+                    _openByPos[_pc] += (s._calculatedAdj !== null ? s._calculatedAdj : s.planUSD);
+                });
+                const _parts = Object.entries(_openByPos)
+                    .sort((a, b) => b[1] - a[1])
+                    .slice(0, 4)
+                    .map(([_pos, _amt]) => `${_pos} ${valFormat(_amt)}`);
+                _posBidEl.textContent = _parts.join(' · ');
+            }
+
             let tbody = document.getElementById('roster-tbody');
             let select = document.getElementById('input-slot');
             tbody.innerHTML = '';
             select.innerHTML = '';
 
             slots.forEach((s, idx) => {
-                let pos = getPosTag(s.id);
+                let pos = getPosTag(s);
 
                 if (activePosFilter !== "ALL" && pos.code !== activePosFilter) {
                     return;
@@ -1412,7 +1806,20 @@
             if (targetCount) {
                 targetCount.innerText = Object.keys(importedPlayerDetails).length;
             }
+            updateValueControls();
             saveState();
+        }
+
+        function getDraftGrade(netValue, totalSpent) {
+            if (totalSpent === 0) return { grade: '—', color: 'text-slate-400' };
+            const pct = (netValue / totalSpent) * 100;
+            if (pct >= 15) return { grade: 'A+', color: 'text-emerald-300' };
+            if (pct >= 8)  return { grade: 'A',  color: 'text-emerald-400' };
+            if (pct >= 3)  return { grade: 'B+', color: 'text-teal-400' };
+            if (pct >= 0)  return { grade: 'B',  color: 'text-sky-400' };
+            if (pct >= -5) return { grade: 'C',  color: 'text-amber-400' };
+            if (pct >= -10)return { grade: 'D',  color: 'text-orange-400' };
+            return { grade: 'F', color: 'text-rose-400' };
         }
 
         function renderRecap() {
@@ -1452,8 +1859,9 @@
             let netColor      = netValue >= 0 ? 'text-emerald-400' : 'text-rose-400';
             let vsColor       = vsPlannedPct <= 100 ? 'text-emerald-400' : 'text-rose-400';
 
+            const grade = getDraftGrade(netValue, totalSpent);
             content.innerHTML = `
-                <div class="grid grid-cols-4 gap-2 mb-1">
+                <div class="grid grid-cols-3 sm:grid-cols-5 gap-2 mb-1">
                     <div class="bg-slate-900/70 rounded-lg p-2 text-center">
                         <div class="text-[9px] text-slate-400 uppercase font-bold mb-1">Picks</div>
                         <div class="text-base font-extrabold text-slate-200">${filledSlots.length}</div>
@@ -1469,6 +1877,10 @@
                     <div class="bg-slate-900/70 rounded-lg p-2 text-center">
                         <div class="text-[9px] text-slate-400 uppercase font-bold mb-1">Net Value</div>
                         <div class="text-base font-extrabold ${netColor}">${netValue >= 0 ? '+' : ''}${valFormat(netValue)}</div>
+                    </div>
+                    <div class="bg-slate-900/70 rounded-lg p-2 text-center">
+                        <div class="text-[9px] text-slate-400 uppercase font-bold mb-1">Grade</div>
+                        <div class="text-base font-extrabold ${grade.color}">${grade.grade}</div>
                     </div>
                 </div>
                 ${bargains.length > 0 ? `
@@ -1522,8 +1934,12 @@
             document.querySelectorAll('.btn-delete-slot').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     let idx = parseInt(e.target.getAttribute('data-idx'));
-                    slots.splice(idx, 1);
-                    render();
+                    const slot = slots[idx];
+                    if (!slot) return;
+                    if (confirm(`Delete the ${slot.id} position? This cannot be undone.`)) {
+                        slots.splice(idx, 1);
+                        render();
+                    }
                 });
             });
 
@@ -1598,12 +2014,24 @@
                     diffBadge = `<span class="text-[9px] ${color} ml-1">(${diff >= 0 ? '+' : ''}${diff})</span>`;
                 }
 
+                let mInfo = importedPlayerDetails[log.player] || {};
+                let mPosCls = mInfo.pos ? playerPosBadgeClass(mInfo.pos) : '';
+                let mPosBadge = mInfo.pos ? `<span class="text-[9px] font-bold px-1 py-0.5 rounded border ${mPosCls} flex-shrink-0">${mInfo.pos}</span>` : '';
+                let mTeam = mInfo.team ? `<span class="text-slate-500 text-[9px]">${mInfo.team}</span>` : '';
+                let mLogo = mInfo.team ? teamLogoImg(mInfo.team, 15) : '';
+                let mTd = mInfo.team ? getTeamData(mInfo.team) : null;
+                if (mTd) { li.style.cssText = `background:linear-gradient(90deg,${mTd.primary}28 0%,transparent 50%);border-left:3px solid ${mTd.primary};padding-left:6px;`; }
+
                 li.innerHTML = `
-                    <div class="flex items-center space-x-2 truncate">
-                        <button data-m-idx="${realIdx}" class="btn-delete-market text-rose-400 hover:text-rose-300 font-bold text-xs px-1" title="Delete entry">✕</button>
-                        <span class="font-medium text-slate-200 truncate max-w-[130px]">${log.player}</span>
+                    <div class="flex items-center gap-1.5 truncate min-w-0">
+                        <button data-m-idx="${realIdx}" class="btn-delete-market text-rose-400 hover:text-rose-300 font-bold text-xs px-1 flex-shrink-0" title="Delete entry">✕</button>
+                        ${mPosBadge}
+                        ${mLogo}
+                        <span class="font-medium text-slate-200 truncate">${log.player}</span>
+                        ${mTeam}
+                        ${fpBtn(log.player)}
                     </div>
-                    <div class="flex items-center">
+                    <div class="flex items-center flex-shrink-0">
                         <span class="font-bold text-amber-400">${valFormat(log.cost)}</span>
                         ${diffBadge}
                     </div>
@@ -1682,8 +2110,8 @@
 
             const visibleByWorkspace = {
                 draft: ['logPick', 'queue'],
-                roster: ['roster'],
-                targets: ['imported', 'customSlot'],
+                roster: ['roster', 'customSlot'],
+                targets: ['imported'],
                 room: ['market', 'roomInsights'],
                 recap: ['recap']
             };
@@ -1731,6 +2159,31 @@
             const closeSplashBtn = document.getElementById('btn-close-splash');
             const startDraftBtn = document.getElementById('btn-start-draft');
 
+            // Sync splash setup fields from saved state
+            const splashBudgetInput = document.getElementById('splash-budget');
+            const splashLeagueInput = document.getElementById('splash-league-size');
+            if (splashBudgetInput) {
+                splashBudgetInput.value = totalBudget;
+                splashBudgetInput.addEventListener('change', (e) => {
+                    let val = parseInt(e.target.value);
+                    if (!isNaN(val) && val > 0) {
+                        totalBudget = val;
+                        if (budgetInput) budgetInput.value = val;
+                        render();
+                    }
+                });
+            }
+            if (splashLeagueInput) {
+                splashLeagueInput.value = leagueSize;
+                splashLeagueInput.addEventListener('change', (e) => {
+                    let val = parseInt(e.target.value);
+                    if (!isNaN(val) && val >= 2 && val <= 32) {
+                        leagueSize = val;
+                        saveState();
+                    }
+                });
+            }
+
             const closeSplash = () => {
                 if (splashModal) splashModal.classList.add('hidden');
             };
@@ -1761,6 +2214,18 @@
                 });
             }
 
+            let leagueSizeInput = document.getElementById('input-league-size');
+            if (leagueSizeInput) {
+                leagueSizeInput.value = leagueSize;
+                leagueSizeInput.addEventListener('change', (e) => {
+                    let val = parseInt(e.target.value);
+                    if (!isNaN(val) && val >= 2 && val <= 32) {
+                        leagueSize = val;
+                        saveState();
+                    }
+                });
+            }
+
             // Bulk Importer
             document.getElementById('btn-bulk-import')?.addEventListener('click', () => {
                 const rawTextElement = document.getElementById('bulk-import-text');
@@ -1776,7 +2241,7 @@
                 let newWishlist = [];
 
                 const espnRegex = /(\d+)\.\s*\(([^)]+)\)\s+([^$]+?)\s+\$(\d+)\s+\d+/g;
-                const fpRegex = /(\d+)\.\s+(.+?)\s*\([^-]*-\s*([A-Z,/]+)\)[^$]*\$(\d+)/g;
+                const fpRegex = /(\d+)\.\s+(.+?)\s*\(([A-Z0-9]+(?:\s+[A-Z0-9]+)?)\s*-\s*([A-Z,/0-9]+)\)[^$]*\$(\d+)/g;
 
                 const isESPN = espnRegex.test(rawText);
                 espnRegex.lastIndex = 0;
@@ -1784,21 +2249,22 @@
                 let match;
                 if (isESPN) {
                     while ((match = espnRegex.exec(rawText)) !== null) {
-                        const sheetRank    = parseInt(match[1], 10);
-                        const posRank      = match[2];
+                        const sheetRank     = parseInt(match[1], 10);
+                        const posRank       = match[2];
                         const nameTeamBlock = match[3].trim();
-                        const pVal         = parseInt(match[4], 10);
+                        const pVal          = parseInt(match[4], 10);
 
-                        let pName = nameTeamBlock;
-                        const lastComma = nameTeamBlock.lastIndexOf(',');
-                        if (lastComma !== -1) pName = nameTeamBlock.substring(0, lastComma).trim();
+                        const parsed = parsePlayerTeamBlock(nameTeamBlock);
+                        const pName  = parsed.name;
+                        const pTeam  = parsed.team;
 
                         let rawPos = posRank.replace(/[0-9]/g, '');
                         let normP  = normalizePos(rawPos);
 
                         if (pName && !isNaN(pVal)) {
-                            importedPlayerMap[pName] = pVal;
-                            importedPlayerDetails[pName] = { value: pVal, pos: normP, rank: sheetRank };
+                            importedPlayerMap[pName]     = pVal;
+                            importedPlayerBaseMap[pName] = pVal;
+                            importedPlayerDetails[pName] = { value: pVal, baseValue: pVal, pos: normP, rank: sheetRank, team: pTeam };
                             count++;
                         }
                     }
@@ -1806,15 +2272,17 @@
                     while ((match = fpRegex.exec(rawText)) !== null) {
                         const sheetRank = parseInt(match[1], 10);
                         const pName     = match[2].trim();
-                        const posBlock  = match[3];
-                        const pVal      = parseInt(match[4], 10);
+                        const pTeam     = match[3].trim();
+                        const posBlock  = match[4];
+                        const pVal      = parseInt(match[5], 10);
 
                         let rawPos = posBlock.split(',')[0].trim();
                         let normP  = normalizePos(rawPos);
 
                         if (pName && !isNaN(pVal)) {
-                            importedPlayerMap[pName] = pVal;
-                            importedPlayerDetails[pName] = { value: pVal, pos: normP, rank: sheetRank };
+                            importedPlayerMap[pName]     = pVal;
+                            importedPlayerBaseMap[pName] = pVal;
+                            importedPlayerDetails[pName] = { value: pVal, baseValue: pVal, pos: normP, rank: sheetRank, team: pTeam };
                             count++;
                         }
                     }
@@ -1887,17 +2355,58 @@
                 addBtn.addEventListener('click', () => {
                     let nameInput = document.getElementById('add-slot-name');
                     let planInput = document.getElementById('add-slot-plan');
+                    let posInput  = document.getElementById('add-slot-pos');
                     let name = nameInput.value.trim() || 'SLOT';
                     let planVal = parseFloat(planInput.value) || 1;
+                    let posCode = posInput ? posInput.value.trim() : '';
 
                     let planUSD = displayMode === 'percent' ? Math.round((planVal / 100) * totalBudget) : Math.round(planVal);
 
-                    slots.push({ id: name, planUSD: planUSD, player: "", cost: null });
+                    slots.push({ id: name, planUSD: planUSD, player: "", cost: null, posCode: posCode || undefined });
                     nameInput.value = '';
                     planInput.value = '';
                     render();
                 });
             }
+
+            document.getElementById('btn-redistribute-values')?.addEventListener('click', redistributeImportedValues);
+            document.getElementById('btn-reset-values')?.addEventListener('click', restoreImportedValues);
+
+            document.getElementById('btn-copy-recap')?.addEventListener('click', () => {
+                let filledSlots = slots.filter(s => s.cost !== null && s.player);
+                if (filledSlots.length === 0) { showToast('No picks logged yet.', 'info'); return; }
+                let totalSpent = filledSlots.reduce((a, s) => a + s.cost, 0);
+                let bargains = [], reaches = [];
+                filledSlots.forEach(s => {
+                    let proj = importedPlayerMap[s.player] !== undefined ? importedPlayerMap[s.player] : s.planUSD;
+                    let diff = s.cost - proj;
+                    if (diff < 0) bargains.push({ name: s.player, cost: s.cost, proj, saved: Math.abs(diff) });
+                    else if (diff > 0) reaches.push({ name: s.player, cost: s.cost, proj, over: diff });
+                });
+                bargains.sort((a, b) => b.saved - a.saved);
+                reaches.sort((a, b) => b.over - a.over);
+                let netValue = bargains.reduce((a, b) => a + b.saved, 0) - reaches.reduce((a, r) => a + r.over, 0);
+                let grade = getDraftGrade(netValue, totalSpent).grade;
+                let lines = [
+                    '=== DRAFT RECAP ===',
+                    `Grade: ${grade}  |  Picks: ${filledSlots.length}  |  Spent: $${totalSpent}  |  Net Value: ${netValue >= 0 ? '+' : ''}$${netValue}`,
+                    ''
+                ];
+                if (bargains.length > 0) {
+                    lines.push(`🟢 BARGAINS (saved $${bargains.reduce((a,b)=>a+b.saved,0)} total)`);
+                    bargains.forEach(b => lines.push(`  ${b.name} — paid $${b.cost}, proj $${b.proj} (saved $${b.saved})`));
+                    lines.push('');
+                }
+                if (reaches.length > 0) {
+                    lines.push(`🔴 REACHES (overpaid $${reaches.reduce((a,r)=>a+r.over,0)} total)`);
+                    reaches.forEach(r => lines.push(`  ${r.name} — paid $${r.cost}, proj $${r.proj} (over $${r.over})`));
+                    lines.push('');
+                }
+                lines.push('Generated by Draft Assistant Pro');
+                navigator.clipboard.writeText(lines.join('\n'))
+                    .then(() => showToast('Recap copied to clipboard!', 'success'))
+                    .catch(() => showToast('Copy failed — check browser permissions.', 'error'));
+            });
 
             let saveBtn = document.getElementById('btn-save');
             if (saveBtn) {
@@ -2011,14 +2520,19 @@
                         marketLogs = [];
                         wishlist = [];
                         importedPlayerMap = {};
+                        importedPlayerBaseMap = {};
                         importedPlayerDetails = {};
                         playerNotes = {};
                         pickHistory = [];
                         marketHistory = [];
                         showTakenPlayers = false;
                         totalBudget = 200;
+                        leagueSize = 10;
                         displayMode = 'dollars';
                         if (budgetInput) budgetInput.value = 200;
+                        if (leagueSizeInput) leagueSizeInput.value = 10;
+                        if (splashBudgetInput) splashBudgetInput.value = 200;
+                        if (splashLeagueInput) splashLeagueInput.value = 10;
                         refreshSearchSuggestions();
                         render();
                         renderMarketFeed();
@@ -2139,7 +2653,23 @@
         }
 
         if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initApp);
+            /* ── Global FP card popup handler ─────────────────────────────────── */
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('.btn-fp-card');
+            if (!btn) return;
+            e.stopPropagation();
+            const name = btn.getAttribute('data-fp');
+            if (!name) return;
+            const slug = fpSlug(name);
+            window.open(
+                `https://www.fantasypros.com/nfl/players/${slug}.php`,
+                'fpcard',
+                'width=960,height=700,scrollbars=yes,resizable=yes,toolbar=no,menubar=no'
+            );
+        });
+        /* ───────────────────────────────────────────────────────────────── */
+
+        document.addEventListener('DOMContentLoaded', initApp);
         } else {
             initApp();
         }
