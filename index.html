@@ -144,10 +144,18 @@
                         <div class="w-8 h-8 rounded-lg bg-sky-600/25 border border-sky-600/40 flex items-center justify-center text-sm flex-shrink-0">📋</div>
                         <div>
                             <h3 class="text-sm font-extrabold text-sky-300">Step 1 — Import Your Cheat Sheet</h3>
-                            <p class="text-[10px] text-slate-500">Paste from FantasyPros or ESPN — the app auto-detects the format and builds your tiered target board.</p>
+                            <p class="text-[10px] text-slate-500">Open FantasyPros, copy the auction values table, then paste below.</p>
                         </div>
                     </div>
-                    <textarea id="bulk-import-text" rows="3" placeholder="Paste FantasyPros or ESPN auction values here…" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:ring-1 focus:ring-sky-500 focus:outline-none resize-none placeholder-slate-600"></textarea>
+
+                    <!-- FP link -->
+                    <a href="https://www.fantasypros.com/nfl/auction-values/calculator.php" target="_blank" rel="noopener"
+                       class="w-full bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 active:from-violet-700 active:to-indigo-700 font-extrabold py-2.5 rounded-lg transition text-sm shadow-md text-white tracking-wide flex items-center justify-center gap-2 no-underline" style="min-height:0">
+                        🔗 Open FantasyPros Auction Values
+                        <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                    </a>
+
+                    <!-- Settings row -->
                     <div class="grid grid-cols-2 gap-2.5">
                         <div>
                             <label class="text-[10px] text-slate-400 font-bold block mb-1">💵 Auction Budget</label>
@@ -161,8 +169,12 @@
                             <input id="splash-league-size" type="number" min="8" max="20" value="10" class="w-full px-2 py-2 bg-slate-950 border border-slate-700 rounded-lg text-xs text-sky-400 font-bold focus:ring-1 focus:ring-sky-500 focus:outline-none text-center">
                         </div>
                     </div>
+
+                    <!-- Paste area -->
+                    <textarea id="bulk-import-text" rows="3" placeholder="Paste FantasyPros auction values here…" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-slate-200 focus:ring-1 focus:ring-sky-500 focus:outline-none resize-none placeholder-slate-600"></textarea>
+
                     <button id="btn-bulk-import" class="w-full bg-gradient-to-r from-sky-600 to-blue-600 hover:from-sky-500 hover:to-blue-500 active:from-sky-700 active:to-blue-700 font-extrabold py-2.5 rounded-lg transition text-sm shadow-md text-white tracking-wide">
-                        ⚡ Parse & Import Values
+                        ⚡ Parse &amp; Import Values
                     </button>
                 </section>
 
