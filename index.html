@@ -33,6 +33,7 @@
         input, select, button {
             min-height: 2.2rem;
         }
+        .btn-fp-card { min-height: 0 !important; }
         @keyframes ticker {
             0% { transform: translateX(0); }
             100% { transform: translateX(-50%); }
@@ -796,16 +797,28 @@
         /* ───────────────────────────────────────────────────────────────── */
 
         /* ── FantasyPros player card popup ───────────────────────────────── */
+        // Manual overrides for players whose FP slug can't be derived algorithmically.
+        // Keys are lowercase full names (apostrophes/periods stripped the same way fpSlug does).
+        const FP_SLUG_OVERRIDES = {
+            'amon-ra st brown':      'amonra-stbrown',      // hyphen in first name + St compound last
+            'dj moore':              'dj-moore-wr',          // disambiguates from old D.J. Moore
+            'antonio williams':      'antonio-williams-wr',  // disambiguates from old Antonio Williams
+            'josh allen':            'josh-allen-qb',        // disambiguates from old Josh Allen
+            'kenneth walker':        'kenneth-walker-rb',    // Kenneth Walker III, RB
+            'jacory croskey-merritt':'jacory-croskeymerritt',// hyphen removed in last name by FP
+        };
         function fpSlug(name) {
-            return String(name)
-                .toLowerCase()
-                .replace(/['.]/g, '')                          // remove apostrophes & periods
-                .replace(/\s+(jr\.?|sr\.?|ii|iii|iv)$/i, '')  // strip common suffixes
-                .replace(/\s+/g, '-')                          // spaces → hyphens
-                .replace(/[^a-z0-9-]/g, '');                   // strip everything else
+            // Normalise first (strip apostrophes + periods, lowercase) then check override map
+            const norm = String(name).toLowerCase().replace(/['.]/g, '');
+            if (FP_SLUG_OVERRIDES[norm]) return FP_SLUG_OVERRIDES[norm];
+            // General rule: keep hyphens (Smith-Njigba, Jr, III), strip everything else odd
+            return norm
+                .replace(/\s+/g, '-')
+                .replace(/[^a-z0-9-]/g, '');
         }
+        const FP_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="20" height="20" style="display:block"><circle cx="50" cy="50" r="50" fill="#0D2157"/><circle cx="50" cy="50" r="43" fill="none" stroke="#F0A500" stroke-width="9"/><text x="50" y="67" text-anchor="middle" fill="#ffffff" font-size="46" font-weight="700" font-style="italic" font-family="Arial,Helvetica,sans-serif" letter-spacing="-2">fp</text></svg>`;
         function fpBtn(name) {
-            return `<button data-fp="${name}" class="btn-fp-card flex-shrink-0 font-black text-[8px] leading-none px-1 py-0.5 rounded border border-orange-600/50 text-orange-500 hover:bg-orange-500 hover:text-white hover:border-orange-400 transition" title="View Player Card on FantasyPros">FP</button>`;
+            return `<button data-fp="${name}" class="btn-fp-card" style="min-height:0;width:20px;height:20px;padding:0;border:none;background:none;cursor:pointer;flex-shrink:0;line-height:0;border-radius:4px;opacity:0.85;transition:opacity .15s,transform .1s" title="View Player Card on FantasyPros" onmouseenter="this.style.opacity='1';this.style.transform='scale(1.12)'" onmouseleave="this.style.opacity='0.85';this.style.transform=''">${FP_SVG}</button>`;
         }
         /* ───────────────────────────────────────────────────────────────── */
 
@@ -1546,7 +1559,7 @@
             wishlist.forEach((name, idx) => {
                 let row = document.createElement('div');
                 let isDrafted = isPlayerDrafted(name);
-                let projVal = importedPlayerMap[name] !== undefined ? ` <span class="text-indigo-400 font-bold">$${importedPlayerMap[name]}</span>` : '';
+                let projVal = importedPlayerMap[name] !== undefined ? `<span class="text-indigo-400 font-bold flex-shrink-0 text-[11px]">$${importedPlayerMap[name]}</span>` : '';
                 let draftedStyle = isDrafted ? 'opacity-40 line-through' : '';
                 let posInfo = importedPlayerDetails[name];
                 let posBadge = (posInfo && posInfo.pos) ? `<span class="text-[9px] font-bold px-1 py-0.5 rounded border ${playerPosBadgeClass(posInfo.pos)} flex-shrink-0">${posInfo.pos}</span>` : '';
@@ -1561,7 +1574,8 @@
                     <span class="text-slate-500 font-bold text-[10px] w-4 text-right flex-shrink-0">${idx + 1}.</span>
                     ${posBadge}
                     ${qLogo}
-                    <span class="wish-item flex-1 font-semibold text-teal-300 cursor-pointer hover:text-teal-100 transition truncate ${draftedStyle}">${name}${qTeam}${projVal}</span>
+                    <span class="wish-item flex-1 min-w-0 font-semibold text-teal-300 cursor-pointer hover:text-teal-100 transition truncate ${draftedStyle}">${name}${qTeam}</span>
+                    ${projVal}
                     <div class="flex items-center space-x-1 flex-shrink-0">
                         ${fpBtn(name)}
                         <button data-w-idx="${idx}" class="btn-wish-up text-slate-500 hover:text-slate-200 font-bold text-[10px] px-1 py-0.5 rounded hover:bg-slate-700 transition" title="Move up">▲</button>
@@ -2663,8 +2677,8 @@
             const slug = fpSlug(name);
             window.open(
                 `https://www.fantasypros.com/nfl/players/${slug}.php`,
-                'fpcard',
-                'width=960,height=700,scrollbars=yes,resizable=yes,toolbar=no,menubar=no'
+                `fp_${Date.now()}`,
+                'popup,width=980,height=720,scrollbars=yes,resizable=yes'
             );
         });
         /* ───────────────────────────────────────────────────────────────── */
