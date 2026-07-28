@@ -797,24 +797,41 @@
         /* ───────────────────────────────────────────────────────────────── */
 
         /* ── FantasyPros player card popup ───────────────────────────────── */
-        // Manual overrides for players whose FP slug can't be derived algorithmically.
-        // Keys are lowercase full names (apostrophes/periods stripped the same way fpSlug does).
+        // FP slug overrides — two categories:
+        //   (A) Non-standard / compound slugs FP generates differently from any algorithm
+        //   (B) Players where FP *keeps* the Jr/III suffix (newer draftees only; veterans have it stripped)
+        // Keys are normalised: lowercase, apostrophes + periods removed.
         const FP_SLUG_OVERRIDES = {
-            'amon-ra st brown':      'amonra-stbrown',      // hyphen in first name + St compound last
-            'dj moore':              'dj-moore-wr',          // disambiguates from old D.J. Moore
-            'antonio williams':      'antonio-williams-wr',  // disambiguates from old Antonio Williams
-            'josh allen':            'josh-allen-qb',        // disambiguates from old Josh Allen
-            'kenneth walker':        'kenneth-walker-rb',    // Kenneth Walker III, RB
-            'jacory croskey-merritt':'jacory-croskeymerritt',// hyphen removed in last name by FP
+            // (A) Non-standard slugs
+            'amon-ra st brown':       'amonra-stbrown',       // hyphen in first name + compound St Brown
+            'nick westbrook-ikhine':  'nick-westbrook',        // FP drops "-Ikhine" entirely
+            'jacory croskey-merritt': 'jacory-croskeymerritt', // FP removes hyphen from last name
+            // (A) Disambiguation — plain slug hits a blank/retired player page
+            'dj moore':               'dj-moore-wr',
+            'antonio williams':       'antonio-williams-wr',
+            'josh allen':             'josh-allen-qb',
+            'kenneth walker':         'kenneth-walker-rb',
+            // (B) Rookies/recent draftees where FP *keeps* the suffix
+            'marvin harrison jr':     'marvin-harrison-jr',
+            'harold fannin jr':       'harold-fannin-jr',
+            'brian thomas jr':        'brian-thomas-jr',
+            'chris rodriguez jr':     'chris-rodriguez-jr',
+            'omar cooper jr':         'omar-cooper-jr',
+            'oronde gadsden ii':      'oronde-gadsden-ii',
+            'luther burden iii':      'luther-burden-iii',
         };
         function fpSlug(name) {
-            // Normalise first (strip apostrophes + periods, lowercase) then check override map
-            const norm = String(name).toLowerCase().replace(/['.]/g, '');
+            // 1. Basic normalise: lowercase, strip apostrophes & periods
+            const norm = String(name).toLowerCase().replace(/['.]/g, '').trim();
+            // 2. Override check with full name (catches Jr-keepers and non-standard slugs)
             if (FP_SLUG_OVERRIDES[norm]) return FP_SLUG_OVERRIDES[norm];
-            // General rule: keep hyphens (Smith-Njigba, Jr, III), strip everything else odd
-            return norm
-                .replace(/\s+/g, '-')
-                .replace(/[^a-z0-9-]/g, '');
+            // 3. Strip trailing generational suffix — FP omits it for most established players
+            //    iii before ii so the longer match wins; word-boundary space required
+            const stripped = norm.replace(/\s+(jr|sr|iii|ii|iv)$/, '').trim();
+            // 4. Override check again on stripped name (catches disambiguation cases)
+            if (FP_SLUG_OVERRIDES[stripped]) return FP_SLUG_OVERRIDES[stripped];
+            // 5. General rule: spaces→hyphens, keep existing hyphens (Smith-Njigba), drop the rest
+            return stripped.replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
         }
         const FP_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="20" height="20" style="display:block"><circle cx="50" cy="50" r="50" fill="#0D2157"/><circle cx="50" cy="50" r="43" fill="none" stroke="#F0A500" stroke-width="9"/><text x="50" y="67" text-anchor="middle" fill="#ffffff" font-size="46" font-weight="700" font-style="italic" font-family="Arial,Helvetica,sans-serif" letter-spacing="-2">fp</text></svg>`;
         function fpBtn(name) {
