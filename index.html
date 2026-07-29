@@ -144,7 +144,7 @@
                         <div class="w-8 h-8 rounded-lg bg-sky-600/25 border border-sky-600/40 flex items-center justify-center text-sm flex-shrink-0">📋</div>
                         <div>
                             <h3 class="text-sm font-extrabold text-sky-300">Step 1 — Import Your Cheat Sheet</h3>
-                            <p class="text-[10px] text-slate-500">Open FantasyPros, copy the auction values table, then paste below.</p>
+                            <p class="text-[10px] text-slate-500">Open FantasyPros, set your scoring, team count, and budget. Copy the overall rankings table, then paste below.</p>
                         </div>
                     </div>
 
@@ -242,7 +242,7 @@
                 <!-- Ticker note -->
                 <div class="flex items-start gap-2 bg-slate-800/40 border border-slate-700/40 rounded-xl px-3 py-2.5">
                     <span class="text-base flex-shrink-0">🏈</span>
-                    <p class="text-[10px] text-slate-400 leading-relaxed"><strong class="text-slate-300">Auction Intel Ticker</strong> — scroll the bottom bar during your draft for live auction strategy tips. Hover to pause.</p>
+                    <p class="text-[10px] text-slate-400 leading-relaxed"><strong class="text-slate-300">Auction Intel Ticker</strong> — scroll the bottom bar during your draft for live auction strategy tips. Click to pause or resume.</p>
                 </div>
 
             </div>
@@ -484,6 +484,9 @@
                             <button id="btn-redistribute-values" class="text-xs bg-indigo-700 hover:bg-indigo-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition" title="Adjust imported values for this roster">
                                 ⚖️ Redistribute Values
                             </button>
+                            <button id="btn-suggest-plans" class="text-xs bg-emerald-800 hover:bg-emerald-700 text-emerald-200 font-bold px-2.5 py-1.5 rounded-lg transition" title="Get smart plan amount suggestions based on your roster and imported values">
+                                💡 Suggest Plans
+                            </button>
                             <button id="btn-reset-values" class="text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold px-2.5 py-1.5 rounded-lg transition hidden" title="Restore imported source values">
                                 Restore Source Values
                             </button>
@@ -628,6 +631,38 @@
     <!-- Toast Notifications -->
     <div id="toast-container" class="fixed top-4 right-4 z-[60] space-y-2 pointer-events-none w-[calc(100%-2rem)] max-w-sm"></div>
 
+    <!-- Budget Suggestion Modal -->
+    <div id="suggest-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/70 backdrop-blur-sm">
+        <div class="bg-slate-800 border border-slate-600 rounded-2xl p-5 w-full max-w-lg mx-4 shadow-2xl max-h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between mb-1">
+                <div class="flex items-center gap-2">
+                    <span class="text-lg">💡</span>
+                    <h3 class="text-sm font-bold text-slate-200">Plan Suggestions</h3>
+                </div>
+                <button id="btn-close-suggest" class="text-slate-400 hover:text-slate-200 text-lg font-bold leading-none">✕</button>
+            </div>
+            <p id="suggest-modal-note" class="text-[10px] text-slate-500 mb-3 leading-relaxed"></p>
+            <div class="overflow-y-auto flex-1 min-h-0">
+                <table class="w-full text-xs">
+                    <thead class="text-[10px] text-slate-500 uppercase tracking-wider border-b border-slate-700 sticky top-0 bg-slate-800">
+                        <tr>
+                            <th class="pb-2 pr-3 text-left">Slot</th>
+                            <th class="pb-2 pr-3 text-left">Pos</th>
+                            <th class="pb-2 pr-3 text-right">Your Plan</th>
+                            <th class="pb-2 pr-3 text-right">Suggested</th>
+                            <th class="pb-2 text-left">Assessment</th>
+                        </tr>
+                    </thead>
+                    <tbody id="suggest-tbody" class="divide-y divide-slate-700/40"></tbody>
+                </table>
+            </div>
+            <div class="flex gap-2 mt-4 pt-3 border-t border-slate-700">
+                <button id="btn-autofill-plans" class="flex-1 bg-emerald-700 hover:bg-emerald-600 text-white font-extrabold py-2 rounded-lg text-xs transition">✨ Auto-Fill All Plans</button>
+                <button id="btn-close-suggest-2" class="bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold px-4 py-2 rounded-lg text-xs transition">Close</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Player Notes Modal -->
     <div id="notes-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center bg-black/70 backdrop-blur-sm">
         <div class="bg-slate-800 border border-slate-600 rounded-2xl p-5 w-full max-w-sm mx-4 shadow-2xl">
@@ -649,7 +684,7 @@
     <!-- Infinite Scrolling Auction Intel Ticker Footer -->
     <footer class="bg-slate-950 border-t border-slate-800 py-0 fixed bottom-0 left-0 w-full z-30 overflow-hidden shadow-2xl flex items-stretch">
         <!-- Label -->
-        <div class="flex items-center gap-1.5 bg-gradient-to-br from-emerald-600 to-teal-700 text-slate-950 font-black text-[9px] uppercase tracking-widest px-3 flex-shrink-0 shadow-lg">
+        <div class="flex items-center gap-1.5 bg-gradient-to-br from-emerald-600 to-teal-700 text-slate-950 font-black text-[9px] uppercase tracking-widest px-3 flex-shrink-0 shadow-lg select-none cursor-pointer" id="ticker-label-area" title="Click ticker to pause / resume">
             <svg width="13" height="13" viewBox="0 0 32 32" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                 <!-- football shape -->
                 <ellipse cx="16" cy="16" rx="15" ry="9" transform="rotate(-35 16 16)" rx="14" ry="8"/>
@@ -658,7 +693,7 @@
                 <line x1="10" y1="16" x2="22" y2="16" stroke="rgba(0,0,0,0.35)" stroke-width="1.2"/>
                 <line x1="10" y1="19" x2="22" y2="19" stroke="rgba(0,0,0,0.35)" stroke-width="1.2"/>
             </svg>
-            <span>AUCTION<br>INTEL</span>
+            <span id="ticker-label-text">AUCTION<br>INTEL</span>
         </div>
         <!-- Divider pip -->
         <div class="w-px bg-teal-700/60 flex-shrink-0"></div>
@@ -716,13 +751,13 @@
 
         const defaultSlots = [
             { id: "QB1", posCode: "QB", planUSD: 20, player: "", cost: null },
+            { id: "QB2", posCode: "QB", planUSD: 6, player: "", cost: null },
             { id: "RB1", posCode: "RB", planUSD: 36, player: "", cost: null },
             { id: "RB2", posCode: "RB", planUSD: 21, player: "", cost: null },
             { id: "WR/RB", posCode: "FLEX", planUSD: 13, player: "", cost: null },
             { id: "WR1", posCode: "WR", planUSD: 35, player: "", cost: null },
             { id: "WR2", posCode: "WR", planUSD: 24, player: "", cost: null },
             { id: "WR3", posCode: "WR", planUSD: 16, player: "", cost: null },
-            { id: "QB2", posCode: "QB", planUSD: 6, player: "", cost: null },
             { id: "FLEX1", posCode: "FLEX", planUSD: 12, player: "", cost: null },
             { id: "FLEX2", posCode: "FLEX", planUSD: 8, player: "", cost: null },
             { id: "KICKER", posCode: "K", planUSD: 1, player: "", cost: null },
@@ -890,7 +925,134 @@
             if (!tickerElem) return;
             const fullSet = proTipsList.map(tip => `<span>${tip}</span>`).join('');
             tickerElem.innerHTML = fullSet + fullSet;
+
+            let tickerPaused = false;
+            function toggleTicker() {
+                tickerPaused = !tickerPaused;
+                tickerElem.style.animationPlayState = tickerPaused ? 'paused' : '';
+                const lbl = document.getElementById('ticker-label-text');
+                if (lbl) lbl.innerHTML = tickerPaused ? '⏸<br>PAUSED' : 'AUCTION<br>INTEL';
+            }
+            tickerElem.addEventListener('click', toggleTicker);
+            const labelArea = document.getElementById('ticker-label-area');
+            if (labelArea) labelArea.addEventListener('click', toggleTicker);
         }
+
+        // ── Plan suggestion engine ──────────────────────────────────────────
+        function suggestPlanAmounts() {
+            // Suggests plan amounts that always sum to the available budget.
+            // Strategy:
+            //   1. BENCH / DST / K slots are fixed at $1 each (reserved first).
+            //   2. Remaining starters get proportional shares of what's left,
+            //      driven by imported player values at the appropriate depth.
+            //   3. Primary positions (QB/RB/WR/TE) are processed before FLEX so
+            //      the FLEX pointer starts after primaries are allocated — giving
+            //      depth players, not the same top values again.
+
+            const totalSpent = slots.filter(s => s.cost !== null).reduce((sum, s) => sum + s.cost, 0);
+            const budgetLeft = Math.max(0, totalBudget - totalSpent);
+
+            const unfilled = [];
+            slots.forEach((slot, idx) => {
+                if (slot.cost !== null) return;
+                unfilled.push({ idx, slot });
+            });
+            if (!unfilled.length) return {};
+
+            // ── Categorise slots ────────────────────────────────────────────
+            const isCheap = c => c === 'BENCH' || c === 'DST/K' || c === 'K' || c === 'DEF';
+            const cheapSlots   = unfilled.filter(({ slot }) => isCheap(slot.posCode || getPosTag(slot).code));
+            const starterSlots = unfilled.filter(({ slot }) => !isCheap(slot.posCode || getPosTag(slot).code));
+
+            const suggestions = {};
+            cheapSlots.forEach(({ idx }) => { suggestions[idx] = 1; });
+
+            if (!starterSlots.length) return suggestions;
+
+            const starterBudget = Math.max(starterSlots.length, budgetLeft - cheapSlots.length);
+
+            // ── Build per-position sorted value lists from imports ──────────
+            const posVals = {};
+            Object.keys(importedPlayerDetails).forEach(name => {
+                const d = importedPlayerDetails[name];
+                const p = d.pos || 'UTIL';
+                if (!posVals[p]) posVals[p] = [];
+                posVals[p].push(importedPlayerMap[name] || d.value || 0);
+            });
+            Object.keys(posVals).forEach(p => posVals[p].sort((a, b) => b - a));
+
+            // Shared read-pointers so FLEX consumes depth values, not top values
+            const ptr = {};
+            const getNext = keys => {
+                let best = 0, bestKey = null;
+                keys.forEach(k => {
+                    const v = (posVals[k] || [])[(ptr[k] || 0)];
+                    if (v !== undefined && v > best) { best = v; bestKey = k; }
+                });
+                if (bestKey) ptr[bestKey] = (ptr[bestKey] || 0) + 1;
+                return best;
+            };
+
+            // Heuristic relative weights (fraction of budget) — used when no import data
+            const heurFrac = {
+                QB:   [0.14, 0.06, 0.02],
+                RB:   [0.24, 0.15, 0.08, 0.03],
+                WR:   [0.22, 0.14, 0.07, 0.03],
+                TE:   [0.10, 0.03, 0.01],
+                FLEX: [0.10, 0.07, 0.04],
+                UTIL: [0.10, 0.07, 0.04],
+                IDP:  [0.04, 0.02, 0.01],
+            };
+            const codeKeys = {
+                QB: ['QB'], RB: ['RB'], WR: ['WR'], TE: ['TE'],
+                FLEX: ['RB', 'WR', 'TE'], UTIL: ['QB', 'RB', 'WR', 'TE'],
+                IDP: ['IDP'],
+            };
+
+            // Process primaries first (QB/RB/WR/TE/IDP), then FLEX/UTIL
+            const primaryCodes = new Set(['QB', 'RB', 'WR', 'TE', 'IDP']);
+            const sorted = [...starterSlots].sort(({ slot: a }, { slot: b }) => {
+                const ca = a.posCode || getPosTag(a).code;
+                const cb = b.posCode || getPosTag(b).code;
+                return (primaryCodes.has(ca) ? 0 : 1) - (primaryCodes.has(cb) ? 0 : 1);
+            });
+
+            const rawWeights = {};
+            const posRank = {};
+            sorted.forEach(({ idx, slot }) => {
+                const code = slot.posCode || getPosTag(slot).code;
+                if (!posRank[code]) posRank[code] = 0;
+                const rank = posRank[code]++;
+                const keys = codeKeys[code] || [code];
+                let w = getNext(keys);
+                if (!w) {
+                    const h = heurFrac[code] || [0.05];
+                    w = (h[Math.min(rank, h.length - 1)] || 0.02) * 200;
+                }
+                rawWeights[idx] = Math.max(1, w);
+            });
+
+            // ── Normalise to starterBudget ──────────────────────────────────
+            const totalRaw = sorted.reduce((s, { idx }) => s + rawWeights[idx], 0);
+            sorted.forEach(({ idx }) => {
+                suggestions[idx] = Math.max(1, Math.round((rawWeights[idx] / totalRaw) * starterBudget));
+            });
+
+            // Fix rounding drift so total == budgetLeft exactly
+            const allUnfilled = [...sorted, ...cheapSlots];
+            let total = allUnfilled.reduce((s, { idx }) => s + suggestions[idx], 0);
+            const byWeight = [...sorted].sort(({ idx: a }, { idx: b }) => rawWeights[b] - rawWeights[a]);
+            let diff = budgetLeft - total, attempt = 0;
+            while (diff !== 0 && attempt < byWeight.length * 3) {
+                const { idx } = byWeight[attempt % byWeight.length];
+                if (diff > 0) { suggestions[idx]++; diff--; }
+                else if (suggestions[idx] > 1) { suggestions[idx]--; diff++; }
+                attempt++;
+            }
+
+            return suggestions;
+        }
+        // ───────────────────────────────────────────────────────────────────
 
         function showToast(message, type) {
             type = type || 'info';
@@ -1756,6 +1918,8 @@
             tbody.innerHTML = '';
             select.innerHTML = '';
 
+            const _suggestions = suggestPlanAmounts();
+
             slots.forEach((s, idx) => {
                 let pos = getPosTag(s);
 
@@ -1801,6 +1965,18 @@
 
                 let displayPlanInputValue = displayMode === 'percent' ? parseFloat(((s.planUSD / totalBudget) * 100).toFixed(1)) : s.planUSD;
 
+                // Inline suggestion hint
+                let planHint = '';
+                if (s.cost === null && displayMode === 'dollars' && _suggestions[idx] !== undefined) {
+                    const _sug = _suggestions[idx];
+                    const _diff = s.planUSD - _sug;
+                    const _pct = Math.abs(_diff) / Math.max(1, _sug);
+                    if (_pct >= 0.30) {
+                        if (_diff > 0) planHint = `<span class="text-[9px] text-rose-400 block leading-tight mt-0.5" title="May be high for this slot">↑ ~$${_sug} suggested</span>`;
+                        else planHint = `<span class="text-[9px] text-amber-400 block leading-tight mt-0.5" title="May be low for this slot">↓ ~$${_sug} suggested</span>`;
+                    }
+                }
+
                 tr.innerHTML = `
                     <td class="p-3">
                         <span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded border ${pos.color}">${pos.code}</span>
@@ -1813,6 +1989,7 @@
                             <span class="text-slate-500 text-xs">${displayMode === 'dollars' ? '$' : '%'}</span>
                             <input type="number" step="${displayMode === 'percent' ? '0.5' : '1'}" value="${displayPlanInputValue}" data-idx="${idx}" class="plan-input w-14 bg-slate-900/50 border border-slate-700/60 rounded px-1.5 py-0.5 text-slate-200 font-semibold text-xs focus:ring-1 focus:ring-emerald-500 focus:outline-none">
                         </div>
+                        ${planHint}
                     </td>
                     <td class="p-3 font-bold text-sm text-emerald-400">
                         ${s.cost !== null ? '<span class="text-slate-600">-</span>' : valFormat(adjUSD)}
@@ -2662,6 +2839,61 @@
                 setTimeout(() => document.getElementById('notes-textarea').focus(), 50);
             }
             window.openNoteModal = openNoteModal;
+
+            // ── Suggest Plans modal ──────────────────────────────────────────
+            function openSuggestModal() {
+                const sug = suggestPlanAmounts();
+                const hasImport = Object.keys(importedPlayerMap).length > 0;
+                const note = document.getElementById('suggest-modal-note');
+                if (note) note.textContent = hasImport
+                    ? `Based on your imported values, league size (${leagueSize}), and roster makeup. Suggestions ignore already-filled slots.`
+                    : `No values imported yet — suggestions use budget-fraction heuristics. Import FantasyPros values for better results.`;
+
+                const tbody = document.getElementById('suggest-tbody');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+                slots.forEach((slot, idx) => {
+                    if (slot.cost !== null) return; // skip filled
+                    const s = sug[idx];
+                    if (s === undefined) return;
+                    const pos = getPosTag(slot);
+                    const diff = slot.planUSD - s;
+                    const pct = Math.abs(diff) / Math.max(1, s);
+                    let badge = '', badgeTitle = '';
+                    if (pct < 0.15)      { badge = '<span class="text-emerald-400">✓ good</span>'; }
+                    else if (diff > 0)   { badge = `<span class="text-rose-400">↑ $${diff} high</span>`; badgeTitle = 'May be overpaying for this slot'; }
+                    else                 { badge = `<span class="text-amber-400">↓ $${Math.abs(diff)} low</span>`; badgeTitle = 'May be underfunding this slot'; }
+
+                    const tr = document.createElement('tr');
+                    tr.className = 'text-slate-300';
+                    tr.innerHTML = `
+                        <td class="py-2 pr-3 font-semibold">${slot.id}</td>
+                        <td class="py-2 pr-3"><span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded border ${pos.color}">${pos.code}</span></td>
+                        <td class="py-2 pr-3 text-right font-bold text-sky-400">$${slot.planUSD}</td>
+                        <td class="py-2 pr-3 text-right font-bold text-emerald-400">$${s}</td>
+                        <td class="py-2 text-xs" title="${badgeTitle}">${badge}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                document.getElementById('suggest-modal').classList.remove('hidden');
+            }
+            document.getElementById('btn-suggest-plans')?.addEventListener('click', openSuggestModal);
+            document.getElementById('btn-close-suggest')?.addEventListener('click',   () => document.getElementById('suggest-modal').classList.add('hidden'));
+            document.getElementById('btn-close-suggest-2')?.addEventListener('click', () => document.getElementById('suggest-modal').classList.add('hidden'));
+            document.getElementById('suggest-modal')?.addEventListener('click', (e) => {
+                if (e.target === document.getElementById('suggest-modal')) document.getElementById('suggest-modal').classList.add('hidden');
+            });
+            document.getElementById('btn-autofill-plans')?.addEventListener('click', () => {
+                const sug = suggestPlanAmounts();
+                let changed = 0;
+                slots.forEach((slot, idx) => {
+                    if (slot.cost !== null) return;
+                    if (sug[idx] !== undefined) { slot.planUSD = sug[idx]; changed++; }
+                });
+                if (changed > 0) { render(); showToast(`Applied suggestions to ${changed} slots.`, 'success'); }
+                document.getElementById('suggest-modal').classList.add('hidden');
+            });
+            // ────────────────────────────────────────────────────────────────
 
             document.getElementById('btn-close-notes')?.addEventListener('click', () => {
                 document.getElementById('notes-modal').classList.add('hidden');
