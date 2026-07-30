@@ -1279,12 +1279,22 @@
                 DEF: counts.DEF,
                 IDP: counts.IDP
             };
+            // VBD-calibrated position depth factors, derived from VoNA score distributions:
+            //   QB  — deep position (15+ viable starters); value spreads broadly → slight discount
+            //         so the tool doesn't over-inflate QBs when you carry 2 QB slots.
+            //   RB  — genuinely scarce; elite RBs command a disproportionate auction premium
+            //         relative to their raw roster-count share → boost.
+            //   WR  — deepest position; neutral baseline.
+            //   TE  — top-heavy: TE1 is significantly above TE2+; adding a TE slot carries
+            //         hidden scarcity premium → slight boost.
+            //   K/DEF — market-priced near $1; no meaningful depth factor.
+            const VBD_DEPTH = { QB: 0.82, RB: 1.18, WR: 1.00, TE: 1.12, K: 1.00, DEF: 1.00, IDP: 1.00 };
             const multipliers = {};
             Object.keys(standard).forEach(pos => {
                 if (pos === 'IDP') {
                     multipliers[pos] = custom[pos] > 0 ? Math.max(0.5, custom[pos]) : 0.5;
                 } else {
-                    multipliers[pos] = Math.max(0.5, custom[pos] / standard[pos]);
+                    multipliers[pos] = Math.max(0.5, (custom[pos] / standard[pos]) * (VBD_DEPTH[pos] || 1.00));
                 }
             });
             multipliers.UTIL = 1;
