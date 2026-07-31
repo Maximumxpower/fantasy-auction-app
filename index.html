@@ -565,13 +565,13 @@
                         <table class="w-full text-left text-xs">
                             <thead class="bg-slate-900/80 text-slate-400 uppercase tracking-wider text-[10px] font-bold border-b border-slate-700">
                                 <tr>
-                                    <th class="p-3">Pos</th>
-                                    <th class="p-3">Slot Name</th>
-                                    <th id="th-plan" class="p-3">Plan ($)</th>
-                                    <th id="th-adj" class="p-3">Adj Target</th>
-                                    <th class="p-3">Player / Defense Drafted</th>
-                                    <th id="th-spent" class="p-3">Spent</th>
-                                    <th class="p-3 text-center">Drop</th>
+                                    <th class="p-2 sm:p-3">Pos</th>
+                                    <th class="p-2 sm:p-3">Name</th>
+                                    <th id="th-plan" class="p-2 sm:p-3">Plan</th>
+                                    <th id="th-adj" class="p-2 sm:p-3 hidden sm:table-cell">Target</th>
+                                    <th class="p-2 sm:p-3">Drafted</th>
+                                    <th id="th-spent" class="p-2 sm:p-3">Spent</th>
+                                    <th class="p-2 sm:p-3 text-center">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="roster-tbody" class="divide-y divide-slate-700/60">
@@ -579,11 +579,11 @@
                             </tbody>
                             <tfoot class="bg-slate-900/90 text-slate-300 font-bold border-t-2 border-slate-700 text-xs">
                                 <tr>
-                                    <td colspan="2" class="p-3 uppercase text-[10px] text-slate-400">Total Summary:</td>
-                                    <td id="foot-plan-sum" class="p-3 text-sky-400">$0</td>
-                                    <td id="foot-adj-sum" class="p-3 text-emerald-400">$0</td>
-                                    <td class="p-3 text-slate-500 italic">Active Roster</td>
-                                    <td id="foot-spent-sum" class="p-3 text-amber-400">$0</td>
+                                    <td colspan="2" class="p-2 sm:p-3 uppercase text-[10px] text-slate-400">Totals:</td>
+                                    <td id="foot-plan-sum" class="p-2 sm:p-3 text-sky-400">$0</td>
+                                    <td id="foot-adj-sum" class="p-2 sm:p-3 text-emerald-400 hidden sm:table-cell">$0</td>
+                                    <td class="p-2 sm:p-3 text-slate-500 italic hidden sm:table-cell">Active Roster</td>
+                                    <td id="foot-spent-sum" class="p-2 sm:p-3 text-amber-400">$0</td>
                                     <td></td>
                                 </tr>
                             </tfoot>
@@ -2101,37 +2101,37 @@
                 }
 
                 tr.innerHTML = `
-                    <td class="p-3">
+                    <td class="p-2 sm:p-3">
                         <span class="text-[10px] font-extrabold px-1.5 py-0.5 rounded border ${pos.color}">${pos.code}</span>
                     </td>
-                    <td class="p-3">
+                    <td class="p-2 sm:p-3">
                         <input type="text" value="${s.id}" data-idx="${idx}" class="slot-name-input w-full bg-transparent border-b border-dashed border-slate-700 focus:border-emerald-500 focus:ring-0 outline-none text-slate-200 font-semibold text-xs py-0.5">
                     </td>
-                    <td class="p-3">
+                    <td class="p-2 sm:p-3">
                         <div class="flex items-center space-x-1">
                             <span class="text-slate-500 text-xs">${displayMode === 'dollars' ? '$' : '%'}</span>
-                            <input type="number" step="${displayMode === 'percent' ? '0.5' : '1'}" value="${displayPlanInputValue}" data-idx="${idx}" class="plan-input w-14 bg-slate-900/50 border border-slate-700/60 rounded px-1.5 py-0.5 text-slate-200 font-semibold text-xs focus:ring-1 focus:ring-emerald-500 focus:outline-none">
+                            <input type="number" step="${displayMode === 'percent' ? '0.5' : '1'}" value="${displayPlanInputValue}" data-idx="${idx}" class="plan-input w-12 sm:w-14 bg-slate-900/50 border border-slate-700/60 rounded px-1.5 py-0.5 text-slate-200 font-semibold text-xs focus:ring-1 focus:ring-emerald-500 focus:outline-none">
                         </div>
                         ${planHint}
                     </td>
-                    <td class="p-3 font-bold text-sm text-emerald-400">
+                    <td class="p-2 sm:p-3 font-bold text-sm text-emerald-400 hidden sm:table-cell">
                         ${s.cost !== null ? '<span class="text-slate-600">-</span>' : valFormat(adjUSD)}
                     </td>
-                    <td class="p-3 font-medium text-slate-200 truncate max-w-[130px]">
+                    <td class="p-2 sm:p-3 font-medium text-slate-200 truncate max-w-[90px] sm:max-w-[130px]">
                         ${s.cost !== null
                             ? `<input type="text" data-idx="${idx}" class="edit-player-input w-full bg-slate-900 border border-slate-700 rounded px-1.5 py-0.5 text-slate-200 font-medium text-xs focus:ring-1 focus:ring-sky-500 focus:outline-none" value="${s.player.replace(/"/g,'&quot;')}">`
-                            : (s.player || '<span class="text-slate-600 italic">unfilled</span>')}
+                            : (s.player || '<span class="text-slate-600 italic text-[10px]">unfilled</span>')}
                     </td>
-                    <td class="${priceColClass}">
+                    <td class="${priceColClass.replace('p-3','p-2 sm:p-3')}">
                         ${s.cost !== null
-                            ? `<input type="number" data-idx="${idx}" class="edit-cost-input w-16 bg-slate-900 border border-slate-700 rounded px-1.5 py-0.5 text-amber-400 font-extrabold text-sm focus:ring-1 focus:ring-amber-500 focus:outline-none" value="${s.cost}">${varianceText}`
+                            ? `<input type="number" data-idx="${idx}" class="edit-cost-input w-14 sm:w-16 bg-slate-900 border border-slate-700 rounded px-1.5 py-0.5 text-amber-400 font-extrabold text-sm focus:ring-1 focus:ring-amber-500 focus:outline-none" value="${s.cost}">${varianceText}`
                             : '<span class="text-slate-600">-</span>'}
                     </td>
-                    <td class="p-3 text-center">
+                    <td class="p-2 sm:p-3 text-center">
                         <div class="flex items-center justify-center gap-0.5">
                             ${s.cost === null ? `
-                            <button data-idx="${idx}" class="btn-move-up text-slate-500 hover:text-emerald-400 font-bold text-xs px-2.5 py-1.5 rounded hover:bg-slate-700/60 transition" title="Move up">▲</button>
-                            <button data-idx="${idx}" class="btn-move-down text-slate-500 hover:text-emerald-400 font-bold text-xs px-2.5 py-1.5 rounded hover:bg-slate-700/60 transition" title="Move down">▼</button>` : `<span class="text-slate-600 text-xs px-1" title="Locked — pick recorded">🔒</span>`}
+                            <button data-idx="${idx}" class="btn-move-up hidden sm:inline-flex text-slate-500 hover:text-emerald-400 font-bold text-xs px-2.5 py-1.5 rounded hover:bg-slate-700/60 transition" title="Move up">▲</button>
+                            <button data-idx="${idx}" class="btn-move-down hidden sm:inline-flex text-slate-500 hover:text-emerald-400 font-bold text-xs px-2.5 py-1.5 rounded hover:bg-slate-700/60 transition" title="Move down">▼</button>` : `<span class="text-slate-600 text-xs px-1" title="Locked — pick recorded">🔒</span>`}
                             <button data-idx="${idx}" class="btn-delete-slot text-rose-400 hover:text-rose-300 font-bold text-sm px-1.5 py-1 transition-transform active:scale-90" title="Delete slot">✕</button>
                         </div>
                     </td>
