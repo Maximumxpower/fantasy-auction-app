@@ -1846,7 +1846,7 @@
                 let qLogo = (posInfo && posInfo.team) ? teamLogoImg(posInfo.team, 15) : '';
                 row.className = `flex items-center space-x-1.5 border border-teal-800/40 rounded-lg px-2 py-1 text-xs`;
                 row.style.cssText = qTeamStyle;
-                let qTeam = (posInfo && posInfo.team) ? `<span class="text-slate-500 text-[10px] font-normal ml-0.5">${posInfo.team}</span>` : '';
+                let qTeam = (posInfo && posInfo.team) ? `<span class="text-slate-500 text-[10px] font-normal ml-0.5 hidden sm:inline">${posInfo.team}</span>` : '';
                 row.innerHTML = `
                     <span class="text-slate-500 font-bold text-[10px] w-4 text-right flex-shrink-0">${idx + 1}.</span>
                     ${posBadge}
@@ -1856,8 +1856,8 @@
                     <div class="flex items-center space-x-1 flex-shrink-0">
                         ${fpBtn(name)}
                         <button data-w-name="${name}" data-w-val="${importedPlayerMap[name] !== undefined ? importedPlayerMap[name] : ''}" class="btn-wish-sell text-slate-500 hover:text-purple-400 text-base p-1 rounded transition leading-none flex-shrink-0" title="Log as room sale">🏷</button>
-                        <button data-w-idx="${idx}" class="btn-wish-up text-slate-500 hover:text-slate-200 font-bold text-xs px-2 py-1.5 rounded hover:bg-slate-700 transition" title="Move up">▲</button>
-                        <button data-w-idx="${idx}" class="btn-wish-down text-slate-500 hover:text-slate-200 font-bold text-xs px-2 py-1.5 rounded hover:bg-slate-700 transition" title="Move down">▼</button>
+                        <button data-w-idx="${idx}" class="btn-wish-up hidden sm:inline-flex text-slate-500 hover:text-slate-200 font-bold text-xs px-2 py-1.5 rounded hover:bg-slate-700 transition" title="Move up">▲</button>
+                        <button data-w-idx="${idx}" class="btn-wish-down hidden sm:inline-flex text-slate-500 hover:text-slate-200 font-bold text-xs px-2 py-1.5 rounded hover:bg-slate-700 transition" title="Move down">▼</button>
                         <button data-w-idx="${idx}" class="btn-del-wish text-slate-500 hover:text-rose-400 font-bold text-sm px-2 py-1 rounded transition" title="Remove">✕</button>
                     </div>
                 `;
