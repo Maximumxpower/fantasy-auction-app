@@ -1823,6 +1823,61 @@
             }
         }
 
+        // Generic touch drag-to-reorder for any list container.
+        // Attaches touchmove/touchend to the document only while a drag is live,
+        // so normal scrolling is never blocked.
+        function bindTouchReorder(container, rowSel, idxAttr, swapFn, renderFn) {
+            let srcIdx = null, srcEl = null, overEl = null;
+
+            function rowAt(x, y) {
+                const el = document.elementFromPoint(x, y);
+                return el ? el.closest(rowSel) : null;
+            }
+            function cleanup() {
+                if (srcEl) srcEl.classList.remove('opacity-50', 'ring-1', 'ring-teal-400/60');
+                if (overEl) overEl.classList.remove('ring-2', 'ring-emerald-400');
+                srcIdx = null; srcEl = null; overEl = null;
+                document.removeEventListener('touchmove', onMove);
+                document.removeEventListener('touchend',  onEnd);
+            }
+            function onMove(e) {
+                if (srcIdx === null) return;
+                e.preventDefault();
+                const t = e.touches[0];
+                const target = rowAt(t.clientX, t.clientY);
+                if (overEl && overEl !== target) overEl.classList.remove('ring-2', 'ring-emerald-400');
+                overEl = (target && target !== srcEl) ? target : null;
+                if (overEl) overEl.classList.add('ring-2', 'ring-emerald-400');
+            }
+            function onEnd(e) {
+                if (srcIdx === null) { cleanup(); return; }
+                const t = e.changedTouches[0];
+                const target = rowAt(t.clientX, t.clientY);
+                if (target) {
+                    const destIdx = parseInt(target.getAttribute(idxAttr));
+                    if (!isNaN(destIdx) && destIdx !== srcIdx) {
+                        cleanup();
+                        swapFn(srcIdx, destIdx);
+                        renderFn();
+                        return;
+                    }
+                }
+                cleanup();
+            }
+            container.addEventListener('touchstart', (e) => {
+                if (!e.target.closest('.drag-handle')) return;
+                const row = e.target.closest(rowSel);
+                if (!row) return;
+                const i = parseInt(row.getAttribute(idxAttr));
+                if (isNaN(i)) return;
+                srcIdx = i;
+                srcEl  = row;
+                srcEl.classList.add('opacity-50', 'ring-1', 'ring-teal-400/60');
+                document.addEventListener('touchmove', onMove, { passive: false });
+                document.addEventListener('touchend',  onEnd,  { passive: true  });
+            }, { passive: true });
+        }
+
         function renderWishlist() {
             const container = document.getElementById('wishlist-container');
             if (!container) return;
@@ -1846,8 +1901,10 @@
                 let qLogo = (posInfo && posInfo.team) ? teamLogoImg(posInfo.team, 15) : '';
                 row.className = `flex items-center space-x-1.5 border border-teal-800/40 rounded-lg px-2 py-1 text-xs`;
                 row.style.cssText = qTeamStyle;
+                row.setAttribute('data-w-idx', idx);
                 let qTeam = (posInfo && posInfo.team) ? `<span class="text-slate-500 text-[10px] font-normal ml-0.5 hidden sm:inline">${posInfo.team}</span>` : '';
                 row.innerHTML = `
+                    <span class="drag-handle text-slate-600 hover:text-slate-400 cursor-grab active:cursor-grabbing text-base px-1 flex-shrink-0 select-none touch-none" title="Drag to reorder">⠿</span>
                     <span class="text-slate-500 font-bold text-[10px] w-4 text-right flex-shrink-0">${idx + 1}.</span>
                     ${posBadge}
                     ${qLogo}
@@ -1921,6 +1978,19 @@
                     saveState();
                 });
             });
+
+            // Touch drag-to-reorder for portrait mobile
+            bindTouchReorder(
+                container,
+                '[data-w-idx]',
+                'data-w-idx',
+                (src, dest) => {
+                    const moved = wishlist.splice(src, 1)[0];
+                    wishlist.splice(dest, 0, moved);
+                    saveState();
+                },
+                () => { renderWishlist(); }
+            );
         }
 
         function render() {
@@ -2130,6 +2200,7 @@
                     <td class="p-2 sm:p-3 text-center">
                         <div class="flex items-center justify-center gap-0.5">
                             ${s.cost === null ? `
+                            <span class="drag-handle sm:hidden text-slate-600 hover:text-slate-400 cursor-grab active:cursor-grabbing text-base px-1.5 select-none touch-none" title="Drag to reorder">⠿</span>
                             <button data-idx="${idx}" class="btn-move-up hidden sm:inline-flex text-slate-500 hover:text-emerald-400 font-bold text-xs px-2.5 py-1.5 rounded hover:bg-slate-700/60 transition" title="Move up">▲</button>
                             <button data-idx="${idx}" class="btn-move-down hidden sm:inline-flex text-slate-500 hover:text-emerald-400 font-bold text-xs px-2.5 py-1.5 rounded hover:bg-slate-700/60 transition" title="Move down">▼</button>` : `<span class="text-slate-600 text-xs px-1" title="Locked — pick recorded">🔒</span>`}
                             <button data-idx="${idx}" class="btn-delete-slot text-rose-400 hover:text-rose-300 font-bold text-sm px-1.5 py-1 transition-transform active:scale-90" title="Delete slot">✕</button>
@@ -2368,6 +2439,22 @@
                     document.querySelectorAll('#roster-tbody tr').forEach(r => r.classList.remove('opacity-50','ring-2','ring-emerald-500/70'));
                 });
             });
+
+            // Touch drag-to-reorder for portrait mobile (roster)
+            const _rosterTbody = document.getElementById('roster-tbody');
+            if (_rosterTbody) {
+                bindTouchReorder(
+                    _rosterTbody,
+                    'tr[data-idx]',
+                    'data-idx',
+                    (src, dest) => {
+                        const moved = slots.splice(src, 1)[0];
+                        slots.splice(dest, 0, moved);
+                        saveState();
+                    },
+                    () => { render(); }
+                );
+            }
         }
 
         function renderMarketFeed() {
@@ -3173,9 +3260,12 @@
             }, { passive: false });
 
             // Desktop: hover (mouseover/mouseout bubble, unlike mouseenter/mouseleave)
+            // Also guard against mobile's synthetic mouseover that fires after touchstart
             document.addEventListener('mouseover', function (e) {
                 const btn = e.target.closest('[data-tip]');
-                if (btn) show(btn);
+                if (!btn) return;
+                if (_interactiveTags.has(e.target.tagName)) return; // suppress flash on inputs
+                show(btn);
             });
             document.addEventListener('mouseout', function (e) {
                 const btn = e.target.closest('[data-tip]');
