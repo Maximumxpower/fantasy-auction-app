@@ -107,6 +107,30 @@
             .workspace-tab-btn { padding-left: .7rem; padding-right: .7rem; }
             #workspace-grid.workspace-recap > #right-workspace { display: block; }
         }
+        /* ── Prevent iOS auto-zoom on input focus (requires font-size ≥ 16px) */
+        @media (max-width: 768px) {
+            input[type="text"], input[type="number"], textarea, select { font-size: 16px !important; }
+        }
+        /* ── Tap tooltips ──────────────────────────────────────────────── */
+        #global-tip {
+            position: fixed;
+            background: #1e293b; color: #cbd5e1;
+            font-size: 11px; font-weight: 500; line-height: 1.4;
+            padding: 7px 10px; border-radius: 8px;
+            border: 1px solid #334155;
+            box-shadow: 0 4px 16px rgba(0,0,0,.5);
+            white-space: normal; width: max-content; max-width: 220px;
+            text-align: center; pointer-events: none;
+            opacity: 0; transition: opacity .15s;
+            z-index: 99999;
+        }
+        #global-tip::after {
+            content: ''; position: absolute; top: 100%; left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: #334155;
+        }
+        #global-tip.tip-visible { opacity: 1; }
     </style>
 </head>
 <body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
@@ -121,7 +145,13 @@
             <!-- Header -->
             <div class="relative flex items-center justify-between px-6 pt-5 pb-4 border-b border-slate-800">
                 <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg flex items-center justify-center flex-shrink-0 text-2xl select-none">🏈</div>
+                    <div class="w-12 h-12 rounded-2xl shadow-lg flex-shrink-0 select-none overflow-hidden">
+                        <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
+                            <rect width="32" height="32" rx="7" fill="#0f172a"/>
+                            <rect x="6" y="6" width="20" height="20" rx="5" fill="none" stroke="#10b981" stroke-width="2.5"/>
+                            <path d="M10 20l4-8 3 4 5-6" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
                     <div>
                         <h2 class="text-xl font-black tracking-tight text-white">Draft Assistant <span class="text-emerald-400">Pro</span></h2>
                         <p class="text-[11px] text-slate-400 font-medium">Real-time auction intelligence · Fantasy Football War Room</p>
@@ -214,6 +244,22 @@
                             </div>
                             <p class="text-[10px] text-slate-400 leading-relaxed">After the draft, get your letter grade, net value vs. spend, biggest bargains, and biggest reaches — shareable as plain text.</p>
                         </div>
+
+                        <div class="bg-slate-800/50 border border-indigo-800/30 rounded-xl p-3 space-y-1.5 col-span-2">
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-[15px]">⚖️</span>
+                                <span class="text-[11px] font-extrabold text-indigo-400">Scale Values to Roster</span>
+                            </div>
+                            <p class="text-[10px] text-slate-400 leading-relaxed">Works for <strong class="text-indigo-300">any league format</strong> — 8-team, 14-team, superflex, TEP, dynasty. After importing, hit <em>Scale Values to Roster</em> and the math reshapes around your exact slot count and positional scarcity. RB-heavy roster? RB values get a scarcity premium. Deep QB pool? QB dollars spread wider.</p>
+                        </div>
+
+                        <div class="bg-slate-800/50 border border-emerald-800/30 rounded-xl p-3 space-y-1.5 col-span-2">
+                            <div class="flex items-center gap-1.5">
+                                <span class="text-[15px]">💡</span>
+                                <span class="text-[11px] font-extrabold text-emerald-400">Suggest Plans — Smart Budget Allocation</span>
+                            </div>
+                            <p class="text-[10px] text-slate-400 leading-relaxed">Hit <em>Suggest Plans</em> and the app reads your remaining budget, your open roster slots, and the actual values of players still available at each position — then calculates exactly how many dollars each slot deserves. Mid-draft it adapts: as you win players and spend money, run it again and the remaining targets reproportion automatically. No spreadsheet math, no guessing.</p>
+                        </div>
                     </div>
                 </div>
 
@@ -241,7 +287,7 @@
 
                 <!-- Ticker note -->
                 <div class="flex items-start gap-2 bg-slate-800/40 border border-slate-700/40 rounded-xl px-3 py-2.5">
-                    <span class="text-base flex-shrink-0">🏈</span>
+                    <span class="text-base flex-shrink-0">📡</span>
                     <p class="text-[10px] text-slate-400 leading-relaxed"><strong class="text-slate-300">Auction Intel Ticker</strong> — scroll the bottom bar during your draft for live auction strategy tips. Click to pause or resume.</p>
                 </div>
 
@@ -250,7 +296,7 @@
             <!-- Footer CTA -->
             <div class="px-6 py-4 border-t border-slate-800 bg-slate-950/50">
                 <button id="btn-start-draft" class="w-full bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 active:from-emerald-600 active:to-teal-600 text-slate-950 font-black px-6 py-3 rounded-xl transition shadow-lg text-sm tracking-wide">
-                    🏈 Enter the War Room
+                    ⚡ Enter the War Room
                 </button>
             </div>
         </div>
@@ -301,20 +347,21 @@
 
         <!-- Real-Time Metrics Banner -->
         <section class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
-            <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-xl shadow-md text-center">
+            <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-xl shadow-md text-center" data-tip="Your budget minus everything you've spent so far. Every open roster slot still needs at least $1.">
                 <span class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">REMAINING CASH</span>
                 <span id="stat-remaining" class="text-xl sm:text-2xl font-extrabold text-emerald-400">$200</span>
             </div>
-            <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-xl shadow-md text-center">
+            <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-xl shadow-md text-center" data-tip="The most you can safely bid on any one player right now. Going over this means you won't have enough $1s to fill your remaining empty slots.">
                 <span id="label-max-bid" class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">MAX BID ALLOWED</span>
                 <span id="stat-maxbid" class="text-xl sm:text-2xl font-extrabold text-amber-400">$184</span>
                 <div id="stat-posbid-detail" class="mt-1 text-[9px] text-slate-500 leading-tight truncate"></div>
+                <div id="stat-pool-value" class="mt-0.5 text-[9px] text-indigo-400/80 leading-tight truncate"></div>
             </div>
-            <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-xl shadow-md text-center">
+            <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-xl shadow-md text-center" data-tip="The sum of all your slot plan targets. Should equal your total budget — any gap shows in Unallocated.">
                 <span class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">PLANNED TOTAL</span>
                 <span id="stat-planned" class="text-xl sm:text-2xl font-extrabold text-sky-400">$200</span>
             </div>
-            <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-xl shadow-md text-center">
+            <div class="bg-slate-800/80 border border-slate-700/60 p-3 rounded-xl shadow-md text-center" data-tip="Budget not yet assigned to any slot plan. Should be $0 — positive means you have unplanned money, negative means your plans exceed your budget.">
                 <span id="label-unallocated" class="text-[10px] sm:text-xs text-slate-400 font-bold uppercase tracking-wider block mb-1">UNALLOCATED PLAN</span>
                 <span id="stat-unallocated" class="text-xl sm:text-2xl font-extrabold text-emerald-400">$0</span>
             </div>
@@ -322,7 +369,7 @@
 
         <!-- Market Inflation Indicator Banner -->
         <section id="market-inflation-banner" class="bg-slate-800 border border-slate-700 rounded-xl p-3 flex flex-wrap justify-between items-center text-xs space-y-1 sm:space-y-0">
-            <div class="flex items-center space-x-2">
+            <div class="flex items-center space-x-2" data-tip="Compares what the room is actually paying vs. projected values. Positive % = room is overpaying (your remaining dollars buy more). Negative % = room is getting discounts (you need to bid more aggressively).">
                 <span class="text-amber-400 text-sm">📈</span>
                 <span class="font-bold text-slate-200">Room Inflation Index:</span>
                 <span id="market-inflation-status" class="font-extrabold text-emerald-400">0% (Balanced Market)</span>
@@ -330,6 +377,7 @@
             <div class="text-slate-400 text-[11px]" id="market-inflation-note">
                 Log room sales to track if managers are overspending or giving discounts vs projected values.
             </div>
+            <div id="market-inflation-pos" class="w-full text-[10px] text-slate-500 mt-1 hidden flex gap-3 flex-wrap" data-tip="Per-position inflation. A hot WR market means the room is burning cash on receivers — pivot to RBs while they're cheap."></div>
         </section>
 
         <!-- Focused workspaces keep every original feature available without
@@ -441,25 +489,25 @@
                 <!-- Market Tracker: Log Other Teams' Picks -->
                 <section id="market-panel" class="bg-slate-800 border border-slate-700 rounded-xl p-4 shadow-xl">
                     <div class="flex items-center justify-between mb-3">
-                        <div class="flex items-center space-x-2">
+                        <div class="flex items-center space-x-2" data-tip="Track every player sold to another team. Each entry powers the Inflation Index and Room Strategy panel above — the more you log, the sharper your edge.">
                             <span class="text-purple-400">📊</span>
                             <h2 class="text-sm font-bold text-slate-200">Room Sales Log</h2>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <button id="btn-market-undo" class="text-[10px] text-amber-400 hover:text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-800/40 hover:bg-amber-950/30 transition">↩ Undo</button>
-                            <span class="text-[10px] bg-purple-900/40 text-purple-300 font-bold px-2 py-0.5 rounded-full border border-purple-800/40">Market Trends</span>
+                            <button id="btn-market-undo" class="text-[10px] text-amber-400 hover:text-amber-300 font-bold px-1.5 py-0.5 rounded border border-amber-800/40 hover:bg-amber-950/30 transition" data-tip="Removes the last entry you logged. Only works one step back.">↩ Undo</button>
+                            <span class="text-[10px] bg-purple-900/40 text-purple-300 font-bold px-2 py-0.5 rounded-full border border-purple-800/40" data-tip="Sales here feed the Inflation Index and Room Strategy panel — your live market read.">Market Trends</span>
                         </div>
                     </div>
                     <div class="space-y-3">
                         <div class="grid grid-cols-2 gap-2">
-                            <input id="market-player" type="text" placeholder="e.g. Pittsburgh Steelers" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-1.5 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-purple-500 focus:outline-none">
-                            <input id="market-cost" type="number" placeholder="Cost ($)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-1.5 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-purple-500 focus:outline-none">
+                            <input id="market-player" type="text" placeholder="Player name" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-1.5 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-purple-500 focus:outline-none" data-tip="Type the player an opponent just won. Autocompletes from your imported board — their projected value will fill in automatically.">
+                            <input id="market-cost" type="number" placeholder="Cost ($)" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-1.5 py-1.5 text-xs text-slate-200 focus:ring-1 focus:ring-purple-500 focus:outline-none" data-tip="The final price the room paid. Compared against projected value to calculate inflation.">
                         </div>
-                        <button id="btn-market-save" class="w-full bg-purple-600 hover:bg-purple-500 font-bold py-1.5 rounded-lg transition text-xs shadow-md text-white">
+                        <button id="btn-market-save" class="w-full bg-purple-600 hover:bg-purple-500 font-bold py-1.5 rounded-lg transition text-xs shadow-md text-white" data-tip="Saves this sale and immediately updates the Inflation Index and Room Strategy. Tip: tap 🏷 on any player badge to pre-fill this form instantly.">
                             Log Room Purchase
                         </button>
                         <!-- Dynamic Feed List -->
-                        <div class="bg-slate-900/50 rounded-lg p-2 max-h-36 overflow-y-auto border border-slate-850">
+                        <div class="bg-slate-900/50 rounded-lg p-2 max-h-36 overflow-y-auto border border-slate-850" data-tip="Your full log of room sales. Tap ✕ on any entry to delete it. The list persists across sessions.">
                             <ul id="market-feed" class="divide-y divide-slate-800 text-[11px] text-slate-300">
                                 <li class="py-1 text-center text-slate-500 italic">No room sales logged yet</li>
                             </ul>
@@ -478,22 +526,22 @@
                             <h2 class="text-sm font-bold text-slate-200">Roster, Plan, and Live Projections</h2>
                         </div>
                         <div class="flex flex-wrap gap-2">
-                            <button id="btn-export-csv" class="text-xs bg-sky-700 hover:bg-sky-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition" title="Export roster to CSV">
+                            <button id="btn-export-csv" class="text-xs bg-sky-700 hover:bg-sky-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition" data-tip="Downloads your roster and all spending as a CSV spreadsheet.">
                                 📤 Export CSV
                             </button>
-                            <button id="btn-redistribute-values" class="text-xs bg-indigo-700 hover:bg-indigo-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition" title="Adjust imported values for this roster">
-                                ⚖️ Redistribute Values
+                            <button id="btn-redistribute-values" class="text-xs bg-indigo-700 hover:bg-indigo-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition" data-tip="Rescales imported player values to fit your roster — boosts scarce positions (RB/TE) and spreads deep ones (QB) so your slot plans reflect real auction market pressure.">
+                                ⚖️ Scale Values to Roster
                             </button>
-                            <button id="btn-suggest-plans" class="text-xs bg-emerald-800 hover:bg-emerald-700 text-emerald-200 font-bold px-2.5 py-1.5 rounded-lg transition" title="Get smart plan amount suggestions based on your roster and imported values">
+                            <button id="btn-suggest-plans" class="text-xs bg-emerald-800 hover:bg-emerald-700 text-emerald-200 font-bold px-2.5 py-1.5 rounded-lg transition" data-tip="Calculates smart dollar targets for each empty slot based on your imported player values and remaining budget.">
                                 💡 Suggest Plans
                             </button>
-                            <button id="btn-reset-values" class="text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold px-2.5 py-1.5 rounded-lg transition hidden" title="Restore imported source values">
-                                Restore Source Values
+                            <button id="btn-reset-values" class="text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold px-2.5 py-1.5 rounded-lg transition hidden" data-tip="Resets player values back to the original imported numbers, undoing any redistribution.">
+                                ↺ Restore Source Values
                             </button>
-                            <button id="btn-clear-data" class="text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold px-2.5 py-1.5 rounded-lg transition" title="Clear LocalStorage memory">
-                                Clear Storage
+                            <button id="btn-clear-data" class="text-xs bg-slate-700 hover:bg-slate-600 text-slate-300 font-bold px-2.5 py-1.5 rounded-lg transition" data-tip="Clears all saved data from this browser. Use to start completely fresh.">
+                                🗑 Clear Storage
                             </button>
-                            <button id="btn-reset" class="text-xs bg-rose-950/40 hover:bg-rose-900 text-rose-300 font-bold px-3 py-1.5 rounded-lg border border-rose-800/40 transition">
+                            <button id="btn-reset" class="text-xs bg-rose-950/40 hover:bg-rose-900 text-rose-300 font-bold px-3 py-1.5 rounded-lg border border-rose-800/40 transition" data-tip="Wipes all picks and costs but keeps your roster slots and imported players.">
                                 Reset Board
                             </button>
                         </div>
@@ -595,7 +643,7 @@
                 </section>
 
                 <section id="room-insights-panel" class="hidden bg-slate-800 border border-slate-700 rounded-xl shadow-xl overflow-hidden">
-                    <div class="p-4 bg-slate-800 border-b border-slate-700 flex items-center space-x-2">
+                    <div class="p-4 bg-slate-800 border-b border-slate-700 flex items-center space-x-2" data-tip="Automatically populated as you log room sales. Shows the overall market temperature and tells you when to push vs. when to sit back.">
                         <span class="text-purple-400">◈</span>
                         <div>
                             <h2 class="text-sm font-bold text-slate-200">Room strategy</h2>
@@ -603,15 +651,15 @@
                         </div>
                     </div>
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 p-4 text-center">
-                        <div class="bg-slate-900/70 rounded-lg p-3">
+                        <div class="bg-slate-900/70 rounded-lg p-3" data-tip="How many opponent purchases you have logged. At least 3–5 sales gives a meaningful inflation signal.">
                             <div class="text-[9px] text-slate-400 uppercase font-bold mb-1">Sales logged</div>
                             <div id="room-sales-count" class="room-insight-value text-slate-200">0</div>
                         </div>
-                        <div class="bg-slate-900/70 rounded-lg p-3">
+                        <div class="bg-slate-900/70 rounded-lg p-3" data-tip="Mean final price across all logged sales. Useful context — if the room avg is $45 and your target goes for $30, that's a steal worth noting.">
                             <div class="text-[9px] text-slate-400 uppercase font-bold mb-1">Avg. sale</div>
                             <div id="room-average-sale" class="room-insight-value text-amber-400">$0</div>
                         </div>
-                        <div class="bg-slate-900/70 rounded-lg p-3 col-span-2 sm:col-span-1">
+                        <div class="bg-slate-900/70 rounded-lg p-3 col-span-2 sm:col-span-1" data-tip="Hot = room is overpaying; your budget stretches further on upcoming players. Cold = room is getting deals; bid more confidently on your targets before they slip. Balanced = market is fair-value; trust your projections.">
                             <div class="text-[9px] text-slate-400 uppercase font-bold mb-1">Signal</div>
                             <div id="room-signal" class="room-insight-value text-emerald-400 text-sm">Balanced</div>
                         </div>
@@ -1559,8 +1607,8 @@
                         <span class="text-indigo-300 font-semibold flex-shrink-0">${valFormat(pl.value)}</span>
                         ${noteDot}
                         ${fpBtn(pl.name)}
-                        <button data-p-name="${pl.name}" data-p-val="${pl.value}" class="btn-sold-market text-slate-600 hover:text-purple-400 text-[10px] transition leading-none flex-shrink-0" title="Log as room sale">🏷</button>
-                        <button data-p-name="${pl.name}" class="btn-note-icon text-slate-600 hover:text-amber-400 text-[10px] transition leading-none flex-shrink-0" title="Note">📝</button>
+                        <button data-p-name="${pl.name}" data-p-val="${pl.value}" class="btn-sold-market text-slate-500 hover:text-purple-400 text-base p-1 rounded transition leading-none flex-shrink-0" title="Log as room sale">🏷</button>
+                        <button data-p-name="${pl.name}" class="btn-note-icon text-slate-500 hover:text-amber-400 text-base p-1 rounded transition leading-none flex-shrink-0" title="Note">📝</button>
                     </div>`;
                 }).join('');
 
@@ -1646,8 +1694,8 @@
                                 <span class="text-indigo-300 font-semibold flex-shrink-0">${valFormat(pl.value)}</span>
                                 ${noteDot}
                                 ${fpBtn(pl.name)}
-                                <button data-p-name="${pl.name}" data-p-val="${pl.value}" class="btn-sold-market text-slate-600 hover:text-purple-400 text-[10px] transition leading-none flex-shrink-0" title="Log as room sale">🏷</button>
-                                <button data-p-name="${pl.name}" class="btn-note-icon text-slate-600 hover:text-amber-400 text-[10px] transition leading-none flex-shrink-0" title="Note">📝</button>
+                                <button data-p-name="${pl.name}" data-p-val="${pl.value}" class="btn-sold-market text-slate-500 hover:text-purple-400 text-base p-1 rounded transition leading-none flex-shrink-0" title="Log as room sale">🏷</button>
+                                <button data-p-name="${pl.name}" class="btn-note-icon text-slate-500 hover:text-amber-400 text-base p-1 rounded transition leading-none flex-shrink-0" title="Note">📝</button>
                             </div>`;
                         }).join(' ');
 
@@ -1745,6 +1793,34 @@
                 statusElem.className = "font-extrabold text-emerald-400";
                 noteElem.innerText = "Spending is closely tracking player projections.";
             }
+
+            // ── Per-position inflation breakdown ─────────────────────────
+            const posEl = document.getElementById('market-inflation-pos');
+            if (posEl) {
+                const posTotals = {};
+                marketLogs.forEach(log => {
+                    const pos = (importedPlayerDetails[log.player] || {}).pos || null;
+                    if (!pos) return;
+                    if (!posTotals[pos]) posTotals[pos] = { spent: 0, expected: 0 };
+                    posTotals[pos].spent += log.cost;
+                    posTotals[pos].expected += importedPlayerMap[log.player] !== undefined ? importedPlayerMap[log.player] : log.cost;
+                });
+                const ORDER = ['QB','RB','WR','TE','K','DEF'];
+                const parts = ORDER
+                    .filter(p => posTotals[p] && posTotals[p].expected > 0)
+                    .map(p => {
+                        const t = posTotals[p];
+                        const pct = Math.round(((t.spent - t.expected) / t.expected) * 100);
+                        const cls = pct > 5 ? 'text-rose-400' : pct < -5 ? 'text-teal-400' : 'text-slate-400';
+                        return `<span class="${cls} font-bold">${p}: ${pct > 0 ? '+' : ''}${pct}%</span>`;
+                    });
+                if (parts.length > 0) {
+                    posEl.innerHTML = parts.join('<span class="text-slate-700 mx-1">·</span>');
+                    posEl.classList.remove('hidden');
+                } else {
+                    posEl.classList.add('hidden');
+                }
+            }
         }
 
         function renderWishlist() {
@@ -1779,9 +1855,10 @@
                     ${projVal}
                     <div class="flex items-center space-x-1 flex-shrink-0">
                         ${fpBtn(name)}
-                        <button data-w-idx="${idx}" class="btn-wish-up text-slate-500 hover:text-slate-200 font-bold text-[10px] px-1 py-0.5 rounded hover:bg-slate-700 transition" title="Move up">▲</button>
-                        <button data-w-idx="${idx}" class="btn-wish-down text-slate-500 hover:text-slate-200 font-bold text-[10px] px-1 py-0.5 rounded hover:bg-slate-700 transition" title="Move down">▼</button>
-                        <button data-w-idx="${idx}" class="btn-del-wish text-slate-500 hover:text-rose-400 font-bold text-xs px-1 transition" title="Remove">✕</button>
+                        <button data-w-name="${name}" data-w-val="${importedPlayerMap[name] !== undefined ? importedPlayerMap[name] : ''}" class="btn-wish-sell text-slate-500 hover:text-purple-400 text-base p-1 rounded transition leading-none flex-shrink-0" title="Log as room sale">🏷</button>
+                        <button data-w-idx="${idx}" class="btn-wish-up text-slate-500 hover:text-slate-200 font-bold text-xs px-2 py-1.5 rounded hover:bg-slate-700 transition" title="Move up">▲</button>
+                        <button data-w-idx="${idx}" class="btn-wish-down text-slate-500 hover:text-slate-200 font-bold text-xs px-2 py-1.5 rounded hover:bg-slate-700 transition" title="Move down">▼</button>
+                        <button data-w-idx="${idx}" class="btn-del-wish text-slate-500 hover:text-rose-400 font-bold text-sm px-2 py-1 rounded transition" title="Remove">✕</button>
                     </div>
                 `;
 
@@ -1792,6 +1869,20 @@
                     }
                     autoSwitchSlotForPlayer(name);
                 });
+
+                const _wSell = row.querySelector('.btn-wish-sell');
+                if (_wSell) {
+                    _wSell.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const mPlayer = document.getElementById('market-player');
+                        const mCost   = document.getElementById('market-cost');
+                        if (mPlayer) mPlayer.value = name;
+                        const _sv = importedPlayerMap[name];
+                        if (mCost && _sv !== undefined) mCost.value = _sv;
+                        document.querySelector('[data-workspace-tab="room"]')?.click();
+                        showToast(`${name} — adjust the price and hit Log Room Purchase.`, 'info');
+                    });
+                }
 
                 container.appendChild(row);
             });
@@ -1906,6 +1997,28 @@
                 }
             }
 
+            // Remaining quality starters (≥$5 projected value, undrafted)
+            const _poolEl = document.getElementById('stat-pool-value');
+            if (_poolEl) {
+                if (Object.keys(importedPlayerMap).length > 0) {
+                    const _poolByPos = {};
+                    Object.keys(importedPlayerDetails).forEach(name => {
+                        if (isPlayerDrafted(name)) return;
+                        const _pp = importedPlayerDetails[name].pos;
+                        if (!_pp || _pp === 'K' || _pp === 'DEF') return;
+                        if ((importedPlayerMap[name] || 0) < 5) return; // only real starters
+                        _poolByPos[_pp] = (_poolByPos[_pp] || 0) + 1;
+                    });
+                    const _poolOrder = ['RB','WR','QB','TE'];
+                    const _poolParts = _poolOrder
+                        .filter(p => _poolByPos[p] > 0)
+                        .map(p => `${p} ${_poolByPos[p]}`);
+                    _poolEl.textContent = _poolParts.length ? '🏊 Starters left: ' + _poolParts.join(' · ') : '';
+                } else {
+                    _poolEl.textContent = '';
+                }
+            }
+
             // Position bid breakdown — shown below max bid card
             const _posBidEl = document.getElementById('stat-posbid-detail');
             if (_posBidEl) {
@@ -1920,7 +2033,7 @@
                     .sort((a, b) => b[1] - a[1])
                     .slice(0, 4)
                     .map(([_pos, _amt]) => `${_pos} ${valFormat(_amt)}`);
-                _posBidEl.textContent = _parts.join(' · ');
+                _posBidEl.textContent = _parts.length ? 'Targets: ' + _parts.join(' · ') : '';
             }
 
             let tbody = document.getElementById('roster-tbody');
@@ -2005,16 +2118,20 @@
                         ${s.cost !== null ? '<span class="text-slate-600">-</span>' : valFormat(adjUSD)}
                     </td>
                     <td class="p-3 font-medium text-slate-200 truncate max-w-[130px]">
-                        ${s.player || '<span class="text-slate-600 italic">unfilled</span>'}
+                        ${s.cost !== null
+                            ? `<input type="text" data-idx="${idx}" class="edit-player-input w-full bg-slate-900 border border-slate-700 rounded px-1.5 py-0.5 text-slate-200 font-medium text-xs focus:ring-1 focus:ring-sky-500 focus:outline-none" value="${s.player.replace(/"/g,'&quot;')}">`
+                            : (s.player || '<span class="text-slate-600 italic">unfilled</span>')}
                     </td>
                     <td class="${priceColClass}">
-                        ${s.cost !== null ? valFormat(s.cost) + varianceText : '<span class="text-slate-600">-</span>'}
+                        ${s.cost !== null
+                            ? `<input type="number" data-idx="${idx}" class="edit-cost-input w-16 bg-slate-900 border border-slate-700 rounded px-1.5 py-0.5 text-amber-400 font-extrabold text-sm focus:ring-1 focus:ring-amber-500 focus:outline-none" value="${s.cost}">${varianceText}`
+                            : '<span class="text-slate-600">-</span>'}
                     </td>
                     <td class="p-3 text-center">
                         <div class="flex items-center justify-center gap-0.5">
                             ${s.cost === null ? `
-                            <button data-idx="${idx}" class="btn-move-up text-slate-500 hover:text-emerald-400 font-bold text-xs px-1.5 py-1 rounded hover:bg-slate-700/60 transition" title="Move up">▲</button>
-                            <button data-idx="${idx}" class="btn-move-down text-slate-500 hover:text-emerald-400 font-bold text-xs px-1.5 py-1 rounded hover:bg-slate-700/60 transition" title="Move down">▼</button>` : `<span class="text-slate-600 text-xs px-1" title="Locked — pick recorded">🔒</span>`}
+                            <button data-idx="${idx}" class="btn-move-up text-slate-500 hover:text-emerald-400 font-bold text-xs px-2.5 py-1.5 rounded hover:bg-slate-700/60 transition" title="Move up">▲</button>
+                            <button data-idx="${idx}" class="btn-move-down text-slate-500 hover:text-emerald-400 font-bold text-xs px-2.5 py-1.5 rounded hover:bg-slate-700/60 transition" title="Move down">▼</button>` : `<span class="text-slate-600 text-xs px-1" title="Locked — pick recorded">🔒</span>`}
                             <button data-idx="${idx}" class="btn-delete-slot text-rose-400 hover:text-rose-300 font-bold text-sm px-1.5 py-1 transition-transform active:scale-90" title="Delete slot">✕</button>
                         </div>
                     </td>
@@ -2092,23 +2209,23 @@
             const grade = getDraftGrade(netValue, totalSpent);
             content.innerHTML = `
                 <div class="grid grid-cols-3 sm:grid-cols-5 gap-2 mb-1">
-                    <div class="bg-slate-900/70 rounded-lg p-2 text-center">
+                    <div class="bg-slate-900/70 rounded-lg p-2 text-center" data-tip="Total roster slots you have filled so far.">
                         <div class="text-[9px] text-slate-400 uppercase font-bold mb-1">Picks</div>
                         <div class="text-base font-extrabold text-slate-200">${filledSlots.length}</div>
                     </div>
-                    <div class="bg-slate-900/70 rounded-lg p-2 text-center">
+                    <div class="bg-slate-900/70 rounded-lg p-2 text-center" data-tip="Total dollars paid across all your picks.">
                         <div class="text-[9px] text-slate-400 uppercase font-bold mb-1">Spent</div>
                         <div class="text-base font-extrabold text-amber-400">${valFormat(totalSpent)}</div>
                     </div>
-                    <div class="bg-slate-900/70 rounded-lg p-2 text-center">
+                    <div class="bg-slate-900/70 rounded-lg p-2 text-center" data-tip="Your total spend as a % of your planned budget. Under 100% = under budget. Over 100% = overspent your plan.">
                         <div class="text-[9px] text-slate-400 uppercase font-bold mb-1">Vs Plan</div>
                         <div class="text-base font-extrabold ${vsColor}">${vsPlannedPct}%</div>
                     </div>
-                    <div class="bg-slate-900/70 rounded-lg p-2 text-center">
+                    <div class="bg-slate-900/70 rounded-lg p-2 text-center" data-tip="Total dollars saved on bargains minus total overpaid on reaches. Positive = you got more value than you paid for overall.">
                         <div class="text-[9px] text-slate-400 uppercase font-bold mb-1">Net Value</div>
                         <div class="text-base font-extrabold ${netColor}">${netValue >= 0 ? '+' : ''}${valFormat(netValue)}</div>
                     </div>
-                    <div class="bg-slate-900/70 rounded-lg p-2 text-center">
+                    <div class="bg-slate-900/70 rounded-lg p-2 text-center" data-tip="Overall draft grade based on net value vs. your spend. A = elite value, F = significantly overpaid.">
                         <div class="text-[9px] text-slate-400 uppercase font-bold mb-1">Grade</div>
                         <div class="text-base font-extrabold ${grade.color}">${grade.grade}</div>
                     </div>
@@ -2171,6 +2288,36 @@
                         render();
                     }
                 });
+            });
+
+            // ── Inline edit: cost and player name for filled slots ──────────
+            document.querySelectorAll('.edit-cost-input').forEach(input => {
+                const commit = () => {
+                    const idx = parseInt(input.dataset.idx);
+                    const val = parseFloat(input.value);
+                    if (!isNaN(val) && val >= 0 && slots[idx]) {
+                        slots[idx].cost = Math.round(val);
+                        saveState();
+                        render();
+                    }
+                };
+                input.addEventListener('blur', commit);
+                input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); commit(); } });
+            });
+
+            document.querySelectorAll('.edit-player-input').forEach(input => {
+                const commit = () => {
+                    const idx = parseInt(input.dataset.idx);
+                    const val = input.value.trim();
+                    if (val && slots[idx]) {
+                        slots[idx].player = val;
+                        saveState();
+                        refreshSearchSuggestions();
+                        render();
+                    }
+                };
+                input.addEventListener('blur', commit);
+                input.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); commit(); } });
             });
 
             document.querySelectorAll('.btn-move-up').forEach(btn => {
@@ -2254,7 +2401,7 @@
 
                 li.innerHTML = `
                     <div class="flex items-center gap-1.5 truncate min-w-0">
-                        <button data-m-idx="${realIdx}" class="btn-delete-market text-rose-400 hover:text-rose-300 font-bold text-xs px-1 flex-shrink-0" title="Delete entry">✕</button>
+                        <button data-m-idx="${realIdx}" class="btn-delete-market text-rose-400 hover:text-rose-300 font-bold text-sm px-2.5 py-1.5 rounded transition flex-shrink-0" title="Delete entry">✕</button>
                         ${mPosBadge}
                         ${mLogo}
                         <span class="font-medium text-slate-200 truncate">${log.player}</span>
@@ -2271,8 +2418,12 @@
 
             document.querySelectorAll('.btn-delete-market').forEach(btn => {
                 btn.addEventListener('click', (e) => {
+                    if (!confirm('Remove this room sale?')) return;
                     let idx = parseInt(e.target.getAttribute('data-m-idx'));
+                    marketHistory.push(JSON.parse(JSON.stringify(marketLogs)));
+                    if (marketHistory.length > 20) marketHistory.shift();
                     marketLogs.splice(idx, 1);
+                    saveState();
                     renderMarketFeed();
                     render();
                 });
@@ -2658,7 +2809,17 @@
                         playerInput.value = '';
                         priceInput.value = '';
                         refreshSearchSuggestions();
+                        // Find next empty slot to auto-advance the selector
+                        const _curIdx = parseInt(slotIdx);
+                        const _nextIdx = slots.findIndex((s, i) => i > _curIdx && s.cost === null);
+                        const _fallback = slots.findIndex(s => s.cost === null);
+                        const _advanceTo = _nextIdx !== -1 ? _nextIdx : _fallback;
                         render();
+                        // Set after render since render() rebuilds the select options
+                        if (_advanceTo !== -1) {
+                            const _sel = document.getElementById('input-slot');
+                            if (_sel) _sel.value = _advanceTo;
+                        }
                     }
                 });
             }
@@ -2825,9 +2986,11 @@
                 link.click();
             });
 
+            let _searchDebounce = null;
             document.getElementById('import-search')?.addEventListener('input', (e) => {
                 importSearchQuery = e.target.value.trim();
-                renderImportedBoard();
+                clearTimeout(_searchDebounce);
+                _searchDebounce = setTimeout(renderImportedBoard, 180);
             });
 
             document.getElementById('btn-clear-queue')?.addEventListener('click', () => {
@@ -2932,6 +3095,14 @@
             attachAutocomplete('input-player');
             attachAutocomplete('input-wish-name');
             attachAutocomplete('market-player');
+            // Autofill market cost when a player is picked from the dropdown
+            document.getElementById('market-player')?.addEventListener('change', (e) => {
+                const _mn = e.target.value.trim();
+                if (importedPlayerMap[_mn] !== undefined) {
+                    const _mc = document.getElementById('market-cost');
+                    if (_mc) _mc.value = importedPlayerMap[_mn];
+                }
+            });
 
             renderMarketFeed();
             render();
@@ -2952,6 +3123,60 @@
                 'popup,width=980,height=720,scrollbars=yes,resizable=yes'
             );
         });
+        /* ───────────────────────────────────────────────────────────────── */
+
+        /* ── Tap-to-show tooltips (works on mobile & desktop) ────────────── */
+        (function () {
+            const tip = document.createElement('div');
+            tip.id = 'global-tip';
+            document.body.appendChild(tip);
+
+            let hideTimer = null;
+
+            function show(btn) {
+                clearTimeout(hideTimer);
+                const rect = btn.getBoundingClientRect();
+                tip.textContent = btn.dataset.tip;
+                // Make visible first so offsetWidth/Height are measurable,
+                // then snap position — opacity transition hides the jump
+                tip.classList.add('tip-visible');
+                requestAnimationFrame(() => {
+                    const tw = tip.offsetWidth;
+                    const th = tip.offsetHeight;
+                    let left = rect.left + rect.width / 2 - tw / 2;
+                    left = Math.max(8, Math.min(left, window.innerWidth - tw - 8));
+                    // Show above button; flip below if too close to top edge
+                    const topAbove = rect.top - th - 10;
+                    tip.style.left = left + 'px';
+                    tip.style.top  = (topAbove < 8 ? rect.bottom + 10 : topAbove) + 'px';
+                });
+            }
+
+            function hide() {
+                tip.classList.remove('tip-visible');
+            }
+
+            // Mobile: tap shows tip for 2.5 s, then fires the click
+            document.addEventListener('touchstart', function (e) {
+                const btn = e.target.closest('[data-tip]');
+                if (!btn) { hide(); return; }
+                e.preventDefault();
+                show(btn);
+                clearTimeout(hideTimer);
+                hideTimer = setTimeout(hide, 2500);
+                setTimeout(() => btn.click(), 100);
+            }, { passive: false });
+
+            // Desktop: hover (mouseover/mouseout bubble, unlike mouseenter/mouseleave)
+            document.addEventListener('mouseover', function (e) {
+                const btn = e.target.closest('[data-tip]');
+                if (btn) show(btn);
+            });
+            document.addEventListener('mouseout', function (e) {
+                const btn = e.target.closest('[data-tip]');
+                if (btn && !btn.contains(e.relatedTarget)) hide();
+            });
+        })();
         /* ───────────────────────────────────────────────────────────────── */
 
         document.addEventListener('DOMContentLoaded', initApp);
