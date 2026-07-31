@@ -3157,9 +3157,14 @@
             }
 
             // Mobile: tap shows tip for 2.5 s, then fires the click
+            // Skip interception for inputs/textareas/selects — let them focus normally
+            const _interactiveTags = new Set(['INPUT','TEXTAREA','SELECT']);
             document.addEventListener('touchstart', function (e) {
                 const btn = e.target.closest('[data-tip]');
                 if (!btn) { hide(); return; }
+                // If the tapped element itself (or its closest interactive ancestor) is
+                // a form control, just hide any open tip and let the browser handle it.
+                if (_interactiveTags.has(e.target.tagName)) { hide(); return; }
                 e.preventDefault();
                 show(btn);
                 clearTimeout(hideTimer);
