@@ -532,6 +532,9 @@
                             <button id="btn-redistribute-values" class="text-xs bg-indigo-700 hover:bg-indigo-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition" data-tip="Rescales imported player values to fit your roster — boosts scarce positions (RB/TE) and spreads deep ones (QB) so your slot plans reflect real auction market pressure.">
                                 ⚖️ Scale Values to Roster
                             </button>
+                            <button id="btn-jl-values" class="text-xs bg-gradient-to-r from-yellow-700 to-amber-700 hover:from-yellow-600 hover:to-amber-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition" data-tip="Recalculates player values for the Justice League's 2QB PPR format — ranks each position by imported value and applies the league's tier curve, giving QBs their full 2QB premium and WRs their PPR edge.">
+                                🏈 Justice League Values
+                            </button>
                             <button id="btn-suggest-plans" class="text-xs bg-emerald-800 hover:bg-emerald-700 text-emerald-200 font-bold px-2.5 py-1.5 rounded-lg transition" data-tip="Calculates smart dollar targets for each empty slot based on your imported player values and remaining budget.">
                                 💡 Suggest Plans
                             </button>
@@ -1427,6 +1430,84 @@
             render();
             showToast("Restored original imported auction values.", "info");
         }
+
+        // ── Justice League Values ────────────────────────────────────────────
+        // Rank-based valuation curves derived from 2025 Justice League reference
+        // (2QB / SuperFlex 10-team PPR). Each array index = within-position rank
+        // (0-based). Players ranked by their imported standard value; the curve
+        // assigns Justice League dollars by rank. Works every year regardless of
+        // which players are in the pool.
+        const JL_CURVES = {
+            QB: [60,59,58,55,54,53,46,45,44,40,39,25,24,20,20,20,19,19,19,19,18,18,18,16,16,15,15,15,15,15],
+            WR: [63,63,62,61,49,48,47,42,41,28,27,26,23,22,20,20,20,20,20,19,19,19,19,19,19,18,18,18,17,17,17,17,17,16,16,16,16,16,16,16,16,16,16,15],
+            RB: [57,56,52,51,50,30,21,21,20,20,20,20,20,20,20,20,20,20,19,18,18,18,18,18,18,16,15],
+            TE: [43,29,20,19,19,18,17,16,16,15,15,15],
+        };
+        const JL_FALLBACK_VALUE = 5;   // players ranked beyond the curve
+        const JL_FLOOR_VALUE    = 1;   // minimum per player
+
+        function applyJusticeLeagueValues() {
+            const names = Object.keys(importedPlayerDetails);
+            if (!names.length) {
+                showToast("Import players first, then apply Justice League Values.", "error");
+                return;
+            }
+
+            // Group players by primary position
+            const byPos = { QB: [], RB: [], WR: [], TE: [] };
+            const other = [];
+            names.forEach(name => {
+                const info = importedPlayerDetails[name] || {};
+                const pos = (info.pos || '').replace(/[^A-Z]/g, '').match(/QB|WR|RB|TE/)?.[0];
+                if (pos && byPos[pos]) {
+                    byPos[pos].push({ name, value: Number(importedPlayerMap[name]) || 0 });
+                } else {
+                    other.push(name);
+                }
+            });
+
+            // Sort each group by imported standard value (descending → rank 0 = best)
+            Object.keys(byPos).forEach(pos => {
+                byPos[pos].sort((a, b) => b.value - a.value);
+            });
+
+            // Assign Justice League values from the curve
+            const applyPos = (pos) => {
+                const curve = JL_CURVES[pos] || [];
+                byPos[pos].forEach(({ name }, rank) => {
+                    const jlVal = rank < curve.length ? curve[rank] : JL_FALLBACK_VALUE;
+                    const finalVal = Math.max(JL_FLOOR_VALUE, jlVal);
+                    importedPlayerMap[name] = finalVal;
+                    importedPlayerBaseMap[name] = finalVal;
+                    importedPlayerDetails[name] = {
+                        ...(importedPlayerDetails[name] || {}),
+                        value: finalVal,
+                        baseValue: finalVal,
+                    };
+                });
+            };
+
+            ['QB','RB','WR','TE'].forEach(applyPos);
+
+            // Non-standard positions (K, DEF, IDP…) keep their imported value
+            other.forEach(name => {
+                const v = Math.max(JL_FLOOR_VALUE, Number(importedPlayerMap[name]) || JL_FLOOR_VALUE);
+                importedPlayerMap[name] = v;
+                importedPlayerBaseMap[name] = v;
+                if (importedPlayerDetails[name]) {
+                    importedPlayerDetails[name].value = v;
+                    importedPlayerDetails[name].baseValue = v;
+                }
+            });
+
+            saveState();
+            renderImportedBoard();
+            renderWishlist();
+            render();
+            updateValueControls();
+            showToast("Justice League values applied — 2QB PPR tier curves active.", "success");
+        }
+        // ────────────────────────────────────────────────────────────────────
 
         function getEligibleSlotPosCodes(slotOrName) {
             const explicitCode = typeof slotOrName === 'object' && slotOrName ? slotOrName.posCode : '';
@@ -2751,6 +2832,7 @@
 
             document.getElementById('btn-redistribute-values')?.addEventListener('click', redistributeImportedValues);
             document.getElementById('btn-reset-values')?.addEventListener('click', restoreImportedValues);
+            document.getElementById('btn-jl-values')?.addEventListener('click', applyJusticeLeagueValues);
 
             document.getElementById('btn-copy-recap')?.addEventListener('click', () => {
                 let filledSlots = slots.filter(s => s.cost !== null && s.player);
@@ -3155,10 +3237,44 @@
                 tip.classList.remove('tip-visible');
             }
 
-            // Desktop only: hover tooltips. Disabled entirely on touch devices
-            // to avoid blocking scroll or flashing overlays on tap.
             const _interactiveTags = new Set(['INPUT','TEXTAREA','SELECT']);
-            if (!('ontouchstart' in window)) {
+
+            if ('ontouchstart' in window) {
+                // Mobile: long-press (600 ms) shows tooltip, auto-hides after 2.5 s.
+                // Uses passive listeners so scrolling is never blocked.
+                let _lpTimer   = null;
+                let _lpHideTimer = null;
+
+                document.addEventListener('touchstart', function (e) {
+                    clearTimeout(_lpTimer);
+                    clearTimeout(_lpHideTimer);
+                    const btn = e.target.closest('[data-tip]');
+                    if (!btn || _interactiveTags.has(e.target.tagName)) return;
+                    _lpTimer = setTimeout(function () {
+                        show(btn);
+                        _lpHideTimer = setTimeout(hide, 2500);
+                    }, 600);
+                }, { passive: true });
+
+                document.addEventListener('touchmove', function () {
+                    clearTimeout(_lpTimer);
+                    _lpTimer = null;
+                }, { passive: true });
+
+                document.addEventListener('touchend', function () {
+                    clearTimeout(_lpTimer);
+                    _lpTimer = null;
+                }, { passive: true });
+
+                document.addEventListener('touchcancel', function () {
+                    clearTimeout(_lpTimer);
+                    clearTimeout(_lpHideTimer);
+                    _lpTimer = null;
+                    hide();
+                }, { passive: true });
+
+            } else {
+                // Desktop: hover tooltips.
                 document.addEventListener('mouseover', function (e) {
                     const btn = e.target.closest('[data-tip]');
                     if (!btn) return;
