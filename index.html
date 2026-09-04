@@ -532,7 +532,7 @@
                             <button id="btn-redistribute-values" class="text-xs bg-indigo-700 hover:bg-indigo-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition" data-tip="Rescales imported player values to fit your roster — boosts scarce positions (RB/TE) and spreads deep ones (QB) so your slot plans reflect real auction market pressure.">
                                 ⚖️ Scale Values to Roster
                             </button>
-                            <button id="btn-jl-values" class="text-xs bg-gradient-to-r from-yellow-700 to-amber-700 hover:from-yellow-600 hover:to-amber-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition" data-tip="Recalculates player values for the Justice League's 2QB PPR format — ranks each position by imported value and applies the league's tier curve, giving QBs their full 2QB premium and WRs their PPR edge.">
+                            <button id="btn-jl-values" class="text-xs bg-gradient-to-r from-yellow-700 to-amber-700 hover:from-yellow-600 hover:to-amber-600 text-white font-bold px-2.5 py-1.5 rounded-lg transition" data-tip="Adjusts imported values to the Justice League's $200-budget 2QB PPR economics while preserving the order of your imported player list.">
                                 🏈 Justice League Values
                             </button>
                             <button id="btn-suggest-plans" class="text-xs bg-emerald-800 hover:bg-emerald-700 text-emerald-200 font-bold px-2.5 py-1.5 rounded-lg transition" data-tip="Calculates smart dollar targets for each empty slot based on your imported player values and remaining budget.">
@@ -1025,6 +1025,7 @@
             // ── Build per-position sorted value lists from imports ──────────
             const posVals = {};
             Object.keys(importedPlayerDetails).forEach(name => {
+                if (isPlayerDrafted(name)) return;
                 const d = importedPlayerDetails[name];
                 const p = d.pos || 'UTIL';
                 if (!posVals[p]) posVals[p] = [];
@@ -1102,6 +1103,19 @@
             }
 
             return suggestions;
+        }
+
+        function applySuggestedPlans() {
+            const suggestions = suggestPlanAmounts();
+            let changed = 0;
+            slots.forEach((slot, idx) => {
+                if (slot.cost !== null || suggestions[idx] === undefined) return;
+                if (slot.planUSD !== suggestions[idx]) {
+                    slot.planUSD = suggestions[idx];
+                    changed++;
+                }
+            });
+            return changed;
         }
         // ───────────────────────────────────────────────────────────────────
 
@@ -1443,8 +1457,10 @@
             RB: [57,56,52,51,50,30,21,21,20,20,20,20,20,20,20,20,20,20,19,18,18,18,18,18,18,16,15],
             TE: [43,29,20,19,19,18,17,16,16,15,15,15],
         };
-        const JL_FALLBACK_VALUE = 5;   // players ranked beyond the curve
+        const JL_REFERENCE_BUDGET = 200;
+        const JL_FALLBACK_VALUE = 5;   // players ranked beyond the curve, at $200
         const JL_FLOOR_VALUE    = 1;   // minimum per player
+        const JL_POSITION_ANCHORS = { QB: 60, RB: 57, WR: 63, TE: 43 };
 
         function applyJusticeLeagueValues() {
             const names = Object.keys(importedPlayerDetails);
@@ -1460,7 +1476,10 @@
                 const info = importedPlayerDetails[name] || {};
                 const pos = (info.pos || '').replace(/[^A-Z]/g, '').match(/QB|WR|RB|TE/)?.[0];
                 if (pos && byPos[pos]) {
-                    byPos[pos].push({ name, value: Number(importedPlayerMap[name]) || 0 });
+                    byPos[pos].push({
+                        name,
+                        value: Number(importedPlayerBaseMap[name]) || Number(importedPlayerMap[name]) || 0
+                    });
                 } else {
                     other.push(name);
                 }
@@ -1471,18 +1490,22 @@
                 byPos[pos].sort((a, b) => b.value - a.value);
             });
 
+            // The reference sheet is calibrated to a $200/team budget. Scale
+            // the entire curve so the same league values work at $100, $150,
+            // $250, etc. without changing the relative tiers.
+            const budgetScale = Math.max(0.01, Number(totalBudget) || JL_REFERENCE_BUDGET) / JL_REFERENCE_BUDGET;
+
             // Assign Justice League values from the curve
             const applyPos = (pos) => {
                 const curve = JL_CURVES[pos] || [];
                 byPos[pos].forEach(({ name }, rank) => {
-                    const jlVal = rank < curve.length ? curve[rank] : JL_FALLBACK_VALUE;
-                    const finalVal = Math.max(JL_FLOOR_VALUE, jlVal);
+                    const referenceVal = rank < curve.length ? curve[rank] : JL_FALLBACK_VALUE;
+                    const finalVal = Math.max(JL_FLOOR_VALUE, Math.round(referenceVal * budgetScale));
                     importedPlayerMap[name] = finalVal;
-                    importedPlayerBaseMap[name] = finalVal;
                     importedPlayerDetails[name] = {
                         ...(importedPlayerDetails[name] || {}),
                         value: finalVal,
-                        baseValue: finalVal,
+                        baseValue: Number(importedPlayerBaseMap[name]) || 0,
                     };
                 });
             };
@@ -1493,10 +1516,9 @@
             other.forEach(name => {
                 const v = Math.max(JL_FLOOR_VALUE, Number(importedPlayerMap[name]) || JL_FLOOR_VALUE);
                 importedPlayerMap[name] = v;
-                importedPlayerBaseMap[name] = v;
                 if (importedPlayerDetails[name]) {
                     importedPlayerDetails[name].value = v;
-                    importedPlayerDetails[name].baseValue = v;
+                    importedPlayerDetails[name].baseValue = Number(importedPlayerBaseMap[name]) || 0;
                 }
             });
 
@@ -1505,7 +1527,74 @@
             renderWishlist();
             render();
             updateValueControls();
-            showToast("Justice League values applied — 2QB PPR tier curves active.", "success");
+            showToast(`Justice League values applied for a $${totalBudget} budget.`, "success");
+        }
+
+        // Order-preserving Justice League conversion. Imported order is the
+        // source of truth; values are adjusted without allowing a later player
+        // to jump ahead of an earlier player.
+        function applyJusticeLeagueValuesOrdered() {
+            const names = Object.keys(importedPlayerDetails);
+            if (!names.length) {
+                showToast("Import players first, then apply Justice League Values.", "error");
+                return;
+            }
+
+            const orderedNames = names
+                .map((name, importIndex) => ({
+                    name,
+                    importIndex,
+                    rank: Number(importedPlayerDetails[name]?.rank)
+                }))
+                .sort((a, b) => {
+                    const aHasRank = Number.isFinite(a.rank);
+                    const bHasRank = Number.isFinite(b.rank);
+                    if (aHasRank && bHasRank && a.rank !== b.rank) return a.rank - b.rank;
+                    if (aHasRank !== bHasRank) return aHasRank ? -1 : 1;
+                    return a.importIndex - b.importIndex;
+                })
+                .map(({ name }) => name);
+
+            const sourceValues = {};
+            const sourceMaxByPos = {};
+            orderedNames.forEach(name => {
+                const info = importedPlayerDetails[name] || {};
+                const pos = info.pos || 'UTIL';
+                const value = Number(importedPlayerBaseMap[name]) || Number(importedPlayerMap[name]) || 0;
+                sourceValues[name] = { pos, value };
+                if (JL_POSITION_ANCHORS[pos]) {
+                    sourceMaxByPos[pos] = Math.max(sourceMaxByPos[pos] || 0, value);
+                }
+            });
+
+            const budgetScale = Math.max(0.01, Number(totalBudget) || JL_REFERENCE_BUDGET) / JL_REFERENCE_BUDGET;
+            let previousValue = Infinity;
+
+            orderedNames.forEach(name => {
+                const { pos, value } = sourceValues[name];
+                const anchor = JL_POSITION_ANCHORS[pos];
+                const sourceMax = sourceMaxByPos[pos];
+                const positionScale = anchor && sourceMax > 0 ? anchor / sourceMax : 1;
+                const candidate = Math.round(value * positionScale * budgetScale);
+                const finalVal = Math.max(
+                    JL_FLOOR_VALUE,
+                    Math.min(previousValue, candidate || JL_FLOOR_VALUE)
+                );
+                previousValue = finalVal;
+                importedPlayerMap[name] = finalVal;
+                importedPlayerDetails[name] = {
+                    ...(importedPlayerDetails[name] || {}),
+                    value: finalVal,
+                    baseValue: Number(importedPlayerBaseMap[name]) || 0
+                };
+            });
+
+            saveState();
+            renderImportedBoard();
+            renderWishlist();
+            render();
+            updateValueControls();
+            showToast(`Justice League values applied for a $${totalBudget} budget while preserving imported order.`, "success");
         }
         // ────────────────────────────────────────────────────────────────────
 
@@ -2614,6 +2703,7 @@
             setupWorkspaceTabs();
             refreshSearchSuggestions();
             renderWishlist();
+            let budgetInput = document.getElementById('input-total-budget');
 
             // Splash Modal Controls
             const splashModal = document.getElementById('welcome-splash');
@@ -2630,6 +2720,7 @@
                     if (!isNaN(val) && val > 0) {
                         totalBudget = val;
                         if (budgetInput) budgetInput.value = val;
+                        saveState();
                         render();
                     }
                 });
@@ -2663,13 +2754,14 @@
                 renderMarketFeed();
             });
 
-            let budgetInput = document.getElementById('input-total-budget');
             if (budgetInput) {
                 budgetInput.value = totalBudget;
                 budgetInput.addEventListener('change', (e) => {
                     let val = parseInt(e.target.value);
                     if (!isNaN(val) && val > 0) {
                         totalBudget = val;
+                        if (splashBudgetInput) splashBudgetInput.value = val;
+                        saveState();
                         render();
                     }
                 });
@@ -2697,6 +2789,20 @@
                     showToast("Please paste your list text first.", "error");
                     return;
                 }
+
+                // Capture the splash value even when the user clicks Import
+                // before the browser fires the input's change event.
+                const pendingBudget = parseInt(splashBudgetInput?.value);
+                if (!isNaN(pendingBudget) && pendingBudget > 0) {
+                    totalBudget = pendingBudget;
+                    if (budgetInput) budgetInput.value = pendingBudget;
+                }
+                const pendingLeagueSize = parseInt(splashLeagueInput?.value);
+                if (!isNaN(pendingLeagueSize) && pendingLeagueSize >= 2 && pendingLeagueSize <= 32) {
+                    leagueSize = pendingLeagueSize;
+                    if (leagueSizeInput) leagueSizeInput.value = pendingLeagueSize;
+                }
+                saveState();
 
                 let count = 0;
                 let newWishlist = [];
@@ -2832,7 +2938,7 @@
 
             document.getElementById('btn-redistribute-values')?.addEventListener('click', redistributeImportedValues);
             document.getElementById('btn-reset-values')?.addEventListener('click', restoreImportedValues);
-            document.getElementById('btn-jl-values')?.addEventListener('click', applyJusticeLeagueValues);
+            document.getElementById('btn-jl-values')?.addEventListener('click', applyJusticeLeagueValuesOrdered);
 
             document.getElementById('btn-copy-recap')?.addEventListener('click', () => {
                 let filledSlots = slots.filter(s => s.cost !== null && s.player);
@@ -2881,14 +2987,20 @@
                     let rawPrice = parseFloat(priceInput.value);
 
                     if (slotIdx !== "" && player && !isNaN(rawPrice)) {
-                        pickHistory.push({ slotIdx: parseInt(slotIdx), prev: JSON.parse(JSON.stringify(slots[parseInt(slotIdx)])) });
+                        pickHistory.push({
+                            slotIdx: parseInt(slotIdx),
+                            prev: JSON.parse(JSON.stringify(slots[parseInt(slotIdx)])),
+                            prevPlans: slots.map(s => s.planUSD)
+                        });
                         if (pickHistory.length > 20) pickHistory.shift();
 
                         let finalCostUSD = displayMode === 'percent' ? Math.round((rawPrice / 100) * totalBudget) : Math.round(rawPrice);
                         slots[slotIdx].player = player;
                         slots[slotIdx].cost = finalCostUSD;
+                        const _autoPlanChanges = applySuggestedPlans();
                         playerInput.value = '';
                         priceInput.value = '';
+                        saveState();
                         refreshSearchSuggestions();
                         // Find next empty slot to auto-advance the selector
                         const _curIdx = parseInt(slotIdx);
@@ -2901,6 +3013,9 @@
                             const _sel = document.getElementById('input-slot');
                             if (_sel) _sel.value = _advanceTo;
                         }
+                        if (_autoPlanChanges > 0) {
+                            showToast(`Plans auto-adjusted for the remaining ${slots.filter(s => s.cost === null).length} slots.`, 'info');
+                        }
                     }
                 });
             }
@@ -2909,6 +3024,11 @@
                 if (pickHistory.length === 0) { showToast("Nothing to undo.", "info"); return; }
                 let last = pickHistory.pop();
                 slots[last.slotIdx] = last.prev;
+                if (last.prevPlans) {
+                    slots.forEach((slot, idx) => {
+                        if (last.prevPlans[idx] !== undefined) slot.planUSD = last.prevPlans[idx];
+                    });
+                }
                 saveState();
                 refreshSearchSuggestions();
                 render();
@@ -3138,12 +3258,7 @@
                 if (e.target === document.getElementById('suggest-modal')) document.getElementById('suggest-modal').classList.add('hidden');
             });
             document.getElementById('btn-autofill-plans')?.addEventListener('click', () => {
-                const sug = suggestPlanAmounts();
-                let changed = 0;
-                slots.forEach((slot, idx) => {
-                    if (slot.cost !== null) return;
-                    if (sug[idx] !== undefined) { slot.planUSD = sug[idx]; changed++; }
-                });
+                const changed = applySuggestedPlans();
                 if (changed > 0) { render(); showToast(`Applied suggestions to ${changed} slots.`, 'success'); }
                 document.getElementById('suggest-modal').classList.add('hidden');
             });
